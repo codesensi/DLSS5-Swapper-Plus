@@ -5,3 +5,8 @@ nodeLinker: hoisted
 allowBuilds:
   electron: true
   electron-winstaller: true
+
+# 强制 extract-zip（被 electron install.js 等依赖）使用已修复 Node 24.16+/26
+# 经典流 backpressure 停摆问题的 yauzl（nodejs/node#63487，extract-zip 本体已停更）
+overrides:
+  yauzl: ^3.3.1
