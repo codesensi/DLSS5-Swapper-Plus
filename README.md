@@ -30,13 +30,13 @@
 >
 > ### 从源码打包
 >
-> **环境要求**：Windows 10/11、Node.js ≥ 18（建议 20+）、npm；构建过程需要访问
+> **环境要求**：Windows 10/11、Node.js ≥ 18（建议 20+）、pnpm；构建过程需要访问
 > GitHub（下载 pinned 组件）与 reshade.me。
 >
 > **1. 安装依赖**
 >
 > ```cmd
-> npm install
+> pnpm install
 > ```
 >
 > **2. 准备素材**（`scripts/collect-payload.js` 会校验，缺了会拒绝继续）
@@ -51,25 +51,25 @@
 > **3. 构建 overlay 工具链**（首次需要；下载 zig 0.14.1 与 ReShade 6.8.0 SDK 到 `tools\`）
 >
 > ```cmd
-> npm run overlay:prepare
-> npm run overlay:build
+> pnpm run overlay:prepare
+> pnpm run overlay:build
 > ```
 >
 > **4. 收集 payload**（下载 DLSS5-Feeder 1.17.0 等 pinned 组件到 `vendor\component-cache`，
-> 全部经 SHA-256 校验；`npm run build` 的 prebuild 钩子会自动执行，可跳过）
+> 全部经 SHA-256 校验；`pnpm run build` 的 prebuild 钩子会自动执行，可跳过）
 >
 > ```cmd
-> npm run payload
+> pnpm run payload
 > ```
 >
 > **5. 打包**（electron-builder，NSIS 安装版 + 便携版一起产出）
 >
 > ```cmd
-> npm run build
+> pnpm run build
 > ```
 >
 > 产物在 `dist\`：`DLSS5-Swapper-Setup-<版本>.exe` 与
-> `DLSS5-Swapper-<版本>-portable.exe`。只想要便携版用 `npm run build:portable`。
+> `DLSS5-Swapper-<版本>-portable.exe`。只想要便携版用 `pnpm run build:portable`。
 >
 > **常见问题**
 >
@@ -77,14 +77,14 @@
 >   系统 `%TEMP%` 对构建进程不可写（如杀软按进程拦截）。把临时目录重定向到项目内：
 >
 >   ```cmd
->   mkdir tools\tmp 2>nul & set TEMP=%CD%\tools\tmp& set TMP=%CD%\tools\tmp& npm run build
+>   mkdir tools\tmp 2>nul & set TEMP=%CD%\tools\tmp& set TMP=%CD%\tools\tmp& pnpm run build
 >   ```
 >
 > - **下载 pinned 组件超时**：Node 的 fetch 不读系统代理，需要显式指定
 >   （端口按实际代理调整）：
 >
 >   ```cmd
->   set NODE_USE_ENV_PROXY=1& set HTTPS_PROXY=http://127.0.0.1:7897& npm run payload
+>   set NODE_USE_ENV_PROXY=1& set HTTPS_PROXY=http://127.0.0.1:7897& pnpm run payload
 >   ```
 >
 > - **原生依赖重建失败**：可加 `--config.npmRebuild=false` 跳过（本项目运行时

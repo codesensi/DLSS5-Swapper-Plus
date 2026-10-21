@@ -1,0 +1,7 @@
+# electron-builder 打包时使用 npm 风格的扁平 node_modules，避免符号链接结构问题
+nodeLinker: hoisted
+
+# 依赖构建脚本审批（pnpm strictDepBuilds 默认拦截 postinstall）
+allowBuilds:
+  electron: true
+  electron-winstaller: true

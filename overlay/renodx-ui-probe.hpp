@@ -15,7 +15,7 @@ namespace nr_probe {
 //
 // This is what went stale when the shipped consumer moved from 4.70 to 6.5.3:
 // the panel said "unsupported build" and every NR control went dark. The build
-// the app ships must appear here, and npm run payload refuses to build if it
+// the app ships must appear here, and pnpm run payload refuses to build if it
 // does not.
 //
 // 6.5.3 registers its page as "DLSS 5 Neural Rendering" where 4.70 called it

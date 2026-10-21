@@ -1,7 +1,7 @@
 'use strict';
 // Gathers everything the published build ships with into payload/, which
 // electron-builder then copies next to the executable as resources/payload.
-// Run it before a build: npm run payload
+// Run it before a build: pnpm run payload
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
@@ -26,7 +26,7 @@ const COMPONENTS = {
 };
 
 // Where the DLSS 5 files and the ReShade installer normally live on this
-// machine. Override either with an argument: npm run payload -- <dlss5Dir>
+// machine. Override either with an argument: pnpm run payload -- <dlss5Dir>
 const DEFAULT_SOURCES = [
   process.argv[2],
   path.resolve(ROOT, '..'),
@@ -161,7 +161,7 @@ function assertOverlayPinMatches() {
     'overlay/feeder-controls.hpp is pinned to a different Feeder than the one being shipped.',
     `  shipping  ${feederRelease.version}  ${feederRelease.addon64Size} bytes  ${wanted}`,
     `  overlay   ${size} bytes  ${pinned}`,
-    '  Update the hash and size in that header, then run npm run overlay:build.'
+    '  Update the hash and size in that header, then run pnpm run overlay:build.'
   ].join('\n'));
 }
 
@@ -184,7 +184,7 @@ function assertOverlayKnowsConsumer() {
     'so the F8 panel would show no neural controls at all.',
     `  shipping  ${renodx.CONSUMER.version}  ${wanted}`,
     `  overlay   ${pinned.join('\n            ') || '(none)'}`,
-    '  Add the build to known_builds with its own offsets, then run npm run overlay:build.'
+    '  Add the build to known_builds with its own offsets, then run pnpm run overlay:build.'
   ].join('\n'));
 }
 
@@ -242,7 +242,7 @@ async function main() {
 const source = findSource();
 if (!source) {
   console.error('لم يتم العثور على ملفات DLSS 5 / DLSS 5 files not found.');
-  console.error('Pass the folder explicitly:  npm run payload -- "C:\\path\\to\\dlss 5 swapper"');
+  console.error('Pass the folder explicitly:  pnpm run payload -- "C:\\path\\to\\dlss 5 swapper"');
   process.exit(1);
 }
 

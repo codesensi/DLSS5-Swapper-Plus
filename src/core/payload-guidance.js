@@ -25,7 +25,7 @@ function missingPayload({ packaged, resourcesPath, appRoot, portable = false, te
   if (!packaged) {
     return {
       code: 'errPayloadMissing',
-      message: `The payload is missing or incomplete at ${directory}. Run "npm run payload" from the project directory.`
+      message: `The payload is missing or incomplete at ${directory}. Run "pnpm run payload" from the project directory.`
     };
   }
   const unpack = temp ? path.join(temp, PORTABLE_DIR) : '%TEMP%' + path.sep + PORTABLE_DIR;

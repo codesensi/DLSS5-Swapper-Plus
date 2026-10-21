@@ -10,7 +10,7 @@
     "test:payload": "node scripts/test-feeder-payload.js",
     "test:optiscaler": "node scripts/test-optiscaler-payload.js",
     "payload": "node scripts/collect-payload.js",
-    "prebuild": "npm run payload",
+    "prebuild": "pnpm run payload",
     "build": "electron-builder --win",
     "build:linux": "electron-builder --linux AppImage deb",
     "icon": "electron scripts/make-icon.js",
@@ -99,8 +99,5 @@
       "include": "build/installer.nsh"
     }
   },
-  "allowScripts": {
-    "electron@33.4.11": true,
-    "electron-winstaller@5.4.0": true
-  }
+  "packageManager": "pnpm@12.14.0"
 }

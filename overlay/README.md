@@ -110,11 +110,11 @@ performed by the adapter. Use only in an offline test game; **keep backups**.
 From the `app` folder, using its own Electron installation:
 
 ```powershell
-npm start                 # Overlay section; no automatic library scan
-npm run overlay:prepare   # Official pinned SDK + checksum-verified portable Zig
-npm run overlay:build     # dist/overlay/dlss5-lab-overlay.addon64
-npm test
-npm run test:ui
+pnpm start                 # Overlay section; no automatic library scan
+pnpm run overlay:prepare   # Official pinned SDK + checksum-verified portable Zig
+pnpm run overlay:build     # dist/overlay/dlss5-lab-overlay.addon64
+pnpm test
+pnpm run test:ui
 ```
 
 Use a **closed offline test game** with **ReShade add-on support** installed.

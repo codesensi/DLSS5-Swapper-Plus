@@ -10,7 +10,7 @@ $overlayProfile = 'dlss5-swapper'
 $toolRoots = @($appRoot, (Join-Path $appRoot '../lab'))
 $zig = $toolRoots | ForEach-Object { Join-Path $_ 'tools/zig-x86_64-windows-0.14.1/zig.exe' } | Where-Object { Test-Path -LiteralPath $_ } | Select-Object -First 1
 $sdk = $toolRoots | ForEach-Object { Join-Path $_ 'tools/reshade-6.8.0' } | Where-Object { Test-Path -LiteralPath (Join-Path $_ 'reshade.hpp') } | Select-Object -First 1
-if (!$zig -or !$sdk) { throw 'Run npm run overlay:prepare first.' }
+if (!$zig -or !$sdk) { throw 'Run pnpm run overlay:prepare first.' }
 $profileDefine = '-DLAB_OVERLAY_PROFILE=' + $overlayProfile
 $output = Join-Path $appRoot $(if ($RenoDxProbe) { 'dist/renodx-probe' } elseif ($Smoke) { 'dist/overlay-smoke' } else { 'dist/overlay' })
 New-Item -ItemType Directory -Force -Path $output | Out-Null

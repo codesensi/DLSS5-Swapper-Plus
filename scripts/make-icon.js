@@ -11,7 +11,7 @@
 // The .ico is assembled here rather than left to the packager, so every size
 // Windows asks for is a separate high-quality downscale of the full-bleed art.
 //
-// Run with:  npm run icon
+// Run with:  pnpm run icon
 const { app, nativeImage } = require('electron');
 const fs = require('fs');
 const path = require('path');

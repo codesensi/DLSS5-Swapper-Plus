@@ -78,7 +78,7 @@ struct controls {
         if(module!=checked){
             checked=module;
             // DLSS5-Feeder 1.17.0. Held in step with
-            // src/core/feeder-release.js by a check in npm run payload: this pin
+            // src/core/feeder-release.js by a check in pnpm run payload: this pin
             // went stale across an earlier upgrade and silently killed every
             // Feeder slider in the panel.
             const unsigned char hash[]={0x68,0x54,0xd0,0x12,0xea,0xc3,0x07,0x02,0x1c,0xd3,0x1c,0x97,0x8b,0xaf,0xd4,0x2f,0x1e,0x22,0xc5,0xb7,0xb2,0x92,0x2c,0x80,0xe0,0xa0,0x01,0x0d,0x42,0x8a,0x3f,0xd7};

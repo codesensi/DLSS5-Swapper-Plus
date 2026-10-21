@@ -149,7 +149,9 @@ test('a package that is not a junction is still listed, named from its package',
 
   const games = library.xbox({ drives: [] });
   assert.equal(games.length, 1, 'only the package still on disk');
-  assert.equal(games[0].dir, path.join(windowsApps, pkg));
+  // realpath can surface the NTFS 8.3 short form of the temp path on some
+  // machines; compare canonical forms so the assertion stays about the folder.
+  assert.equal(fs.realpathSync.native(games[0].dir), fs.realpathSync.native(path.join(windowsApps, pkg)));
   assert.equal(games[0].name, 'Dave The Diver', 'the package name read as words');
 });
 

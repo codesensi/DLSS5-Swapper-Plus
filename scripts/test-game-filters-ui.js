@@ -1,6 +1,6 @@
 'use strict';
 
-// Run with npm run test:ui. The hidden window uses synthetic metadata and an
+// Run with pnpm run test:ui. The hidden window uses synthetic metadata and an
 // isolated profile; no real library, game files or network calls are involved.
 const { app, BrowserWindow, Menu } = require('electron');
 const assert = require('node:assert/strict');
