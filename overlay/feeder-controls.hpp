@@ -77,17 +77,17 @@ struct controls {
         if(!module){checked=nullptr;valid=false;reason="Feeder is not loaded";return;}
         if(module!=checked){
             checked=module;
-            // DLSS5-Feeder 1.17.0. Held in step with
+            // DLSS5-Feeder 1.19.0. Held in step with
             // src/core/feeder-release.js by a check in pnpm run payload: this pin
             // went stale across an earlier upgrade and silently killed every
             // Feeder slider in the panel.
-            const unsigned char hash[]={0x68,0x54,0xd0,0x12,0xea,0xc3,0x07,0x02,0x1c,0xd3,0x1c,0x97,0x8b,0xaf,0xd4,0x2f,0x1e,0x22,0xc5,0xb7,0xb2,0x92,0x2c,0x80,0xe0,0xa0,0x01,0x0d,0x42,0x8a,0x3f,0xd7};
-            valid=nr_probe::hash_matches(module,329728,hash);
+            const unsigned char hash[]={0x2b,0x8c,0x90,0x50,0x12,0xfd,0x46,0x4d,0xdf,0x05,0x54,0xc6,0xb1,0x78,0xcb,0xa5,0x50,0x30,0xec,0x10,0xeb,0x91,0x7a,0xcd,0xce,0xe0,0xe7,0xa2,0x37,0x6f,0xe4,0xdd};
+            valid=nr_probe::hash_matches(module,343552,hash);
             wchar_t file[32768]={};DWORD n=GetModuleFileNameW(module,file,32768);
             valid=valid&&n>0&&n<32768;path=file;
             if(valid)path=path.substr(0,path.find_last_of(L"\\/")+1)+L"dlss5-feed.cfg";
         }
-        if(!valid){reason="Unsupported Feeder binary (this build drives x64 v1.17.0)";return;}
+        if(!valid){reason="Unsupported Feeder binary (this build drives x64 v1.19.0)";return;}
         std::string text;if(!read(path,text)){reason="Feeder config unavailable; let Feeder initialize";return;}
         for(auto &f:fields){size_t a,b;float v;if(locate(text,f.key,a,b,v)&&v>=f.min&&v<=f.max&&(f.step!=1||std::floor(v)==v)){f.value=v;f.available=true;}}
         // The bridge, like the work-resolution controls, is D3D11 only.
@@ -131,7 +131,7 @@ struct controls {
     }
     std::string json()const {
         std::ostringstream out;out.imbue(std::locale::classic());out<<",\"feedPresent\":"<<(present?"true":"false")<<",\"feedReason\":"<<lab_live::quoted(reason)<<",\"feedTools\":[";
-        for(size_t i=0;i<fields.size();++i){auto &f=fields[i];if(i)out<<',';out<<"{\"id\":"<<301+i<<",\"kind\":"<<f.kind<<",\"effect\":\"Feeder 1.17.0\",\"name\":"<<lab_live::quoted(f.name)<<",\"min\":"<<f.min<<",\"max\":"<<f.max<<",\"step\":"<<f.step<<",\"value\":"<<f.value<<",\"available\":"<<(present&&f.available?"true":"false")<<'}';}return out.str()+"]";
+        for(size_t i=0;i<fields.size();++i){auto &f=fields[i];if(i)out<<',';out<<"{\"id\":"<<301+i<<",\"kind\":"<<f.kind<<",\"effect\":\"Feeder 1.19.0\",\"name\":"<<lab_live::quoted(f.name)<<",\"min\":"<<f.min<<",\"max\":"<<f.max<<",\"step\":"<<f.step<<",\"value\":"<<f.value<<",\"available\":"<<(present&&f.available?"true":"false")<<'}';}return out.str()+"]";
     }
 };
 }

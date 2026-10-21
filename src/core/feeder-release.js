@@ -1,21 +1,22 @@
 'use strict';
 
 // One verified release for the shader, both client architectures and helper.
-// Never mix host protocol versions: 1.17.0 speaks IPC v11, and a 1.16.x or
-// 1.17.0-beta.1 half refuses to talk to it. Both halves ship from this pin, so
+// Never mix host protocol versions: 1.19.0 speaks IPC v11, and a 1.16.x or
+// 1.18-beta half refuses to talk to it. Both halves ship from this pin, so
 // a payload built from here is always a matched pair. Digest supplied by
 // GitHub's release API.
 module.exports = {
-  version: '1.17.0',
-  archive: ['DLSS5-Feeder-1.17.0.zip', 'https://github.com/jlrouzies-fr/DLSS5-Feeder/releases/download/v1.17.0/DLSS5-Feeder-1.17.0.zip', '11a96b36ae89ef75b3cff0e03849db35591143fe4df171986502905809469e12'],
+  version: '1.19.0',
+  archive: ['DLSS5-Feeder-1.19.0.zip', 'https://github.com/jlrouzies-fr/DLSS5-Feeder/releases/download/v1.19.0/DLSS5-Feeder-1.19.0.zip', '9cc19e28f8fb4e216ea61621fdf6443e207e338ec639979ab335503c75f48f36'],
   // The overlay pins dlss5-feed.addon64 by size and digest before it will
   // drive Feeder's sliders, so the number lives here too and a build-time
   // check holds the two in step. #225 was this pin going stale unnoticed.
-  addon64Size: 329728,
+  addon64Size: 343552,
   hashes: {
-    'dlss5-feed.addon32': 'bfe24218be719cf5b91d829283953432907922333280931b755d83ac793fd8b2',
-    'dlss5-feed.addon64': '6854d012eac307021cd31c978bafd42f1e22c5b7b2922c80e0a0010d428a3fd7',
-    'dlss5-feed-host64.exe': 'c835754277a0590780d846443f314a83a30e2d2815ee0b2f7c18f1a24f252936',
+    'dlss5-feed-helper.addon64': 'c069aa9d8b01fcee34234bc458a798c3be6f27fc8b9f23b74b5fb1784a828886',
+    'dlss5-feed.addon32': '34c767bd53a99f51a6cb5d87b267734e04314d16bf495a6c69ab98acd62d0874',
+    'dlss5-feed.addon64': '2b8c905012fd464ddf0554c6b178cba55030ec10eb917acdcee0e7a2376fe4dd',
+    'dlss5-feed-host64.exe': '79e427430c5c0102f6c7a557155b706ad51b0c40933f6e245fce922bf5b1401e',
     'reshade-shaders/Shaders/DLSS5_Feed.fx': 'c4ba1610df8e1593faa7c203d6d0517058d3a8ecf2dfda18ca67849844391456',
     // Feeder's own loader layer. A Vulkan game whose driver does not expose
     // the KHR external-interop extensions needs it for one launch.
