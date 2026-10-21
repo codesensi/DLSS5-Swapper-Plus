@@ -9,7 +9,7 @@ const { missingPayload } = require('../src/core/payload-guidance');
 test('from source it still says the thing a developer needs', () => {
   const { code, message } = missingPayload({ packaged: false, appRoot: 'C:\\src\\app', resourcesPath: 'ignored' });
   assert.equal(code, 'errPayloadMissing');
-  assert.match(message, /npm run payload/);
+  assert.match(message, /pnpm run payload/);
   assert.ok(message.includes('C:\\src\\app\\payload'), message);
 });
 

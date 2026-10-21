@@ -119,8 +119,8 @@ test('the overlay says which reason applies instead of blaming the route (#338)'
   assert.doesNotMatch(main, /the panel does not attach on/);
   assert.match(main, /const why = target\.bitness !== 64 \? 'bits' : route === 'renodx' \? 'multipass' : route === 'optiscaler' \? 'optiscaler' : 'api';/);
   const i18n = read('src', 'renderer', 'i18n.js');
-  assert.equal((i18n.match(/overlayNotForRoute: \(why, api\) =>/g) || []).length, 2, 'in English and Arabic');
-  assert.equal((i18n.match(/multipassNext: \(dlss\) =>/g) || []).length, 2, 'in English and Arabic');
+  assert.equal((i18n.match(/overlayNotForRoute: \(why, api\) =>/g) || []).length, 3, 'in English, Arabic and Chinese');
+  assert.equal((i18n.match(/multipassNext: \(dlss\) =>/g) || []).length, 3, 'in English, Arabic and Chinese');
   assert.match(read('src', 'renderer', 'renderer.js'), /'overlayNotForRoute', 'multipassNext'/);
 });
 
@@ -172,9 +172,9 @@ test('d3d11.dll is for DirectX 11 only (#328)', () => {
   assert.match(read('preload.js'), /setReshadeProxy: \(dir, exePath, value\) => ipcRenderer\.invoke\('set-reshade-proxy'/);
   assert.match(read('src', 'core', 'backend-manager.js'), /reshadeFileChanged\(old, config\)\);/);
   const i18n = read('src', 'renderer', 'i18n.js');
-  assert.equal((i18n.match(/reshadeProxyHint: '/g) || []).length, 2, 'in English and Arabic');
-  assert.equal((i18n.match(/reshadeProxyWrapHint: '/g) || []).length, 2, 'in English and Arabic');
-  assert.equal((i18n.match(/fReshadeFile: '/g) || []).length, 2, 'in English and Arabic');
+  assert.equal((i18n.match(/reshadeProxyHint: '/g) || []).length, 3, 'in English, Arabic and Chinese');
+  assert.equal((i18n.match(/reshadeProxyWrapHint: '/g) || []).length, 3, 'in English, Arabic and Chinese');
+  assert.equal((i18n.match(/fReshadeFile: '/g) || []).length, 3, 'in English, Arabic and Chinese');
 });
 
 test('a slow download is retried before it is called a network failure (#370, #373)', async () => {
@@ -256,7 +256,7 @@ test('a safe graphics mode for windows that flicker (#365)', () => {
   assert.match(renderer, /id="setSafeGraphics"/);
   assert.match(renderer, /\$\('setSafeGraphics'\)\.onclick = async \(\) => \{/);
   const i18n = read('src', 'renderer', 'i18n.js');
-  assert.equal((i18n.match(/setSafeGraphicsHint: '/g) || []).length, 2, 'in English and Arabic');
+  assert.equal((i18n.match(/setSafeGraphicsHint: '/g) || []).length, 3, 'in English, Arabic and Chinese');
 });
 
 test('theme 2 is a skin of its own, and cannot leak into theme 1', () => {
@@ -293,7 +293,7 @@ test('theme 2 is a skin of its own, and cannot leak into theme 1', () => {
   assert.match(renderer, /const modernSheet = state\.skin === 'two' && window\.theme2;/);
   const i18n = read('src', 'renderer', 'i18n.js');
   for (const key of ['setSkins', 'skinOne', 'skinTwo', 't2Play', 't2Setup', 't2Search']) {
-    assert.equal(i18n.split(key + ": '").length - 1, 2, `${key} in English and Arabic`);
+    assert.equal(i18n.split(key + ": '").length - 1, 3, `${key} in English, Arabic and Chinese`);
   }
 });
 
@@ -343,7 +343,7 @@ test('the add-ons are the current ones, pinned in one place each', () => {
     assert.match(feeder.hashes[rel], /^[0-9a-f]{64}$/);
   }
   // The overlay drives the add-on only when the binary in the game is the exact
-  // one shipped, so the header and the pin move together. npm run payload
+  // one shipped, so the header and the pin move together. pnpm run payload
   // refuses to build otherwise; this says it before the build does.
   const header = read('overlay', 'feeder-controls.hpp');
   const bytes = header.match(/const unsigned char hash\[\]=\{([^}]+)\}/)[1]
