@@ -47,17 +47,53 @@ $env:ELECTRON_BUILDER_BINARIES_MIRROR = 'https://npmmirror.com/mirrors/electron-
 
 以上均为**当前会话临时变量**，关闭终端即失效，不影响系统全局配置。
 
+### 开发与测试
+
+日常开发**不需要打包**：源码直接跑，改完即验。
+
+```powershell
+pnpm start                 # 启动应用（Electron 直接跑源码，改 JS/CSS 后重启即生效）
+```
+
+改悬浮层 C++（`overlay\*.cpp/.hpp`）后只需两步验证游戏内面板：
+
+```powershell
+pnpm run overlay:build     # 重编悬浮层（~30s，缓存在 vendor\toolchain\zig-cache）
+pnpm start                 # 重启应用，悬浮层页会拿到新编译的 addon64
+```
+
+**测试命令**（Node ≥ 24 自带 test runner，无需打包）：
+
+```powershell
+pnpm test                                          # 全量测试（65 个文件，node --test）
+pnpm run test:payload                              # 真实 payload 冒烟：合成游戏目录上走完安装/恢复全流程
+pnpm run test:optiscaler                           # OptiScaler 组件同样验证
+node --test test/release-228.test.js               # 单跑某个测试文件
+node --test test/apply.test.js test/scan.test.js   # 任选几个
+```
+
+测试分层说明：
+
+| 层级 | 命令 | 验什么 |
+|---|---|---|
+| 单元/契约 | `pnpm test` | 主进程与核心模块逻辑，纯内存夹具 |
+| 集成 | `test:payload` / `test:optiscaler` | 在合成游戏目录上真实执行 apply/restore，校验 PE 架构与配置改写（不启动游戏） |
+| 构建期 | `pnpm run payload` | 跨 pin 交叉校验（overlay 指纹 ↔ 组件摘要），不一致直接拒构建 |
+| 人工 | 游戏内 F8 | 神经通道、滑条联动、日志面板——唯一需要真机的环节 |
+
+注意：`test:payload`/`test:optiscaler` 依赖 `pnpm run payload` 先跑过（读 `dist\payload\`）；`test:optiscaler` 首次会经 `vendor\runtime-tests\components\` 下载/解压测试组件（已钉哈希）。
+
 ### 打包流程
 
 在**管理员 PowerShell** 中按顺序执行：
 
 ```powershell
 pnpm install              # 1. 安装依赖
-pnpm run icon             # 2. 生成游戏图标
-pnpm run overlay:prepare  # 3. 准备悬浮层构建素材
+pnpm run icon             # 2. 生成游戏图标（build\icon.ico，每机一次）
+pnpm run overlay:prepare  # 3. 准备悬浮层构建素材（zig + ReShade SDK，每版本一次）
 pnpm run overlay:build    # 4. 编译悬浮层
-pnpm run payload          # 5. 下载/校验/组装运行时组件
-pnpm run build            # 6. 打包安装版 + 便携版
+pnpm run payload          # 5. 下载/校验/组装运行时组件（build 的 prebuild 钩子会自动执行）
+pnpm run build            # 6. 打包安装版 + 便携版（产物在 dist\）
 ```
 
 ### 注意点
