@@ -15,9 +15,9 @@ function renderer() {
 }
 const placeholders = text => (text.match(/\{\d+\}/g) || []).sort();
 
-test('all 38 registered languages own every feature translation with matching placeholders', () => {
+test('all 5 registered languages own every feature translation with matching placeholders', () => {
   const ui = renderer();
-  assert.equal(ui.LANGS.length, 38);
+  assert.equal(ui.LANGS.length, 5);
   assert.deepEqual(Object.keys(features.catalog).sort(), Array.from(ui.LANGS, lang => lang.code).sort());
   for (const { code } of ui.LANGS) {
     const strings = features.strings(code);
@@ -38,7 +38,7 @@ test('all 38 registered languages own every feature translation with matching pl
 });
 
 test('locale resolution, interpolation and script loading order remain predictable', () => {
-  assert.equal(features.locale('pt-BR'), 'pt');
+  assert.equal(features.locale('pt-BR'), 'en');
   assert.equal(features.locale('ZH-hant'), 'zh-TW');
   assert.equal(features.locale('xx'), 'en');
   assert.equal(features.t('en', 'filteredCount', 7, 18), '7 of 18 shown');
@@ -48,5 +48,7 @@ test('locale resolution, interpolation and script loading order remain predictab
   assert.ok(html.indexOf('i18n-extra.js') < html.indexOf('../shared/feature-i18n.js'));
   assert.ok(html.indexOf('../shared/feature-i18n.js') < html.indexOf('src="renderer.js"'));
   const ui = renderer();
-  for (const code of ['ar', 'fa', 'ur']) assert.equal(ui.dirOf(code), 'rtl');
+  // Removed locales fall back to the first registered language, which is LTR.
+  for (const code of ['ar', 'fa', 'ur', 'pt-BR']) assert.equal(ui.dirOf(code), 'ltr');
+  assert.equal(ui.dirOf('zh-TW'), 'ltr');
 });

@@ -29,7 +29,7 @@ test('the driver warning says "may", because it is a warning (#300, #278, #270)'
 test('a game folder Windows will not let us write to is refused in words, up front (#301)', () => {
   assert.match(read('src', 'core', 'backend-manager.js'),
     /if \(!core\.canWrite\(config\.gameDir\)\) throw Object\.assign\(new Error\('errNoWriteAccess'\), \{ code: 'errNoWriteAccess' \}\);/);
-  assert.equal((read('src', 'renderer', 'i18n.js').match(/errNoWriteAccess: '/g) || []).length, 3, 'in English, Arabic and Chinese');
+  assert.equal((read('src', 'renderer', 'i18n.js').match(/errNoWriteAccess: '/g) || []).length, 2, 'in English and Chinese (ja/ko fall back)');
 });
 
 test('every installed game has its read-only ReShade.ini cleared once per start (#155)', () => {
