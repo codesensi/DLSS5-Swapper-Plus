@@ -1003,7 +1003,6 @@
   border-bottom: 1px solid var(--t2-line);
   backdrop-filter: blur(16px) saturate(.8);
 }
-:root[data-skin="two"][dir="rtl"] .t2-bar { padding: 0 24px 0 238px; }
 :root[data-skin="two"] .t2-wordmark {
   width: 146px;
   display: flex;
@@ -1149,7 +1148,6 @@
   transform: translateX(var(--x, 0));
   transition: transform .42s var(--t2-snap), width .42s var(--t2-snap), opacity .15s ease;
 }
-:root[data-skin="two"][dir="rtl"] .t2-dock-glow { transform: translateX(calc(-1 * var(--x, 0px))); }
 :root[data-skin="two"] .t2-dock-foot {
   min-width: max-content;
   margin: 0 0 0 auto;
@@ -1158,7 +1156,6 @@
   gap: 8px;
   padding-inline-start: 16px;
 }
-:root[data-skin="two"][dir="rtl"] .t2-dock-foot { margin: 0 auto 0 0; }
 :root[data-skin="two"] .t2-status {
   height: 30px;
   padding: 0 10px;
@@ -1833,7 +1830,7 @@
   background-color: var(--t2-canvas-2);
   transition: border-color .18s ease, background-color .18s ease, transform .28s var(--detail-spring);
 }
-:root[data-skin="two"][dir="rtl"] .t2-config-content .install-options select { padding: 0 13px 0 42px; }
+
 :root[data-skin="two"] .t2-config-content .install-options select:hover { transform: translateY(-2px); border-color: var(--t2-line-strong) !important; }
 :root[data-skin="two"] .t2-config-content .sheet-notes { margin-top: 20px; border-radius: 8px; background: var(--t2-canvas-2); }
 :root[data-skin="two"] .t2-config-content .sheet-notes-body { animation: t2-notes-open .3s var(--t2-ease) both; transform-origin: top; }
@@ -3877,7 +3874,6 @@
   background-repeat: no-repeat; background-position: right 11px center; background-size: 13px;
   transition: border-color .18s ease, color .18s ease, background-color .18s ease, transform .16s cubic-bezier(.2,.8,.2,1);
 }
-[dir="rtl"] :root[data-skin="two"] .game-filters select { padding: 0 14px 0 32px; background-position: left 11px center; }
 :root[data-skin="two"] .game-filters select:hover { color: #eef3f9; border-color: rgba(255, 255, 255, .2); transform: translateY(-1px); }
 :root[data-skin="two"] .game-filters select:focus { border-color: rgba(143, 217, 95, .55); box-shadow: 0 0 0 4px rgba(143, 217, 95, .12); }
 :root[data-skin="two"] .game-filters .ghost {

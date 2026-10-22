@@ -224,6 +224,22 @@ const SCAN_RULES = 7;
 // every write carries everything already known.
 let liveState = null;
 
+// The OS language seeds the first launch only. One of the shipped languages
+// wins when Electron reports a matching locale (zh-TW/zh-HK match before the
+// bare zh); anything else stays English. Saved once via set-lang, this stays
+// out of the way afterwards.
+const SHIPPED_LOCALES = ['en', 'zh', 'ja', 'ko', 'zh-TW'];
+function defaultLocale() {
+  try {
+    const locale = (app.getLocale() || '').replace('_', '-');
+    const exact = SHIPPED_LOCALES.find((code) => code.toLowerCase() === locale.toLowerCase());
+    if (exact) return exact;
+    const base = locale.toLowerCase().split('-')[0];
+    if (base === 'zh') return 'zh';
+    return SHIPPED_LOCALES.find((code) => code.toLowerCase() === base) || 'en';
+  } catch { return 'en'; }
+}
+
 function readState() {
   try {
     const value = JSON.parse(fs.readFileSync(stateFile(), 'utf8'));
@@ -472,7 +488,7 @@ ipcMain.handle('boot', () => {
     skin: state.skin === 'two' ? 'two' : 'one',
     // Theme 2 can keep the sidebar as a rail of icons that opens on hover.
     rail: state.rail === 'on' ? 'on' : 'off',
-    lang: state.lang || 'en',
+    lang: state.lang || defaultLocale(),
     groupGamesByStore: state.groupGamesByStore !== false,
     logo: asUrl('logo.png'),
     logoDark: asUrl('logo-dark.png')

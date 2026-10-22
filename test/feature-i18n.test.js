@@ -8,7 +8,7 @@ const features = require('../src/shared/feature-i18n');
 
 function renderer() {
   const context = vm.createContext({ window: {} });
-  for (const file of ['renderer/i18n.js', 'renderer/i18n-extra.js', 'shared/feature-i18n.js']) {
+  for (const file of ['renderer/i18n.js', 'shared/feature-i18n.js']) {
     vm.runInContext(fs.readFileSync(path.join(__dirname, '../src', file), 'utf8'), context, { filename: file });
   }
   return context.window.i18n;
@@ -45,7 +45,8 @@ test('locale resolution, interpolation and script loading order remain predictab
   assert.equal(features.t('ja', 'filteredCount', 7, 18), '18 件中 7 件表示');
   assert.equal(features.t('en', 'filteredCount', '{1}', 18), '{1} of 18 shown');
   const html = fs.readFileSync(path.join(__dirname, '../src/renderer/index.html'), 'utf8');
-  assert.ok(html.indexOf('i18n-extra.js') < html.indexOf('../shared/feature-i18n.js'));
+  assert.equal(html.indexOf('i18n-extra.js'), -1, 'the extra file was merged into i18n.js');
+  assert.ok(html.indexOf('i18n.js') >= 0 && html.indexOf('i18n.js') < html.indexOf('../shared/feature-i18n.js'));
   assert.ok(html.indexOf('../shared/feature-i18n.js') < html.indexOf('src="renderer.js"'));
   const ui = renderer();
   // Removed locales fall back to the first registered language, which is LTR.
