@@ -28,7 +28,7 @@
     "electron-builder": "^26.15.3"
   },
   "build": {
-    "appId": "com.rakan.dlss5swapper",
+    "appId": "com.dlss5swapperplus.app",
     "productName": "DLSS 5 Swapper Plus",
     "files": [
       "main.js",
