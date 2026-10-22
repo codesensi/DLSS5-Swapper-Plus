@@ -10,8 +10,8 @@ const root = path.join(__dirname, '..');
 const read = (...parts) => fs.readFileSync(path.join(root, ...parts), 'utf8');
 
 test('DirectDraw gets dgVoodoo the way DX8 and DX9 do (#292, #279, #150)', () => {
-  assert.match(read('main.js'),
-    /if \(api === 'd3d8' \|\| api === 'd3d9' \|\| api === 'ddraw'\) \{\s*try \{\s*p\.source\.feeder\.dgVoodooDir = await ensureDgVoodoo/);
+  assert.match(read('src', 'main', 'ipc', 'install.js'),
+    /if \(api === 'd3d8' \|\| api === 'd3d9' \|\| api === 'ddraw'\) \{\s*try \{\s*p\.source\.feeder\.dgVoodooDir = await ctx\.ensureDgVoodoo/);
 });
 
 test('the overlay message no longer claims an install that has not finished (#275, #292)', () => {
@@ -33,9 +33,10 @@ test('a game folder Windows will not let us write to is refused in words, up fro
 });
 
 test('every installed game has its read-only ReShade.ini cleared once per start (#155)', () => {
-  const main = read('main.js');
-  assert.match(main, /function repairReadOnlyConfigs\(games\)/);
-  assert.match(main, /repairReadOnlyConfigs\(lastGames\);\s*return lastGames;/);
+  const library = read('src', 'main', 'ipc', 'library.js');
+  assert.match(library, /function repairReadOnlyConfigs\(ctx, games\)/);
+  assert.match(library, /repairReadOnlyConfigs\(ctx, ctx\.cache\.lastGames\);/);
+  assert.match(read('src', 'main', 'ipc', 'library.js'), /return ctx\.cache\.lastGames;/);
 });
 
 test('the uninstaller says uninstalling does not restore games (#266)', () => {

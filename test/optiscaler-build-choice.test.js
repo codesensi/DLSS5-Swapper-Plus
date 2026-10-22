@@ -87,8 +87,9 @@ test('an installed fork is reported as installed, and its manifest names it', ()
   assert.match(opticore, /const release = releaseFor\(config\.optiVersion\)/);
   assert.match(opticore, /if \(!release\.layout\.forwarder\) await retireForwarder\(/);
   // And the main process passes the build the game asked for.
-  const main = fs.readFileSync(path.join(root, 'main.js'), 'utf8');
-  assert.match(main, /optiVersion = release\.version;/);
-  assert.match(main, /^\s+optiVersion,$/m);
-  assert.match(main, /label: r\.label \|\| r\.version/);
+  const install = fs.readFileSync(path.join(root, 'src', 'main', 'ipc', 'install.js'), 'utf8');
+  assert.match(install, /optiVersion = release\.version;/);
+  assert.match(install, /^\s+optiVersion,$/m);
+  const addons = fs.readFileSync(path.join(root, 'src', 'main', 'ipc', 'addons.js'), 'utf8');
+  assert.match(addons, /label: r\.label \|\| r\.version/);
 });

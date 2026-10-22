@@ -23,7 +23,13 @@ function launch(profile) {
         ipcMain: { handle: (channel, handler) => handlers.set(channel, handler) }
       };
       if (name === './package.json') return { version: 'test' };
-      if (name.startsWith('./src/')) return {};
+      if (name.startsWith('./src/')) {
+        // The main-process layers are plain factories over Node builtins;
+        // loading them for real is what makes the handlers work at all.
+        // (Relative specifiers are main.js's, so resolve from the root.)
+        if (name.startsWith('./src/main/')) return require(path.join(__dirname, '..', name));
+        return {};
+      }
       return require(name);
     }
   }, { filename: mainPath });

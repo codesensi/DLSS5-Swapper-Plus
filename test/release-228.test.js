@@ -115,9 +115,9 @@ test('an older DLSS in the game is still upgraded', async (t) => {
 });
 
 test('the overlay says which reason applies instead of blaming the route (#338)', () => {
-  const main = read('main.js');
-  assert.doesNotMatch(main, /the panel does not attach on/);
-  assert.match(main, /const why = target\.bitness !== 64 \? 'bits' : route === 'renodx' \? 'multipass' : route === 'optiscaler' \? 'optiscaler' : 'api';/);
+  const install = read('src', 'main', 'ipc', 'install.js');
+  assert.doesNotMatch(install, /the panel does not attach on/);
+  assert.match(install, /const why = target\.bitness !== 64 \? 'bits' : route === 'renodx' \? 'multipass' : route === 'optiscaler' \? 'optiscaler' : 'api';/);
   const i18n = read('src', 'renderer', 'i18n.js');
   assert.equal((i18n.match(/overlayNotForRoute: \(why, api\) =>/g) || []).length, 4, 'in English, Chinese, Japanese and Korean (zh-TW quotes its keys)');
   assert.equal((i18n.match(/multipassNext: \(dlss\) =>/g) || []).length, 4, 'in English, Chinese, Japanese and Korean (zh-TW quotes its keys)');
@@ -149,13 +149,12 @@ test('d3d11.dll is for DirectX 11 only (#328)', () => {
   assert.equal(hookForApi('dxgi', 'dxgi'), 'dxgi.dll');
   assert.equal(hookForApi('d3d9', 'd3d11'), 'd3d9.dll');
   assert.equal(hookForApi('opengl', 'd3d11'), 'opengl32.dll');
-  const main = read('main.js');
   // It reaches the wrapped DirectX 8/9 titles too now, because inside dgVoodoo
   // they are DirectX 11 games and some of those layers load only d3d11.dll
   // (#343, #374). Never DirectX 12, which loads neither.
-  assert.match(main, /reshadeProxy: \['dxgi', 'd3d8', 'd3d9', 'ddraw'\]\.includes\(api\) && target\.apiLabel !== 'DirectX 12' && route !== 'optiscaler'/);
+  assert.match(read('src', 'main', 'ipc', 'install.js'), /reshadeProxy: \['dxgi', 'd3d8', 'd3d9', 'ddraw'\]\.includes\(api\) && target\.apiLabel !== 'DirectX 12' && route !== 'optiscaler'/);
   assert.match(read('src', 'renderer', 'renderer.js'), /const RESHADE_PROXY_APIS = \['dxgi', 'd3d8', 'd3d9', 'ddraw'\];/);
-  assert.match(main, /ipcMain\.handle\('set-reshade-proxy'/);
+  assert.match(read('src', 'main', 'ipc', 'install.js'), /ipcMain\.handle\('set-reshade-proxy'/);
   assert.match(read('preload.js'), /setReshadeProxy: \(dir, exePath, value\) => ipcRenderer\.invoke\('set-reshade-proxy'/);
   assert.match(read('src', 'core', 'backend-manager.js'), /reshadeFileChanged\(old, config\)\);/);
   const i18n = read('src', 'renderer', 'i18n.js');
@@ -218,8 +217,9 @@ test('an emulator may take the multipass route, and is still recommended the Fee
 test('a safe graphics mode for windows that flicker (#365)', () => {
   const main = read('main.js');
   assert.match(main, /if \(loadState\(\)\.safeGraphics === true\) app\.disableHardwareAcceleration\(\);/);
-  assert.match(main, /ipcMain\.handle\('set-safe-graphics'/);
-  assert.match(main, /safeGraphics: state\.safeGraphics === true/);
+  const session = read('src', 'main', 'ipc', 'session.js');
+  assert.match(session, /ipcMain\.handle\('set-safe-graphics'/);
+  assert.match(session, /safeGraphics: state\.safeGraphics === true/);
   assert.match(read('preload.js'), /setSafeGraphics: \(enabled\) => ipcRenderer\.invoke\('set-safe-graphics', enabled\)/);
   const renderer = read('src', 'renderer', 'renderer.js');
   assert.match(renderer, /id="setSafeGraphics"/);
@@ -249,10 +249,10 @@ test('theme 2 is a skin of its own, and cannot leak into theme 1', () => {
   assert.match(html, /<link rel="stylesheet" href="theme2\.css" \/>/);
   assert.match(html, /<script src="theme2\.js"><\/script>/);
   assert.match(html, /data-skin="one"/);
-  const main = read('main.js');
-  assert.match(main, /ipcMain\.handle\('set-skin'/);
-  assert.match(main, /ipcMain\.handle\('set-rail'/);
-  assert.match(main, /ipcMain\.handle\('launch-game'/);
+  const session = read('src', 'main', 'ipc', 'session.js');
+  assert.match(session, /ipcMain\.handle\('set-skin'/);
+  assert.match(session, /ipcMain\.handle\('set-rail'/);
+  assert.match(read('src', 'main', 'ipc', 'library.js'), /ipcMain\.handle\('launch-game'/);
   const preload = read('preload.js');
   assert.match(preload, /setSkin: \(skin\) => ipcRenderer\.invoke\('set-skin', skin\)/);
   assert.match(preload, /launchGame: \(dir\) => ipcRenderer\.invoke\('launch-game', dir\)/);
