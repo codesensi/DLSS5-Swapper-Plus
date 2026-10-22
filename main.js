@@ -1,5 +1,5 @@
 'use strict';
-// DLSS 5 Swapper
+// DLSS 5 Swapper Plus
 // Finds the games already on the machine and installs DLSS 5 Neural
 // Rendering into them, using the scanners in src/core.
 const { app, BrowserWindow, ipcMain, dialog, shell, clipboard, Menu, Tray, Notification, nativeImage, safeStorage } = require('electron');
@@ -308,7 +308,7 @@ function posterUrl(game, state) {
 let tray = null;
 // The main process has no translations of its own, so the renderer hands these
 // over the way it already does for the game context menu.
-let trayLabels = { show: 'Open DLSS 5 Swapper', quit: 'Quit' };
+let trayLabels = { show: 'Open DLSS 5 Swapper Plus', quit: 'Quit' };
 
 function showWindow() {
   if (!win || win.isDestroyed()) return;
@@ -334,7 +334,7 @@ function ensureTray() {
   // fallback is better than no tray at all.
   const icon = source.isEmpty() ? source : source.resize({ width: 16, height: 16, quality: 'good' });
   try { tray = new Tray(icon); } catch { return null; }
-  tray.setToolTip('DLSS 5 Swapper');
+  tray.setToolTip('DLSS 5 Swapper Plus');
   tray.on('click', showWindow);
   tray.on('double-click', showWindow);
   buildTrayMenu();
@@ -595,7 +595,7 @@ ipcMain.handle('save-diagnostics', async (event, dir, activity) => {
   const stamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
   const picked = await dialog.showSaveDialog(window, {
     title: 'Save diagnostics',
-    defaultPath: path.join(app.getPath('documents'), `dlss5-swapper-diagnostics-${stamp}.txt`),
+    defaultPath: path.join(app.getPath('documents'), `dlss5-swapper-plus-diagnostics-${stamp}.txt`),
     filters: [{ name: 'Text', extensions: ['txt'] }]
   });
   if (picked.canceled || !picked.filePath) return { ok: false, cancelled: true };

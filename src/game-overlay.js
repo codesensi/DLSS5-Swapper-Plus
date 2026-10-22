@@ -11,7 +11,7 @@ function routes(target){return target?.bitness===64&&target.api==='dxgi'&&target
 function prepare({library,target,route}){
   if(!routes(target).includes(route))throw Error('The in-game overlay currently supports 64-bit DX11/DX12 only.');
   const entry=library.resolve('builtin');
-  if(!entry.ready)throw Error(`The overlay add-on is missing from this app: ${entry.file}. Antivirus software removes it; restore it and add an exclusion, or reinstall DLSS 5 Swapper.`);
+  if(!entry.ready)throw Error(`The overlay add-on is missing from this app: ${entry.file}. Antivirus software removes it; restore it and add an exclusion, or reinstall DLSS 5 Swapper Plus.`);
   readNative(entry.file);
   const dir=path.dirname(target.path);
   const records=library.list().installations.filter(r=>r.directory.toLowerCase()===dir.toLowerCase());

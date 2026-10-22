@@ -55,7 +55,7 @@ module.exports = function registerOverlayIpc({ app, ipcMain, dialog, shell, wind
     const picked = await dialog.showOpenDialog(window(), { title: 'Select a CLOSED offline test game with ReShade add-on support', properties: ['openFile'], filters: [{ name: 'Windows game executable', extensions: ['exe'] }] });
     if (picked.canceled) return null;
     const confirm = await dialog.showMessageBox(window(), { type: 'warning', title: 'Overlay test — not a DLSS installation',
-      message: 'Confirm the game is closed and already uses ReShade with add-on support. Keep DLSS 5 Swapper open while testing the built-in overlay.',
+      message: 'Confirm the game is closed and already uses ReShade with add-on support. Keep DLSS 5 Swapper Plus open while testing the built-in overlay.',
       detail: `${picked.filePaths[0]}\n\nOnly a uniquely named overlay add-on is copied next to this executable. No existing DLLs or configuration files are replaced by installation. No Vulkan registry changes. Avoid online / anti-cheat games.\n\nThis overlay automatically connects through an undocumented, exact-build v4.7 adapter that temporarily redirects its UI dispatch. This may be incompatible with other add-ons. RenoDX itself saves settings you change. This is not NVIDIA's official SDK or overlay.`,
       buttons: ['Cancel', 'Install test overlay'], defaultId: 0, cancelId: 0 });
     return confirm.response === 1 ? library().install(id, picked.filePaths[0]) : null;

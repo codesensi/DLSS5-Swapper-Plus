@@ -35,9 +35,9 @@
 #include "renodx-ui-probe.hpp"
 #endif
 
-extern "C" __declspec(dllexport) const char *NAME = "DLSS 5 Swapper Overlay";
-extern "C" __declspec(dllexport) const char *DESCRIPTION = "F8: compact panel. Keep DLSS 5 Swapper open. The game's input is held while the panel is open. Automatic experimental RenoDX v4.7 bridge controls original NR settings; exact binary required. Original ReShade/RenoDX windows remain available.";
-extern "C" __declspec(dllexport) const char *AUTHOR = "DLSS 5 Swapper";
+extern "C" __declspec(dllexport) const char *NAME = "DLSS 5 Swapper Plus Overlay";
+extern "C" __declspec(dllexport) const char *DESCRIPTION = "F8: compact panel. Keep DLSS 5 Swapper Plus open. The game's input is held while the panel is open. Automatic experimental RenoDX v4.7 bridge controls original NR settings; exact binary required. Original ReShade/RenoDX windows remain available.";
+extern "C" __declspec(dllexport) const char *AUTHOR = "DLSS 5 Swapper Plus";
 extern "C" void lab_imgui_vec2(void *, float *, float *);
 static_assert(IMGUI_VERSION_NUM == 19250, "Revalidate the ReShade/ImGui ABI before changing SDKs");
 
@@ -325,7 +325,7 @@ void draw(reshade::api::effect_runtime *runtime) {
     }
     if (!bridge.connected() || bridge.pixels.empty()) {
         release_texture(runtime, s); s.dragging = s.focused = s.hovered = false; s.last_status.clear();
-        ImGui::TextWrapped("DLSS 5 Swapper must remain open. Waiting for the shared panel design (one test game at a time)...");
+        ImGui::TextWrapped("DLSS 5 Swapper Plus must remain open. Waiting for the shared panel design (one test game at a time)...");
         return;
     }
     if (s.uploaded != bridge.sequence) {
@@ -432,9 +432,9 @@ void draw(reshade::api::effect_runtime *runtime) {
 void reloaded(reshade::api::effect_runtime *runtime) { state_for(runtime).live.dirty = true; }
 void controls(reshade::api::effect_runtime *runtime) {
     auto &s = state_for(runtime);
-    ImGui::TextWrapped("Optional compact overlay. Choose its hotkey on the Overlay page in DLSS 5 Swapper (default F8). Home keeps the original tools available.");
+    ImGui::TextWrapped("Optional compact overlay. Choose its hotkey on the Overlay page in DLSS 5 Swapper Plus (default F8). Home keeps the original tools available.");
     if (ImGui::Button("Open compact overlay")) { panel_open = true; runtime->open_overlay(false, reshade::api::input_source::none); }
-    ImGui::TextWrapped("Keep DLSS 5 Swapper open. Drag the panel header to move it. Escape closes only the compact panel. While the panel is open the game receives no mouse or keyboard input.");
+    ImGui::TextWrapped("Keep DLSS 5 Swapper Plus open. Drag the panel header to move it. Escape closes only the compact panel. While the panel is open the game receives no mouse or keyboard input.");
     ImGui::TextWrapped("The compact panel automatically connects to a verified RenoDX build using an experimental adapter. It redirects RenoDX's UI dispatch temporarily; unsupported builds are refused. Original settings are saved by RenoDX.");
 }
 void compact_draw(reshade::api::effect_runtime *runtime) {
@@ -500,12 +500,12 @@ void compact_draw(reshade::api::effect_runtime *runtime) {
 extern "C" __declspec(dllexport) bool AddonInit(HMODULE addon, HMODULE reshade_module) {
     if (registered) return true;
     if (!reshade::register_addon(addon, reshade_module)) return false;
-    reshade::register_overlay("DLSS 5 Swapper", controls);
+    reshade::register_overlay("DLSS 5 Swapper Plus", controls);
     reshade::register_event<reshade::addon_event::destroy_effect_runtime>(destroy);
     reshade::register_event<reshade::addon_event::reshade_reloaded_effects>(reloaded);
     reshade::register_event<reshade::addon_event::reshade_overlay>(compact_draw);
     registered = true;
-    reshade::log::message(reshade::log::level::debug, "DLSS 5 Swapper shared surface registered. RenoDX UI adapter connects automatically, is experimental and hash-pinned. Keep DLSS 5 Swapper open.");
+    reshade::log::message(reshade::log::level::debug, "DLSS 5 Swapper Plus shared surface registered. RenoDX UI adapter connects automatically, is experimental and hash-pinned. Keep DLSS 5 Swapper Plus open.");
     return true;
 }
 extern "C" __declspec(dllexport) void AddonUninit(HMODULE addon, HMODULE reshade_module) {
@@ -513,7 +513,7 @@ extern "C" __declspec(dllexport) void AddonUninit(HMODULE addon, HMODULE reshade
     reshade::unregister_event<reshade::addon_event::reshade_overlay>(compact_draw);
     reshade::unregister_event<reshade::addon_event::destroy_effect_runtime>(destroy);
     reshade::unregister_event<reshade::addon_event::reshade_reloaded_effects>(reloaded);
-    reshade::unregister_overlay("DLSS 5 Swapper", controls);
+    reshade::unregister_overlay("DLSS 5 Swapper Plus", controls);
     while (!surfaces.empty()) destroy(surfaces.begin()->first);
     reshade::unregister_addon(addon, reshade_module); registered = false;
 }

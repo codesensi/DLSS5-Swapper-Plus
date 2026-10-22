@@ -52,7 +52,7 @@
     bar.id = 't2Bar';
     const logo = q('.brand img');
     bar.innerHTML = `
-      <div class="t2-wordmark" aria-label="DLSS 5 Swapper">
+      <div class="t2-wordmark" aria-label="DLSS 5 Swapper Plus">
         ${logo ? `<img src="${logo.getAttribute('src')}" alt="">` : '<b>DLSS 5</b>'}
         <span>SWAPPER</span>
       </div>

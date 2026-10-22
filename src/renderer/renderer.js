@@ -1199,8 +1199,8 @@ document.querySelector('.link[data-view]').onclick = () => show('games');
 function paintBrand() {
   const art = state.theme === 'dark' ? (state.logo.logoDark || state.logo.logo) : state.logo.logo;
   $('brand').innerHTML = art
-    ? `<img src="${art}" alt="DLSS 5 Swapper">`
-    : '<b style="font-size:19px">DLSS 5 Swapper</b>';
+    ? `<img src="${art}" alt="DLSS 5 Swapper Plus">`
+    : '<b style="font-size:19px">DLSS 5 Swapper Plus</b>';
 }
 
 // ---------------- language ----------------

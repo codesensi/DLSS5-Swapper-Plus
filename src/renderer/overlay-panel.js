@@ -174,8 +174,8 @@ const OL_ZH = {
 
   'Design inspired by the NVIDIA reference. Masking, models and DLSS sliders are not connected to the SDK.':
     '设计参考 NVIDIA 方案。遮罩、模型和 DLSS 滑块均未连接 SDK。',
-  'Restart DLSS 5 Swapper and connect the updated overlay to load RenoDX controls.':
-    '重启 DLSS 5 Swapper 并连接更新后的叠加层，以加载 RenoDX 控制。',
+  'Restart DLSS 5 Swapper Plus and connect the updated overlay to load RenoDX controls.':
+    '重启 DLSS 5 Swapper Plus 并连接更新后的叠加层，以加载 RenoDX 控制。',
   'Design preview; no game connection.': '设计预览；未连接游戏。',
   'RenoDX v4.7 controls use its original callback. FX controls below are separate. Experimental adapter; original tool windows remain available.':
     'RenoDX v4.7 控制使用其原始回调。下方的 FX 控制是独立的。实验性适配器；原始工具窗口仍可使用。',
@@ -204,8 +204,8 @@ const olIsZh = () => String(document.documentElement.lang || 'en').toLowerCase()
 const OL_ZH_PARTS = [
   ['The overlay add-on is missing from this app, so no game can load it:',
     '本程序缺少叠加层插件，任何游戏都无法加载它：'],
-  ['Antivirus software removes this file - restore it from your antivirus quarantine and add an exclusion, or reinstall DLSS 5 Swapper.',
-    '防病毒软件会删除此文件 —— 请从隔离区恢复并添加排除项，或重新安装 DLSS 5 Swapper。'],
+  ['Antivirus software removes this file - restore it from your antivirus quarantine and add an exclusion, or reinstall DLSS 5 Swapper Plus.',
+    '防病毒软件会删除此文件 —— 请从隔离区恢复并添加排除项，或重新安装 DLSS 5 Swapper Plus。'],
   [': show/hide · Drag header: move · Esc: close · Home: original tools',
     '：显示 / 隐藏 · 拖动标题栏移动 · Esc 关闭 · Home 原始工具'],
   [': show/hide · Drag header to move · Esc: close · Home: original tools',

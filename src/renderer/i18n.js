@@ -89,7 +89,7 @@ const S = {
     historySnapshot: 'Backup record', historyRecovered: 'Interrupted operation recovered',
     historyLoadFailed: 'Could not load history. Reopen this page to try again.',
     overlaySkipped: (error) => `The in-game overlay will not be installed: ${error}. The rest of the install carries on.`,
-    errNoWriteAccess: 'Windows will not let this app write to the game folder, so nothing was changed. Games installed under Program Files are protected: run DLSS 5 Swapper as administrator, or move the game to another folder.',
+    errNoWriteAccess: 'Windows will not let this app write to the game folder, so nothing was changed. Games installed under Program Files are protected: run DLSS 5 Swapper Plus as administrator, or move the game to another folder.',
     sheetCommunityTitle: 'What the community found', sheetCommunityOpen: 'Open reports',
     sheetCommunityNone: 'No community reports for this game yet - after installing, you could be the first.',
     sheetCommunityCounts: (reports, comments) => `${reports} report${reports === 1 ? '' : 's'} · ${comments} comment${comments === 1 ? '' : 's'}`,
@@ -190,15 +190,15 @@ The install will go through. If the neural pass never appears in game, 616.56 is
     driverFaultGo: 'Install anyway',
     driverFaultStopped: 'stopped - driver not accepted',
     setTray: 'Keep running in the system tray', setTrayHint: 'Closing the window hides it to the tray instead of quitting. Use Quit in the tray menu to exit.',
-    trayShow: 'Open DLSS 5 Swapper', trayQuit: 'Quit',
+    trayShow: 'Open DLSS 5 Swapper Plus', trayQuit: 'Quit',
     setAutoScan: 'Scan all drives automatically', setAutoScanHint: 'Off by default. User-added folders are always scanned.',
     setNotices: 'Community notifications', setNoticesHint: 'Tell me when somebody replies to my comment, mentions me, or comments on a game I follow.',
     setGroupGames: 'Group games by store', setGroupGamesHint: 'Turn off to show all games and emulators in one alphabetical grid, without store sections.',
     setFolders: 'Scanned folders', setAdd: 'Add', setLibrary: 'Library file', setReset: 'Reset',
     setRoots: 'Found on your drives',
     setPosters: 'Posters', setSaved: (n) => `${n} saved`, setLang: 'Language',
-    aboutTitle: 'DLSS 5 Swapper', aboutBody: 'Puts DLSS 5 Neural Rendering into your games, and takes it back out whenever you want.', aboutBy: 'Built by Rakan Alkhaldi', aboutLocalized: 'Localization: bilibili: ',
-    supportBody: 'DLSS 5 Swapper is free and MIT licensed. If it saved you an evening of fiddling, you can buy me a coffee - or scan the code with your phone.',
+    aboutTitle: 'DLSS 5 Swapper Plus', aboutBody: 'Puts DLSS 5 Neural Rendering into your games, and takes it back out whenever you want.', aboutBy: 'Built by Rakan Alkhaldi', aboutLocalized: 'Localization: bilibili: ',
+    supportBody: 'DLSS 5 Swapper Plus is free and MIT licensed. If it saved you an evening of fiddling, you can buy me a coffee - or scan the code with your phone.',
     agoNow: 'just now', agoMin: (n) => `${n} min ago`, agoHour: (n) => `${n} h ago`, agoDay: (n) => `${n} d ago`,
     artFound: (a, b) => `Artwork: ${a} of ${b} found`, libReady: (n, d) => `Library ready — ${n} games, ${d} on DirectX 12`,
     olHotkeyTitle: 'Overlay hotkey',
@@ -272,7 +272,7 @@ The install will go through. If the neural pass never appears in game, 616.56 is
     historySnapshot: 'سجل نسخة احتياطية', historyRecovered: 'استعادة عملية متوقفة',
     historyLoadFailed: 'تعذّر تحميل الهستري. أعد فتح الصفحة للمحاولة مرة أخرى.',
     overlaySkipped: (error) => `لن يُثبَّت الأوفرلاي داخل اللعبة: ${error}. وبقية التثبيت مستمرة.`,
-    errNoWriteAccess: 'ويندوز لا يسمح للبرنامج بالكتابة في مجلد اللعبة، فلم يتغيّر شيء. الألعاب المثبّتة داخل Program Files محمية: شغّل DLSS 5 Swapper كمسؤول، أو انقل اللعبة إلى مجلد آخر.',
+    errNoWriteAccess: 'ويندوز لا يسمح للبرنامج بالكتابة في مجلد اللعبة، فلم يتغيّر شيء. الألعاب المثبّتة داخل Program Files محمية: شغّل DLSS 5 Swapper Plus كمسؤول، أو انقل اللعبة إلى مجلد آخر.',
     sheetCommunityTitle: 'ماذا وجد المجتمع', sheetCommunityOpen: 'افتح التقارير',
     sheetCommunityNone: 'لا توجد تقارير من المجتمع لهذه اللعبة بعد - بعد التثبيت، يمكنك أن تكون الأول.',
     sheetCommunityCounts: (reports, comments) => `${reports} تقرير · ${comments} تعليق`,
@@ -375,12 +375,12 @@ The install will go through. If the neural pass never appears in game, 616.56 is
     driverFaultGo: 'ثبّت على أي حال',
     driverFaultStopped: 'أُوقف - لم يُقبل التعريف',
     setTray: 'الإبقاء عليه في شريط النظام', setTrayHint: 'إغلاق النافذة يخفيها في شريط النظام بدل إنهاء البرنامج. استخدم «إنهاء» من قائمة الأيقونة للخروج.',
-    trayShow: 'فتح DLSS 5 Swapper', trayQuit: 'إنهاء',
+    trayShow: 'فتح DLSS 5 Swapper Plus', trayQuit: 'إنهاء',
     setAutoScan: 'فحص جميع الأقراص تلقائياً', setAutoScanHint: 'متوقف افتراضياً. المجلدات التي تضيفها تُفحص دائماً.',
     setFolders: 'المجلدات الممسوحة', setAdd: 'إضافة', setLibrary: 'ملف المكتبة', setReset: 'تصفير',
     setRoots: 'مكتشفة في أقراصك',
     setPosters: 'البوسترات', setSaved: (n) => `${n} محفوظ`, setLang: 'اللغة',
-    aboutTitle: 'DLSS 5 Swapper', aboutBody: 'يضع DLSS 5 في ألعابك، ويرجّعها كما كانت متى شئت.', aboutBy: 'من تطوير راكان الخالدي',
+    aboutTitle: 'DLSS 5 Swapper Plus', aboutBody: 'يضع DLSS 5 في ألعابك، ويرجّعها كما كانت متى شئت.', aboutBy: 'من تطوير راكان الخالدي',
     supportBody: 'البرنامج مجاني ومفتوح المصدر برخصة MIT. إن وفّر عليك عناءً فبإمكانك دعمي بفنجان قهوة - أو امسح الرمز بجوالك.',
     agoNow: 'الآن', agoMin: (n) => `قبل ${n} دقيقة`, agoHour: (n) => `قبل ${n} ساعة`, agoDay: (n) => `قبل ${n} يوم`,
     artFound: (a, b) => `الصور: ${a} من ${b}`, libReady: (n, d) => `المكتبة جاهزة — ${n} لعبة، ${d} على DirectX 12`
@@ -411,7 +411,7 @@ The install will go through. If the neural pass never appears in game, 616.56 is
     setFolders: '已扫描的文件夹', setAdd: '添加', setLibrary: '库文件', setReset: '重置',
     setRoots: '在磁盘上找到',
     setPosters: '封面', setSaved: (n) => `已保存 ${n} 个`, setLang: '语言',
-    aboutTitle: 'DLSS 5 Swapper', aboutBody: '为你的游戏装上 DLSS 5，也能随时还原。', aboutBy: '由 Rakan Alkhaldi 开发', aboutLocalized: '汉化补全: bilibili: ',
+    aboutTitle: 'DLSS 5 Swapper Plus', aboutBody: '为你的游戏装上 DLSS 5，也能随时还原。', aboutBy: '由 Rakan Alkhaldi 开发', aboutLocalized: '汉化补全: bilibili: ',
     agoNow: '刚刚', agoMin: (n) => `${n} 分钟前`, agoHour: (n) => `${n} 小时前`, agoDay: (n) => `${n} 天前`,
     artFound: (a, b) => `封面：${b} 个中找到 ${a} 个`, libReady: (n, d) => `库已就绪 — ${n} 个游戏，${d} 个使用 DirectX 12`,
     olHotkeyTitle: '叠加层热键', olKeyHelp: '点击输入框，然后按下你的快捷键。支持 Ctrl、Alt 和 Shift。Home / Escape 保留给 ReShade。',
@@ -462,7 +462,7 @@ The install will go through. If the neural pass never appears in game, 616.56 is
     historySnapshot: '备份记录', historyRecovered: '已恢复被中断的操作', historyLoadFailed: '无法加载历史记录。请重新打开此页面再试。',
     historySaveWarning: '历史记录未能完整读取或保存。当前显示的是可用条目；请在关闭程序前将其复制出来，并检查应用数据文件夹的访问权限。',
     overlaySkipped: (error) => `游戏内叠加层将不会安装：${error}。其余安装继续进行。`,
-    errNoWriteAccess: 'Windows 不允许本程序写入游戏文件夹，因此未做任何更改。安装在 Program Files 下的游戏受保护：请以管理员身份运行 DLSS 5 Swapper，或将游戏移动到其他文件夹。',
+    errNoWriteAccess: 'Windows 不允许本程序写入游戏文件夹，因此未做任何更改。安装在 Program Files 下的游戏受保护：请以管理员身份运行 DLSS 5 Swapper Plus，或将游戏移动到其他文件夹。',
 
     // ===== 社区反馈摘要 =====
     sheetCommunityTitle: '社区反馈结果', sheetCommunityOpen: '查看报告', sheetCommunityNone: '此游戏暂无社区报告 — 安装之后，你可以成为第一个提交的人。',
@@ -488,7 +488,7 @@ The install will go through. If the neural pass never appears in game, 616.56 is
     driverFaultGo: '仍然安装', driverFaultStopped: '已停止 — 未接受该驱动',
 
     // ===== 设置项 =====
-    setTray: '保持系统托盘运行', setTrayHint: '关闭窗口时将其隐藏到托盘而不是退出。可使用托盘菜单中的「退出」来结束程序。', trayShow: '打开 DLSS 5 Swapper', trayQuit: '退出',
+    setTray: '保持系统托盘运行', setTrayHint: '关闭窗口时将其隐藏到托盘而不是退出。可使用托盘菜单中的「退出」来结束程序。', trayShow: '打开 DLSS 5 Swapper Plus', trayQuit: '退出',
     setAutoScan: '自动扫描所有磁盘', setAutoScanHint: '默认关闭。手动添加的文件夹始终会被扫描。',
     setNotices: '社区通知', setNoticesHint: '当有人回复我的评论、提到我，或评论我关注的游戏时通知我。',
     setGroupGames: '按商店分组显示游戏', setGroupGamesHint: '关闭后，所有游戏和模拟器将按字母顺序合并显示，不再按商店分区。',
@@ -531,7 +531,7 @@ The install will go through. If the neural pass never appears in game, 616.56 is
     multipassNext: (dlss) => dlss === 'yes'
       ? '多通道已安装。在游戏内按 Home 打开 RenoDX DLSS 标签页（最后一个，不是首页）：Pass Count 和所有其他设置都在那里。请在游戏自身设置中保持 DLSS 开启。'
       : '多通道已安装。在游戏内按 Home 打开 RenoDX DLSS 标签页（最后一个，不是首页）。该游戏没有自带 DLSS，因此在该页面关闭 Require DLSS 并把 Hook Method 设为 Present。Pass Count 也在同一标签页。',
-    supportBody: 'DLSS 5 Swapper 免费且基于 MIT 许可证。如果它为你省下了一晚上的折腾，可以请我喝杯咖啡 — 或用手机扫描二维码。',
+    supportBody: 'DLSS 5 Swapper Plus 免费且基于 MIT 许可证。如果它为你省下了一晚上的折腾，可以请我喝杯咖啡 — 或用手机扫描二维码。',
   },
   es: {
     navHome: 'Inicio', navGames: 'Juegos', navHistory: 'Historial', navSettings: 'Ajustes', navAbout: 'Acerca de',
@@ -559,7 +559,7 @@ The install will go through. If the neural pass never appears in game, 616.56 is
     setFolders: 'Carpetas analizadas', setAdd: 'Añadir', setLibrary: 'Archivo de biblioteca', setReset: 'Restablecer',
     setRoots: 'Encontradas en tus discos',
     setPosters: 'Carátulas', setSaved: (n) => `${n} guardadas`, setLang: 'Idioma',
-    aboutTitle: 'DLSS 5 Swapper', aboutBody: 'Instala DLSS 5 en tus juegos y devuelve los originales cuando quieras.', aboutBy: 'Creado por Rakan Alkhaldi',
+    aboutTitle: 'DLSS 5 Swapper Plus', aboutBody: 'Instala DLSS 5 en tus juegos y devuelve los originales cuando quieras.', aboutBy: 'Creado por Rakan Alkhaldi',
     agoNow: 'ahora mismo', agoMin: (n) => `hace ${n} min`, agoHour: (n) => `hace ${n} h`, agoDay: (n) => `hace ${n} d`,
     artFound: (a, b) => `Carátulas: ${a} de ${b}`, libReady: (n, d) => `Biblioteca lista — ${n} juegos, ${d} en DirectX 12`
   },
@@ -589,7 +589,7 @@ The install will go through. If the neural pass never appears in game, 616.56 is
     setFolders: 'Pastas analisadas', setAdd: 'Adicionar', setLibrary: 'Arquivo da biblioteca', setReset: 'Redefinir',
     setRoots: 'Encontradas nos seus discos',
     setPosters: 'Capas', setSaved: (n) => `${n} salvas`, setLang: 'Idioma',
-    aboutTitle: 'DLSS 5 Swapper', aboutBody: 'Instala o DLSS 5 nos seus jogos e restaura os originais quando você quiser.', aboutBy: 'Feito por Rakan Alkhaldi',
+    aboutTitle: 'DLSS 5 Swapper Plus', aboutBody: 'Instala o DLSS 5 nos seus jogos e restaura os originais quando você quiser.', aboutBy: 'Feito por Rakan Alkhaldi',
     agoNow: 'agora mesmo', agoMin: (n) => `há ${n} min`, agoHour: (n) => `há ${n} h`, agoDay: (n) => `há ${n} d`,
     artFound: (a, b) => `Capas: ${a} de ${b}`, libReady: (n, d) => `Biblioteca pronta — ${n} jogos, ${d} em DirectX 12`
   },
@@ -619,7 +619,7 @@ The install will go through. If the neural pass never appears in game, 616.56 is
     setFolders: 'Просканированные папки', setAdd: 'Добавить', setLibrary: 'Файл библиотеки', setReset: 'Сбросить',
     setRoots: 'Найдено на дисках',
     setPosters: 'Обложки', setSaved: (n) => `сохранено ${n}`, setLang: 'Язык',
-    aboutTitle: 'DLSS 5 Swapper', aboutBody: 'Ставит DLSS 5 в ваши игры и в любой момент возвращает всё как было.', aboutBy: 'Автор — Rakan Alkhaldi',
+    aboutTitle: 'DLSS 5 Swapper Plus', aboutBody: 'Ставит DLSS 5 в ваши игры и в любой момент возвращает всё как было.', aboutBy: 'Автор — Rakan Alkhaldi',
     agoNow: 'только что', agoMin: (n) => `${n} мин назад`, agoHour: (n) => `${n} ч назад`, agoDay: (n) => `${n} дн назад`,
     artFound: (a, b) => `Обложки: ${a} из ${b}`, libReady: (n, d) => `Библиотека готова — ${n} игр, ${d} на DirectX 12`
   },
@@ -649,7 +649,7 @@ The install will go through. If the neural pass never appears in game, 616.56 is
     setFolders: 'Geprüfte Ordner', setAdd: 'Hinzufügen', setLibrary: 'Bibliotheksdatei', setReset: 'Zurücksetzen',
     setRoots: 'Auf den Laufwerken gefunden',
     setPosters: 'Cover', setSaved: (n) => `${n} gespeichert`, setLang: 'Sprache',
-    aboutTitle: 'DLSS 5 Swapper', aboutBody: 'Bringt DLSS 5 in deine Spiele - und jederzeit wieder heraus.', aboutBy: 'Von Rakan Alkhaldi',
+    aboutTitle: 'DLSS 5 Swapper Plus', aboutBody: 'Bringt DLSS 5 in deine Spiele - und jederzeit wieder heraus.', aboutBy: 'Von Rakan Alkhaldi',
     agoNow: 'gerade eben', agoMin: (n) => `vor ${n} Min.`, agoHour: (n) => `vor ${n} Std.`, agoDay: (n) => `vor ${n} T.`,
     artFound: (a, b) => `Cover: ${a} von ${b}`, libReady: (n, d) => `Bibliothek bereit — ${n} Spiele, ${d} mit DirectX 12`
   },
@@ -679,7 +679,7 @@ The install will go through. If the neural pass never appears in game, 616.56 is
     setFolders: 'Dossiers analysés', setAdd: 'Ajouter', setLibrary: 'Fichier de bibliothèque', setReset: 'Réinitialiser',
     setRoots: 'Trouvés sur vos disques',
     setPosters: 'Jaquettes', setSaved: (n) => `${n} enregistrées`, setLang: 'Langue',
-    aboutTitle: 'DLSS 5 Swapper', aboutBody: 'Installe DLSS 5 dans vos jeux, et remet les originaux quand vous voulez.', aboutBy: 'Par Rakan Alkhaldi',
+    aboutTitle: 'DLSS 5 Swapper Plus', aboutBody: 'Installe DLSS 5 dans vos jeux, et remet les originaux quand vous voulez.', aboutBy: 'Par Rakan Alkhaldi',
     agoNow: 'à l’instant', agoMin: (n) => `il y a ${n} min`, agoHour: (n) => `il y a ${n} h`, agoDay: (n) => `il y a ${n} j`,
     artFound: (a, b) => `Jaquettes : ${a} sur ${b}`, libReady: (n, d) => `Bibliothèque prête — ${n} jeux, ${d} en DirectX 12`
   },
@@ -709,7 +709,7 @@ The install will go through. If the neural pass never appears in game, 616.56 is
     setFolders: 'スキャン対象フォルダー', setAdd: '追加', setLibrary: 'ライブラリファイル', setReset: 'リセット',
     setRoots: 'ドライブ上で見つかりました',
     setPosters: '画像', setSaved: (n) => `${n} 件保存`, setLang: '言語',
-    aboutTitle: 'DLSS 5 Swapper', aboutBody: 'ゲームに DLSS 5 を導入し、いつでも元に戻せます。', aboutBy: '制作: Rakan Alkhaldi',
+    aboutTitle: 'DLSS 5 Swapper Plus', aboutBody: 'ゲームに DLSS 5 を導入し、いつでも元に戻せます。', aboutBy: '制作: Rakan Alkhaldi',
     agoNow: 'たった今', agoMin: (n) => `${n} 分前`, agoHour: (n) => `${n} 時間前`, agoDay: (n) => `${n} 日前`,
     artFound: (a, b) => `画像: ${b} 件中 ${a} 件`, libReady: (n, d) => `ライブラリ準備完了 — ${n} 件、${d} 件が DirectX 12`
   },
@@ -739,7 +739,7 @@ The install will go through. If the neural pass never appears in game, 616.56 is
     setFolders: '검사한 폴더', setAdd: '추가', setLibrary: '라이브러리 파일', setReset: '초기화',
     setRoots: '드라이브에서 찾음',
     setPosters: '이미지', setSaved: (n) => `${n}개 저장됨`, setLang: '언어',
-    aboutTitle: 'DLSS 5 Swapper', aboutBody: '게임에 DLSS 5를 설치하고, 언제든 원래대로 되돌립니다.', aboutBy: '제작: Rakan Alkhaldi',
+    aboutTitle: 'DLSS 5 Swapper Plus', aboutBody: '게임에 DLSS 5를 설치하고, 언제든 원래대로 되돌립니다.', aboutBy: '제작: Rakan Alkhaldi',
     agoNow: '방금', agoMin: (n) => `${n}분 전`, agoHour: (n) => `${n}시간 전`, agoDay: (n) => `${n}일 전`,
     artFound: (a, b) => `이미지: ${b}개 중 ${a}개`, libReady: (n, d) => `라이브러리 준비됨 — ${n}개, ${d}개는 DirectX 12`
   },
@@ -769,7 +769,7 @@ The install will go through. If the neural pass never appears in game, 616.56 is
     setFolders: 'Cartelle analizzate', setAdd: 'Aggiungi', setLibrary: 'File libreria', setReset: 'Reimposta',
     setRoots: 'Trovate nei tuoi dischi',
     setPosters: 'Copertine', setSaved: (n) => `${n} salvate`, setLang: 'Lingua',
-    aboutTitle: 'DLSS 5 Swapper', aboutBody: 'Installa DLSS 5 nei tuoi giochi e ripristina gli originali quando vuoi.', aboutBy: 'Creato da Rakan Alkhaldi',
+    aboutTitle: 'DLSS 5 Swapper Plus', aboutBody: 'Installa DLSS 5 nei tuoi giochi e ripristina gli originali quando vuoi.', aboutBy: 'Creato da Rakan Alkhaldi',
     agoNow: 'adesso', agoMin: (n) => `${n} min fa`, agoHour: (n) => `${n} h fa`, agoDay: (n) => `${n} g fa`,
     artFound: (a, b) => `Copertine: ${a} su ${b}`, libReady: (n, d) => `Libreria pronta — ${n} giochi, ${d} con DirectX 12`
   },
@@ -799,7 +799,7 @@ The install will go through. If the neural pass never appears in game, 616.56 is
     setFolders: 'Taranan klasörler', setAdd: 'Ekle', setLibrary: 'Kitaplık dosyası', setReset: 'Sıfırla',
     setRoots: 'Sürücülerinizde bulundu',
     setPosters: 'Görseller', setSaved: (n) => `${n} kayıtlı`, setLang: 'Dil',
-    aboutTitle: 'DLSS 5 Swapper', aboutBody: 'Oyunlarınıza DLSS 5 kurar, istediğiniz an geri alır.', aboutBy: 'Geliştiren: Rakan Alkhaldi',
+    aboutTitle: 'DLSS 5 Swapper Plus', aboutBody: 'Oyunlarınıza DLSS 5 kurar, istediğiniz an geri alır.', aboutBy: 'Geliştiren: Rakan Alkhaldi',
     agoNow: 'az önce', agoMin: (n) => `${n} dk önce`, agoHour: (n) => `${n} sa önce`, agoDay: (n) => `${n} gün önce`,
     artFound: (a, b) => `Görseller: ${b} içinden ${a}`, libReady: (n, d) => `Kitaplık hazır — ${n} oyun, ${d} tanesi DirectX 12`
   },
@@ -829,7 +829,7 @@ The install will go through. If the neural pass never appears in game, 616.56 is
     setFolders: 'Skanowane foldery', setAdd: 'Dodaj', setLibrary: 'Plik biblioteki', setReset: 'Resetuj',
     setRoots: 'Znalezione na dyskach',
     setPosters: 'Okładki', setSaved: (n) => `zapisano ${n}`, setLang: 'Język',
-    aboutTitle: 'DLSS 5 Swapper', aboutBody: 'Instaluje DLSS 5 w twoich grach i w każdej chwili przywraca oryginały.', aboutBy: 'Autor: Rakan Alkhaldi',
+    aboutTitle: 'DLSS 5 Swapper Plus', aboutBody: 'Instaluje DLSS 5 w twoich grach i w każdej chwili przywraca oryginały.', aboutBy: 'Autor: Rakan Alkhaldi',
     agoNow: 'przed chwilą', agoMin: (n) => `${n} min temu`, agoHour: (n) => `${n} godz. temu`, agoDay: (n) => `${n} dni temu`,
     artFound: (a, b) => `Okładki: ${a} z ${b}`, libReady: (n, d) => `Biblioteka gotowa — ${n} gier, ${d} na DirectX 12`
   }

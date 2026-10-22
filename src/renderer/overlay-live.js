@@ -125,7 +125,7 @@ window.mountOverlayLive = (root, { designOnly = false } = {}) => {
     extra.replaceChildren(el('h4', '', 'MORE RENODX CONTROLS'));
     const tools = el('div', 'ol-additional'); extra.append(tools);
     for (const t of status?.nrTools || []) if (![101, 102, 103, 104, 105, 114].includes(t.id)) addTool(tools, t);
-    if (!status?.nrTools) tools.append(el('p', 'ol-live-note', 'Restart DLSS 5 Swapper and connect the updated overlay to load RenoDX controls.'));
+    if (!status?.nrTools) tools.append(el('p', 'ol-live-note', 'Restart DLSS 5 Swapper Plus and connect the updated overlay to load RenoDX controls.'));
     const models = panel.querySelector('.ol-models');
     models.parentElement.querySelector('h4').textContent = 'NR STYLE';
     for (const [i, model] of [...models.children].entries()) {
@@ -199,7 +199,7 @@ window.mountOverlayLive = (root, { designOnly = false } = {}) => {
       const t = id >= 301 ? status?.feedPresent&&status.feedTools?.find(t=>t.id===id) : id === 0 ? { kind: 3, value: status?.effects ? 1 : 0, available: !!status } :
         // The on-screen status card is the add-on's own, so it is available
         // as soon as the overlay is connected - with or without a consumer.
-        id === 50 ? { kind: 1, value: status?.badge ? 1 : 0, available: !!status, effect: 'DLSS 5 Swapper', name: 'On-screen status card' } :
+        id === 50 ? { kind: 1, value: status?.badge ? 1 : 0, available: !!status, effect: 'DLSS 5 Swapper Plus', name: 'On-screen status card' } :
         id >= 101 ? status?.nrAvailable && status.nrTools?.find(t => t.id === id) : status?.tools.find(t => t.id === id);
       input.disabled = !t?.available;
       if (!t || input.dataset.dragging || (document.activeElement === input && input.type === 'number')) continue;

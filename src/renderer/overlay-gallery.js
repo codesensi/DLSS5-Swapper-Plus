@@ -2,7 +2,7 @@
 (()=>{
 const $=id=>document.getElementById(id);
 const olZh=()=>String(document.documentElement.lang||'en').toLowerCase().startsWith('zh');
-const GALLERY_ZH={"Interactive demo · no game changes":"交互式演示 · 不会改动游戏","Saved.":"已保存。","Choose your style. Preview it, then make it yours.":"选择你的风格，先预览，再定为你的。","Install overlay with DLSS":"随 DLSS 安装叠加层","＋ Add Overlay":"＋ 添加叠加层","Developer files":"开发者文件","Hotkey":"热键","Create theme":"创建主题","Emerald":"翠玉绿","Azure":"天青蓝","Amethyst":"紫水晶","✓ Selected":"✓ 已选择","Select":"选择","◉ Preview":"◉ 预览","Delete this theme":"删除此主题","Custom native overlay: browser preview unavailable. Only test trusted files.":"自定义原生叠加层：无法在浏览器中预览。请只测试可信文件。","Install separately":"单独安装","Remove":"移除","Existing installations":"现有安装","Remove overlay only":"仅移除叠加层","Overlay service is not running. Restart DLSS 5 Swapper, then press the hotkey in game.":"叠加层服务未运行。请重启 DLSS 5 Swapper，然后在游戏内按下热键。","Overlay service connected to a running game.":"叠加层服务已连接到正在运行的游戏。","Overlay service ready, waiting for a game. Keep DLSS 5 Swapper open and press the hotkey in game.":"叠加层服务已就绪，正在等待游戏。请保持 DLSS 5 Swapper 开启，并在游戏内按下热键。","Done.":"完成。","My theme":"我的主题","Create a theme":"创建主题","Pick an accent colour. The panel's other shades are derived from it.":"选择一个强调色。面板的其他色阶由它派生。","Colour":"颜色","Name":"名称","Cancel":"取消","Save":"保存","Give the theme a name.":"请为主题命名。","Reserved / unsupported key. Try F9 or Ctrl + Shift + O.":"该按键被保留或不受支持。请尝试 F9 或 Ctrl + Shift + O。"};
+const GALLERY_ZH={"Interactive demo · no game changes":"交互式演示 · 不会改动游戏","Saved.":"已保存。","Choose your style. Preview it, then make it yours.":"选择你的风格，先预览，再定为你的。","Install overlay with DLSS":"随 DLSS 安装叠加层","＋ Add Overlay":"＋ 添加叠加层","Developer files":"开发者文件","Hotkey":"热键","Create theme":"创建主题","Emerald":"翠玉绿","Azure":"天青蓝","Amethyst":"紫水晶","✓ Selected":"✓ 已选择","Select":"选择","◉ Preview":"◉ 预览","Delete this theme":"删除此主题","Custom native overlay: browser preview unavailable. Only test trusted files.":"自定义原生叠加层：无法在浏览器中预览。请只测试可信文件。","Install separately":"单独安装","Remove":"移除","Existing installations":"现有安装","Remove overlay only":"仅移除叠加层","Overlay service is not running. Restart DLSS 5 Swapper Plus, then press the hotkey in game.":"叠加层服务未运行。请重启 DLSS 5 Swapper Plus，然后在游戏内按下热键。","Overlay service connected to a running game.":"叠加层服务已连接到正在运行的游戏。","Overlay service ready, waiting for a game. Keep DLSS 5 Swapper Plus open and press the hotkey in game.":"叠加层服务已就绪，正在等待游戏。请保持 DLSS 5 Swapper Plus 开启，并在游戏内按下热键。","Done.":"完成。","My theme":"我的主题","Create a theme":"创建主题","Pick an accent colour. The panel's other shades are derived from it.":"选择一个强调色。面板的其他色阶由它派生。","Colour":"颜色","Name":"名称","Cancel":"取消","Save":"保存","Give the theme a name.":"请为主题命名。","Reserved / unsupported key. Try F9 or Ctrl + Shift + O.":"该按键被保留或不受支持。请尝试 F9 或 Ctrl + Shift + O。"};
 const text=(en,ar)=>olZh()?(GALLERY_ZH[en]||en):(document.documentElement.lang==='ar'?ar:en);
 const esc=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const builtInThemes=[['green','Emerald','الأخضر'],['blue','Azure','الأزرق'],['purple','Amethyst','البنفسجي']];
@@ -47,13 +47,13 @@ async function showBridge(){
  if(state&&state.addon===false){
   box.dataset.state='off';
   box.textContent=text(
-   `The overlay add-on is missing from this app, so no game can load it: ${state.addonFile||''}. Antivirus software removes this file - restore it from your antivirus quarantine and add an exclusion, or reinstall DLSS 5 Swapper.`,
+   `The overlay add-on is missing from this app, so no game can load it: ${state.addonFile||''}. Antivirus software removes this file - restore it from your antivirus quarantine and add an exclusion, or reinstall DLSS 5 Swapper Plus.`,
    `ملف الأوفرلاي مفقود من البرنامج، فلا تستطيع أي لعبة تحميله: ${state.addonFile||''}. برامج الحماية تحذف هذا الملف - استعده من الحجر الصحي وأضف استثناءً، أو أعد تثبيت البرنامج.`);
   return;
  }
  if(!state||!state.listening){
   box.dataset.state='off';
-  box.textContent=text('Overlay service is not running. Restart DLSS 5 Swapper, then press the hotkey in game.',
+  box.textContent=text('Overlay service is not running. Restart DLSS 5 Swapper Plus, then press the hotkey in game.',
    'خدمة الأوفرلاي لا تعمل. أعد تشغيل البرنامج ثم اضغط زر الاختصار داخل اللعبة.');
   return;
  }
@@ -63,7 +63,7 @@ async function showBridge(){
   return;
  }
  box.dataset.state='ready';
- box.textContent=text('Overlay service ready, waiting for a game. Keep DLSS 5 Swapper open and press the hotkey in game.',
+ box.textContent=text('Overlay service ready, waiting for a game. Keep DLSS 5 Swapper Plus open and press the hotkey in game.',
   'خدمة الأوفرلاي جاهزة وتنتظر لعبة. أبقِ البرنامج مفتوحاً واضغط زر الاختصار داخل اللعبة.');
 }
 async function action(name,id){if(busy)return;if(name==='preview'){preview(id);return;}if(name==='select'){await save({theme:id});return;}if(name==='delete-theme'){await save({custom:null,theme:prefs.theme==='custom'?'green':prefs.theme});return;}busy=true;try{const r=await({add:window.lab.overlayAdd,remove:window.lab.overlayRemove,install:window.lab.overlayInstall,uninstall:window.lab.overlayUninstall,source:window.lab.overlaySource})[name](id);$('olStatus').textContent=r.ok?text('Done.','تم.'):r.error;}catch(e){$('olStatus').textContent=e.message;}finally{busy=false;await render();}}
