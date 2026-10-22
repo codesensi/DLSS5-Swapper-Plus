@@ -17,7 +17,7 @@ const fs = require('fs');
 const path = require('path');
 
 const ROOT = path.resolve(__dirname, '..');
-const SOURCE = process.argv[2] || path.join(ROOT, 'app_iocn.png');
+const SOURCE = process.argv[2] || path.join(ROOT, 'assets/app-icon.png');
 const OUT_DIR = path.join(ROOT, 'build');
 const ICO_SIZES = [16, 24, 32, 48, 64, 128, 256];
 

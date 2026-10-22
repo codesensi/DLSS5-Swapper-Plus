@@ -76,7 +76,7 @@
       ],
       "category": "Game",
       "maintainer": "codesensi",
-      "icon": "app_iocn.png",
+      "icon": "assets/app-icon.png",
       "artifactName": "DLSS5-Swapper-Plus-${version}-${arch}.${ext}"
     },
     "compression": "maximum",
