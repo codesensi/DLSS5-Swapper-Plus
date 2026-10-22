@@ -43,6 +43,14 @@ const RESHADE_DIRS = [
   path.join(os.homedir(), 'Desktop')
 ];
 
+// Fallback when no local ReShade_Setup_*_Addon.exe exists anywhere. 6.8.0 is
+// the version the overlay's ReShade SDK headers (tools\reshade-6.8.0) and its
+// ImGui pin were built against, so the fallback can never drift from the SDK
+// the way a "download latest" would. A local copy still wins when present,
+// which keeps an offline build machine working and lets a developer override
+// the pin deliberately. Digest cross-checked against two local copies.
+const RESHADE_SETUP_PIN = ['ReShade_Setup_6.8.0_Addon.exe', 'https://reshade.me/downloads/ReShade_Setup_6.8.0_Addon.exe', 'afe4c8f13048306307983b8b3d41d5bf00a86820440b0e57dea10950e1176445'];
+
 function copyFile(src, dest) {
   fs.mkdirSync(path.dirname(dest), { recursive: true });
   fs.copyFileSync(src, dest);
@@ -349,13 +357,19 @@ const overlayBuild = overlayBuilds.find((f) => fs.existsSync(f));
 if (overlayBuild) copyFile(overlayBuild, path.join(OVERLAY_BIN, 'dlss5-lab-overlay.addon64'));
 else console.warn('  ! overlay add-on not built - the Overlay page will offer no built-in entry');
 
-const reshade = findReShadeSetup();
-if (!reshade) {
+let reshade = findReShadeSetup();
+if (reshade) {
+  console.log(`  using local ReShade_Setup_${reshade.version.join('.')}_Addon.exe (${path.relative(ROOT, reshade.file) || reshade.file})`);
+} else {
   // Warning-and-continue here once shipped a build that silently could not
   // install ReShade, which is half of what the app does. Stop instead.
-  console.error('\nReShade_Setup_*_Addon.exe not found in Downloads or Desktop.');
-  console.error('Get the Addon build from https://reshade.me, put it in Downloads, and run again.');
-  process.exit(1);
+  console.log('  no local ReShade_Setup_*_Addon.exe - downloading the pinned build');
+  const [name] = RESHADE_SETUP_PIN;
+  reshade = {
+    file: await pinned(RESHADE_SETUP_PIN),
+    version: (name.match(/(\d+)\.(\d+)\.(\d+)/) || []).slice(1).map(Number),
+    name
+  };
 }
 copyFile(reshade.file, path.join(PAYLOAD, reshade.name));
 
