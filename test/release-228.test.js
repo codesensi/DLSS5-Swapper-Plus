@@ -335,10 +335,10 @@ test('theme 2 opens a game as a page, and moves with real transitions', () => {
 test('the add-ons are the current ones, pinned in one place each', () => {
   const feeder = require('../src/core/feeder-release');
   const renodx = require('../src/core/renodx-release');
-  assert.equal(feeder.version, '1.17.0');
+  assert.equal(feeder.version, '1.19.0');
   // Both halves of the 32-bit split come out of this one pin, so a payload can
   // never carry a client and a helper that refuse to talk to each other.
-  assert.match(feeder.archive[1], /\/v1\.17\.0\/DLSS5-Feeder-1\.17\.0\.zip$/);
+  assert.match(feeder.archive[1], /\/v1\.19\.0\/DLSS5-Feeder-1\.19\.0\.zip$/);
   for (const rel of ['dlss5-feed.addon32', 'dlss5-feed.addon64', 'dlss5-feed-host64.exe']) {
     assert.match(feeder.hashes[rel], /^[0-9a-f]{64}$/);
   }
@@ -350,7 +350,7 @@ test('the add-ons are the current ones, pinned in one place each', () => {
     .split(',').map((b) => b.trim().replace(/^0x/, '')).join('');
   assert.equal(bytes, feeder.hashes['dlss5-feed.addon64']);
   assert.ok(header.includes('hash_matches(module,' + feeder.addon64Size + ',hash)'), 'the header pins the shipped size');
-  assert.match(header, /this build drives x64 v1\.17\.0/);
+  assert.match(header, /this build drives x64 v1\.19\.0/);
   // 1.17.0's output stabiliser, on the panel rather than only in the cfg file.
   assert.match(header, /std::array<field,12> schema\(\)/);
   assert.match(header, /std::array<field,12> fields=schema\(\);/);
@@ -359,7 +359,7 @@ test('the add-ons are the current ones, pinned in one place each', () => {
 
   assert.equal(renodx.CONSUMER.version, '6.5.3');
   assert.match(renodx.CONSUMER.archive[1], /RankFTW\/rhi-repo/);
-  assert.match(renodx.MULTIPASS.version, /^SF 26\.0927/);
+  assert.match(renodx.MULTIPASS.version, /^SF 26\.1003/);
   // The build no longer depends on a file sitting on one machine's desktop.
   const script = read('scripts', 'collect-payload.js');
   assert.match(script, /require\('\.\.\/src\/core\/renodx-release'\)/);
