@@ -4,7 +4,6 @@
 // Run it before a build: pnpm run payload
 const fs = require('fs');
 const path = require('path');
-const os = require('os');
 const crypto = require('crypto');
 const extractZip = require('extract-zip');
 const { execFileSync } = require('child_process');
@@ -25,26 +24,19 @@ const COMPONENTS = {
   reshadeUiHeader: ['ReShadeUI.fxh', 'https://raw.githubusercontent.com/crosire/reshade-shaders/ee30868391d4ad103db60489820102d8fd40e3c1/Shaders/ReShadeUI.fxh', '78adf672df47460297eb9fe6dd238d2aafa24510b52b84feb1a745dff70eb901']
 };
 
-// Where the DLSS 5 files and the ReShade installer normally live on this
-// machine. Override either with an argument: pnpm run payload -- <dlss5Dir>
-const DEFAULT_SOURCES = [
-  process.argv[2],
-  path.resolve(ROOT, '..'),
-  path.join(os.homedir(), 'OneDrive', 'Desktop', 'dlss 5 swapper'),
-  path.join(os.homedir(), 'Desktop', 'dlss 5 swapper')
-].filter(Boolean);
-
-// vendor/ comes first: a copy that lives with the project cannot be cleaned
-// out of Downloads between builds, which is how one release shipped without it.
-const RESHADE_DIRS = [
-  path.join(ROOT, 'vendor'),
-  path.join(os.homedir(), 'Downloads'),
-  path.join(os.homedir(), 'OneDrive', 'Downloads'),
-  path.join(os.homedir(), 'Desktop')
-];
+// Everything third-party lives under vendor/. The DLSS distribution is
+// hand-placed and flat (DLLs directly in the folder - the old "streamline/
+// subfolder" layout is no longer recognised); the ReShade installer and the
+// optional add-ons have their own vendor folders. Override the DLSS location
+// with an argument: pnpm run payload -- <dlssDir>
+const DLSS_SOURCE = process.argv[2]
+  ? path.resolve(process.argv[2])
+  : path.join(ROOT, 'vendor', 'dlss-streamline');
+const VENDOR_ADDONS = path.join(ROOT, 'vendor', 'addons');
+const RESHADE_SETUP_DIR = path.join(ROOT, 'vendor', 'reshade-setup');
 
 // Fallback when no local ReShade_Setup_*_Addon.exe exists anywhere. 6.8.0 is
-// the version the overlay's ReShade SDK headers (tools\reshade-6.8.0) and its
+// the version the overlay's ReShade SDK headers (vendor\toolchain\reshade) and its
 // ImGui pin were built against, so the fallback can never drift from the SDK
 // the way a "download latest" would. A local copy still wins when present,
 // which keeps an offline build machine working and lets a developer override
@@ -87,29 +79,23 @@ async function extracted(component, folder) {
 }
 
 function findSource() {
-  for (const dir of DEFAULT_SOURCES) {
-    const streamline = fs.existsSync(path.join(dir, 'streamline'))
-      ? path.join(dir, 'streamline')
-      : dir;
-    try {
-      const files = fs.readdirSync(streamline);
-      if (files.some((f) => /^nvngx_dlssnr\.dll$/i.test(f))) return { dir, streamline };
-    } catch {}
-  }
+  const streamline = DLSS_SOURCE; // flat layout: DLLs sit directly in the folder
+  try {
+    const files = fs.readdirSync(streamline);
+    if (files.some((f) => /^nvngx_dlssnr\.dll$/i.test(f))) return { dir: streamline, streamline };
+  } catch {}
   return null;
 }
 
 // Only an "Addon" build can load the DLSS 5 add-on; pick the newest one.
 function findReShadeSetup() {
   const found = [];
-  for (const dir of RESHADE_DIRS) {
-    let entries = [];
-    try { entries = fs.readdirSync(dir); } catch { continue; }
-    for (const name of entries) {
-      if (!/^ReShade_Setup_.*_Addon\.exe$/i.test(name)) continue;
-      const version = (name.match(/(\d+)\.(\d+)\.(\d+)/) || []).slice(1).map(Number);
-      found.push({ file: path.join(dir, name), version, name });
-    }
+  let entries = [];
+  try { entries = fs.readdirSync(RESHADE_SETUP_DIR); } catch { return null; }
+  for (const name of entries) {
+    if (!/^ReShade_Setup_.*_Addon\.exe$/i.test(name)) continue;
+    const version = (name.match(/(\d+)\.(\d+)\.(\d+)/) || []).slice(1).map(Number);
+    found.push({ file: path.join(RESHADE_SETUP_DIR, name), version, name });
   }
   found.sort((a, b) => {
     for (let i = 0; i < 3; i++) {
@@ -130,7 +116,7 @@ const RENODX = { 'renodx-dlss5.addon64': renodx.CONSUMER, 'renodx-dlss.addon64':
 
 async function findRenoDxAddon(sourceDir, wanted) {
   const release = RENODX[wanted];
-  for (const dir of [sourceDir, path.resolve(ROOT, '..'), ...DEFAULT_SOURCES]) {
+  for (const dir of [sourceDir, VENDOR_ADDONS]) {
     let files = [];
     try { files = fs.readdirSync(dir); } catch { continue; }
     const name = files.find((file) => file.toLowerCase() === wanted);
@@ -250,7 +236,7 @@ async function main() {
 const source = findSource();
 if (!source) {
   console.error('لم يتم العثور على ملفات DLSS 5 / DLSS 5 files not found.');
-  console.error('Pass the folder explicitly:  pnpm run payload -- "C:\\path\\to\\dlss 5 swapper"');
+  console.error('Pass the folder explicitly:  pnpm run payload -- "C:\\path\\to\\dlss-streamline"');
   process.exit(1);
 }
 
@@ -261,18 +247,6 @@ for (const name of fs.readdirSync(source.streamline)) {
   if (!/\.(dll|txt)$/i.test(name)) continue;
   copyFile(path.join(source.streamline, name), path.join(PAYLOAD, 'streamline', name));
 }
-
-// A loose DLL dropped in the source root wins over the copy inside streamline/,
-// so replacing one file there is enough to change what the build ships.
-let overrides = 0;
-for (const name of fs.readdirSync(source.dir)) {
-  if (!/^(nvngx_[a-z_]*|sl\.[a-z_]+)\.dll$/i.test(name)) continue;
-  const from = path.join(source.dir, name);
-  if (!fs.statSync(from).isFile()) continue;
-  copyFile(from, path.join(PAYLOAD, 'streamline', name));
-  overrides++;
-}
-if (overrides) console.log(`  (${overrides} override${overrides > 1 ? 's' : ''} from the source root)`);
 
 // The native route's consumer is the verified renodx-dlss5 build, by name. It
 // used to be "the first .addon64 beside the source", and once the multipass
@@ -293,7 +267,7 @@ fs.mkdirSync(EXTRAS, { recursive: true });
 const base = path.basename(addon).toLowerCase();
 const deprecated = new Set(['76e8a0c90a6b99a7']);
 let extras = 0;
-for (const dir of [path.resolve(ROOT, '..'), ...DEFAULT_SOURCES]) {
+for (const dir of [VENDOR_ADDONS]) {
   let entries = [];
   try { entries = fs.readdirSync(dir, { withFileTypes: true }); } catch { continue; }
   for (const e of entries) {
@@ -350,8 +324,7 @@ console.log(`  (${extras} optional add-on build${extras === 1 ? '' : 's'} bundle
 const OVERLAY_BIN = path.join(ROOT, 'overlay-bin');
 fs.rmSync(OVERLAY_BIN, { recursive: true, force: true });
 const overlayBuilds = [
-  path.join(ROOT, 'dist', 'overlay', 'dlss5-lab-overlay.addon64'),
-  path.join(ROOT, '..', 'lab', 'dist', 'overlay', 'dlss5-lab-overlay.addon64')
+  path.join(ROOT, 'dist', 'overlay', 'dlss5-lab-overlay.addon64')
 ];
 const overlayBuild = overlayBuilds.find((f) => fs.existsSync(f));
 if (overlayBuild) copyFile(overlayBuild, path.join(OVERLAY_BIN, 'dlss5-lab-overlay.addon64'));

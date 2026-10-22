@@ -5,17 +5,16 @@ $appRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
 # folder. It must match the app's userData directory or the overlay loads in the
 # game and then waits for a bridge that is writing somewhere else.
 $overlayProfile = 'dlss5-swapper'
-# The SDK and compiler normally sit in tools/ here; a checkout that shares one
-# toolchain with a sibling project is searched second.
-$toolRoots = @($appRoot, (Join-Path $appRoot '../lab'))
-$zig = $toolRoots | ForEach-Object { Join-Path $_ 'tools/zig-x86_64-windows-0.14.1/zig.exe' } | Where-Object { Test-Path -LiteralPath $_ } | Select-Object -First 1
-$sdk = $toolRoots | ForEach-Object { Join-Path $_ 'tools/reshade-6.8.0' } | Where-Object { Test-Path -LiteralPath (Join-Path $_ 'reshade.hpp') } | Select-Object -First 1
-if (!$zig -or !$sdk) { throw 'Run pnpm run overlay:prepare first.' }
+# The SDK and compiler live under vendor\toolchain with version-less folder
+# names; the versions themselves are pinned in scripts/prepare-overlay.ps1.
+$zig = Join-Path $appRoot 'vendor/toolchain/zig/zig.exe'
+$sdk = Join-Path $appRoot 'vendor/toolchain/reshade'
+if (!(Test-Path -LiteralPath $zig) -or !(Test-Path -LiteralPath (Join-Path $sdk 'reshade.hpp'))) { throw 'Run pnpm run overlay:prepare first.' }
 $profileDefine = '-DLAB_OVERLAY_PROFILE=' + $overlayProfile
 $output = Join-Path $appRoot $(if ($RenoDxProbe) { 'dist/renodx-probe' } elseif ($Smoke) { 'dist/overlay-smoke' } else { 'dist/overlay' })
 New-Item -ItemType Directory -Force -Path $output | Out-Null
-$env:ZIG_GLOBAL_CACHE_DIR = Join-Path $appRoot 'tools/zig-cache'
-$env:ZIG_LOCAL_CACHE_DIR = Join-Path $appRoot 'tools/zig-local-cache'
+$env:ZIG_GLOBAL_CACHE_DIR = Join-Path $appRoot 'vendor/toolchain/zig-cache/global'
+$env:ZIG_LOCAL_CACHE_DIR = Join-Path $appRoot 'vendor/toolchain/zig-cache/local'
 # Compile the tiny ImVec2 return adapter with ReShade's MSVC ABI, without CRT.
 $abiObject = Join-Path $output 'imgui-abi.obj'
 & $zig cc -target x86_64-windows-msvc -x c++ -std=c++17 -O2 -fno-exceptions -fno-rtti -nostdinc -nostdlib -c (Join-Path $appRoot 'overlay/imgui-abi.cpp') -o $abiObject
