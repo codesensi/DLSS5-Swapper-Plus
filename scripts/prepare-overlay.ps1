@@ -27,7 +27,16 @@ if (!(Test-Path -LiteralPath $compiler)) {
     if ($digest -ne '554f5378228923ffd558eac35e21af020c73789d87afeabf4bfd16f2e6feed2c') {
         throw 'Zig archive checksum mismatch. Nothing was executed.'
     }
-    Expand-Archive -LiteralPath $archive -DestinationPath $toolchainDir -Force
+    # tar (bundled with Windows 10 1803+) extracts ~10x faster than
+    # Expand-Archive on the ~4000 small files zig ships; fall back to the
+    # managed extractor if tar is somehow missing.
+    $tar = Get-Command tar.exe -ErrorAction SilentlyContinue
+    if ($tar) {
+        tar -xf $archive -C $toolchainDir
+        if ($LASTEXITCODE -ne 0) { throw "tar failed to extract $zigArchiveName (exit $LASTEXITCODE)." }
+    } else {
+        Expand-Archive -LiteralPath $archive -DestinationPath $toolchainDir -Force
+    }
     if (!(Test-Path -LiteralPath $zigDir)) {
         Move-Item -LiteralPath (Join-Path $toolchainDir "zig-x86_64-windows-$zigVersion") -Destination $zigDir
     }
