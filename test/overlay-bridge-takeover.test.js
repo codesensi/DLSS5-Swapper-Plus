@@ -44,7 +44,7 @@ const connect = (pipeName) => new Promise((resolve, reject) => {
 const settle = (ms = 120) => new Promise(resolve => setTimeout(resolve, ms));
 
 async function bridge(t, idleTakeoverMs = 5000) {
-  const userData = fs.mkdtempSync(path.join(os.tmpdir(), 'dlss5-swapper-bridge-'));
+  const userData = fs.mkdtempSync(path.join(os.tmpdir(), 'dlss5-swapper-plus-bridge-'));
   const live = await startBridge({ BrowserWindow: FakeWindow, userData, idleTakeoverMs });
   t.after(() => { live.close(); fs.rmSync(userData, { recursive: true, force: true }); });
   return live;
@@ -84,7 +84,7 @@ test('the bridge reports what it is doing', async (t) => {
     { listening: live.state().listening, connected: live.state().connected, game: live.state().game },
     { listening: true, connected: false, game: false });
   assert.ok(fs.existsSync(live.endpoint), 'the endpoint the add-on reads is written');
-  assert.match(live.pipeName, /^\\\\\.\\pipe\\dlss5-swapper-bridge-/i);
+  assert.match(live.pipeName, /^\\\\\.\\pipe\\dlss5-swapper-plus-bridge-/i);
 
   const socket = await connect(live.pipeName);
   await settle();
