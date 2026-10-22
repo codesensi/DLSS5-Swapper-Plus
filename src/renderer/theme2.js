@@ -179,6 +179,22 @@
     paint();
   }
 
+  // The masthead is built once, so a later language switch would leave its
+  // labels in the language of the day it was built. Rewritten on applyLang.
+  function syncLang() {
+    if (!built) return;
+    const searchLabel = q('#t2Search span');
+    if (searchLabel) searchLabel.textContent = t('t2Search');
+    const pin = q('#t2Pin');
+    if (pin) pin.title = pin.ariaLabel = t(state.rail === 'on' ? 'railExpand' : 'railCollapse');
+    const grid = q('#t2View [data-view-mode="grid"]');
+    const list = q('#t2View [data-view-mode="list"]');
+    if (grid) grid.title = grid.ariaLabel = t('t2Cards');
+    if (list) list.title = list.ariaLabel = t('t2List');
+    // The current-view label reads the nav the same way the dock does.
+    syncDock();
+  }
+
   function syncDock() {
     if (!dock) return;
     const current = q('.nav-item.active')?.dataset.view;
@@ -329,7 +345,6 @@
     const kicker = String(name).split(/[:\u2013-]/)[0].trim().toUpperCase();
     const genres = (art && art.genres ? art.genres : []).slice(0, 3);
     const ready = Boolean(d.ok && pick && !pick.installIssue && routesFor(pick).length);
-    const summary = art && art.summary ? art.summary : '';
     const api = pick ? selectedApi(pick, dir) : null;
     const route = pick ? selectedRoute(d, pick, dir) : null;
     const routeName = route === 'optiscaler' ? 'OptiScaler' : route === 'renodx' ? 'RenoDX'
@@ -356,7 +371,6 @@
           <div class="gp-hero-copy">
             <span class="gp-kicker">${esc(kicker)}</span>
             <h1 class="gp-title">${esc(name)}</h1>
-            ${summary ? `<p class="gp-sub">${esc(summary)}</p>` : ''}
             ${genres.length ? `<div class="gp-chips">${genres.map((one) => `<span class="gp-chip">${esc(one)}</span>`).join('')}</div>` : ''}
             <div class="gp-cta">
               <button class="gp-play" id="t2Play">${icon(ICONS.play, 16)}<span>${esc(t('t2Play'))}</span></button>
@@ -474,7 +488,10 @@
       play.disabled = true;
       try {
         const answer = await window.lab.launchGame(dir);
-        if (!answer?.ok) log(answer?.message || t('t2PlayFailed'));
+        if (!answer?.ok) {
+          const translated = answer?.code && t(answer.code);
+          log(translated && translated !== answer.code ? translated : (answer?.message || t('t2PlayFailed')));
+        }
       } catch (error) { log(error.message); }
       finally { setTimeout(() => { play.disabled = false; }, 1200); }
     };
@@ -626,7 +643,7 @@
     return document.startViewTransition(() => originalCloseSheet());
   };
 
-  root.theme2 = { enable, disable, sheetMarkup, wireSheet, syncDock, transition, openPalette, closePalette, stagger };
+  root.theme2 = { enable, disable, sheetMarkup, wireSheet, syncDock, syncLang, transition, openPalette, closePalette, stagger };
 
   // The app's boot can finish before this file has even been parsed - the
   // answer to boot() is one IPC round trip, and a second script is a second

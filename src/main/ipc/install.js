@@ -116,7 +116,7 @@ function register(ctx) {
     const p = payload();
     if (!p) return { ok: false, ...ctx.winLayer.payloadMissing() };
     const scan = await ctx.scanGame(dir);
-    if (!scan.chosen) return { ok: false, message: 'No game executable found' };
+    if (!scan.chosen) return { ok: false, code: 'errNoGameExecutable', message: 'errNoGameExecutable' };
 
     // Honour the sheet's choice, but only if it is one of the candidates we
     // actually found - never patch a path the renderer made up.
@@ -130,7 +130,7 @@ function register(ctx) {
     if (requestedRoute === 'optiscaler' && !availableRoutes.includes('optiscaler')) {
       return { ok: false, code: ctx.installRoutes.optiReason(target, api) || 'optiUnsupported' };
     }
-    if (!availableRoutes.length) return { ok: false, code: 'unsupportedRendererHint', message: 'This rendering API is not supported. Select the game’s DirectX 11 mode where available.' };
+    if (!availableRoutes.length) return { ok: false, code: 'unsupportedRendererHint', message: 'unsupportedRendererHint' };
     const recommendedRoute = ctx.installRoutes.recommendedRoute(scan, target);
     const route = availableRoutes.includes(requestedRoute) ? requestedRoute
       : (availableRoutes.includes(recommendedRoute) ? recommendedRoute : availableRoutes[0]);
@@ -143,10 +143,10 @@ function register(ctx) {
       : null;
     const proton = ctx.contextForSteamGame(protonGame);
     if (process.platform === 'linux' && !proton) {
-      return { ok: false, code: 'errProtonRequired', message: 'This installer supports Windows games launched through Steam Proton. Launch the game once with Proton, then try again.' };
+      return { ok: false, code: 'errProtonRequired', message: 'errProtonRequired' };
     }
     if (process.platform === 'linux' && api === 'vulkan') {
-      return { ok: false, code: 'errLinuxVulkanUnsupported', message: 'The Vulkan Feeder route needs a host Vulkan layer and is not supported on Linux yet. Select a DirectX renderer in the game.' };
+      return { ok: false, code: 'errLinuxVulkanUnsupported', message: 'errLinuxVulkanUnsupported' };
     }
 
     const send = (e) => event.sender.send('job', e);
@@ -214,7 +214,7 @@ function register(ctx) {
     // Feeder and its helper. Never report a working installation if absent.
     if (route === 'feeder') {
       if (!p.source.feeder || !(target.bitness === 32 ? p.source.feeder.ok32 : p.source.feeder.ok64)) {
-        return { ok: false, message: 'Feeder payload is incomplete or from mixed releases. Reinstall the updated Swapper package.' };
+        return { ok: false, code: 'errFeederPayload', message: 'errFeederPayload' };
       }
       const checks = [[target.bitness, path.dirname(target.path)]];
       if (target.bitness === 32) checks.push([64, path.join(path.dirname(target.path), 'host64')]);

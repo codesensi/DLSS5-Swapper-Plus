@@ -18,6 +18,10 @@ const { scanGame, scanSource } = require('./src/core/scan.js');
 const { discover, dedupe, isInside, steam } = require('./src/core/library');
 const { contextForSteamGame, createSetupRunner } = require('./src/core/proton');
 const art = require('./src/core/steamart');
+// Store lookups go through Electron's fetch so the system proxy applies;
+// Node's own fetch ignores it and the store API times out on such networks.
+// The vm tests stub electron without a net module, hence the guard.
+if (typeof net !== 'undefined' && typeof net.fetch === 'function') art.setFetch(net.fetch);
 const { saveActiveManifest, writeTracked, makeReShadeConfigWritable } = require('./src/core/apply.js');
 const pe = require('./src/core/pe.js');
 const { ensureLumenite, ensureDgVoodoo, missingVCRuntime } = require('./src/core/runtime-components.js');
@@ -219,7 +223,7 @@ app.whenReady().then(async () => {
   if (!singleInstance) return;
   // Registered here rather than at load: main.js is exercised in test
   // sandboxes, where src modules are stubbed and cannot be called.
-  require('./src/main/overlay-ipc')({ app, ipcMain, dialog, shell, window: () => winLayer.getWindow(), bridge: () => overlayBridge });
+  require('./src/main/overlay-ipc')({ app, ipcMain, dialog, shell, window: () => winLayer.getWindow(), bridge: () => overlayBridge, featureText });
   winLayer.createWindow();
   // The icon is there from launch, not only after the first close - somebody
   // who wants the app parked in the tray wants to see that it is.

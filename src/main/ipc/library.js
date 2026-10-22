@@ -46,7 +46,7 @@ function register(ctx) {
     try {
       const scan = await ctx.scanGame(dir);
       const exe = scan.chosen && scan.chosen.path;
-      if (!exe) return { ok: false, message: 'No game executable found' };
+      if (!exe) return { ok: false, code: 'errNoGameExecutable', message: 'No game executable found' };
       const error = await shell.openPath(exe);
       return error ? { ok: false, message: error } : { ok: true, via: 'exe' };
     } catch (error) { return { ok: false, message: error.message }; }
@@ -71,12 +71,12 @@ function register(ctx) {
     const found = ctx.diagnostics.sources({ gameDir: dir, exeDir, userData });
     const list = found.length
       ? found.map(item => `• ${item.file}  (${Math.ceil(item.bytes / 1024)} KB)`).join('\n')
-      : 'No log files were found for this game yet.';
+      : ctx.featureText('diagAskEmpty');
     const consent = await dialog.showMessageBox(window, {
-      type: 'question', title: 'Save diagnostics',
-      message: 'These files will be copied into one text file:',
-      detail: `${list}\n\nIt also records the app version, your GPU and driver, and this session's activity log. Game folder paths appear in it. Read it before attaching it anywhere.`,
-      buttons: ['Cancel', 'Choose where to save'], defaultId: 1, cancelId: 0
+      type: 'question', title: ctx.featureText('diagTitle'),
+      message: ctx.featureText('diagAskMessage'),
+      detail: `${list}\n\n${ctx.featureText('diagAskDetail')}`,
+      buttons: [ctx.featureText('cancel'), ctx.featureText('diagChooseSave')], defaultId: 1, cancelId: 0
     });
     if (consent.response !== 1) return { ok: false, cancelled: true };
 
@@ -93,9 +93,9 @@ function register(ctx) {
 
     const stamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
     const picked = await dialog.showSaveDialog(window, {
-      title: 'Save diagnostics',
+      title: ctx.featureText('diagTitle'),
       defaultPath: path.join(app.getPath('documents'), `dlss5-swapper-plus-diagnostics-${stamp}.txt`),
-      filters: [{ name: 'Text', extensions: ['txt'] }]
+      filters: [{ name: ctx.featureText('diagTextFilter'), extensions: ['txt'] }]
     });
     if (picked.canceled || !picked.filePath) return { ok: false, cancelled: true };
     try {
@@ -187,7 +187,7 @@ function register(ctx) {
   // ---------- editing the library ----------
 
   ipcMain.handle('add-folder', async () => {
-    const res = await dialog.showOpenDialog(ctx.winLayer.getWindow(), { properties: ['openDirectory'], title: 'Scan this folder for games' });
+    const res = await dialog.showOpenDialog(ctx.winLayer.getWindow(), { properties: ['openDirectory'], title: ctx.featureText('scanFolderTitle') });
     if (res.canceled) return null;
     const state = loadState();
     if (!state.folders.includes(res.filePaths[0])) state.folders.push(res.filePaths[0]);
@@ -232,7 +232,7 @@ function register(ctx) {
   });
 
   ipcMain.handle('add-game', async () => {
-    const res = await dialog.showOpenDialog(ctx.winLayer.getWindow(), { properties: ['openDirectory'], title: 'Add one game' });
+    const res = await dialog.showOpenDialog(ctx.winLayer.getWindow(), { properties: ['openDirectory'], title: ctx.featureText('addGameTitle') });
     if (res.canceled) return null;
     const state = loadState();
     if (!state.manual.includes(res.filePaths[0])) state.manual.push(res.filePaths[0]);
@@ -243,8 +243,8 @@ function register(ctx) {
   ipcMain.handle('set-poster', async (_event, dir) => {
     const res = await dialog.showOpenDialog(ctx.winLayer.getWindow(), {
       properties: ['openFile'],
-      title: 'Pick a poster',
-      filters: [{ name: 'Images', extensions: ['jpg', 'jpeg', 'png', 'webp'] }]
+      title: ctx.featureText('pickPosterTitle'),
+      filters: [{ name: ctx.featureText('imagesFilter'), extensions: ['jpg', 'jpeg', 'png', 'webp'] }]
     });
     if (res.canceled) return null;
 

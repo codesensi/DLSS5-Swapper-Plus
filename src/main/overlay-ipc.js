@@ -2,7 +2,7 @@
 const path = require('node:path');
 const { createOverlayLibrary } = require('../core/overlays');
 
-module.exports = function registerOverlayIpc({ app, ipcMain, dialog, shell, window, bridge = () => null }) {
+module.exports = function registerOverlayIpc({ app, ipcMain, dialog, shell, window, bridge = () => null, featureText = (key) => key }) {
   const appRoot = path.resolve(__dirname, '..', '..');
   // Installed, the built add-on rides along as an extra resource; from source it
   // is whatever scripts/build/build-overlay.ps1 last produced.
@@ -35,33 +35,33 @@ module.exports = function registerOverlayIpc({ app, ipcMain, dialog, shell, wind
   handle('preferences',()=>require('./overlay-preferences').read(app.getPath('userData')));
   handle('save-preferences',patch=>require('./overlay-preferences').save(app.getPath('userData'),patch));
   handle('add', async () => {
-    const picked = await dialog.showOpenDialog(window(), { title: 'Add a custom ReShade overlay', properties: ['openFile'], filters: [{ name: 'ReShade native add-ons', extensions: ['addon64', 'addon32'] }] });
+    const picked = await dialog.showOpenDialog(window(), { title: featureText('overlayAddTitle'), properties: ['openFile'], filters: [{ name: featureText('overlayAddFilter'), extensions: ['addon64', 'addon32'] }] });
     if (picked.canceled) return null;
-    const confirm = await dialog.showMessageBox(window(), { type: 'warning', title: 'Native add-on — trusted developers only',
-      message: 'This file contains native code. A ReShade add-on can access your files when loaded by a game.',
-      detail: 'Adding it here only stores a copy; it is not executed here. A checksum does not certify that the file is safe.',
-      buttons: ['Cancel', 'Add trusted file'], defaultId: 0, cancelId: 0 });
+    const confirm = await dialog.showMessageBox(window(), { type: 'warning', title: featureText('overlayAddConfirmTitle'),
+      message: featureText('overlayAddConfirm'),
+      detail: featureText('overlayAddDetail'),
+      buttons: [featureText('cancel'), featureText('overlayAddAccept')], defaultId: 0, cancelId: 0 });
     return confirm.response === 1 ? library().add(picked.filePaths[0]) : null;
   });
   handle('remove', async id => {
     const entry = library().resolve(id);
-    if (entry.builtin) throw Error('The built-in overlay cannot be deleted.');
-    const confirm = await dialog.showMessageBox(window(), { type: 'question', message: `Remove ${entry.name}?`, detail: 'Your original imported file is kept.', buttons: ['Cancel', 'Remove'], defaultId: 0, cancelId: 0 });
+    if (entry.builtin) throw Error(featureText('overlayBuiltinProtected'));
+    const confirm = await dialog.showMessageBox(window(), { type: 'question', message: featureText('overlayRemoveTitle', entry.name), detail: featureText('overlayRemoveDetail'), buttons: [featureText('cancel'), featureText('overlayRemoveAccept')], defaultId: 0, cancelId: 0 });
     if (confirm.response === 1) library().remove(id);
   });
   handle('install', async id => {
     const entry = library().resolve(id);
-    if (!entry.ready) throw Error('Build the experimental add-on first (see Developer files).');
-    const picked = await dialog.showOpenDialog(window(), { title: 'Select a CLOSED offline test game with ReShade add-on support', properties: ['openFile'], filters: [{ name: 'Windows game executable', extensions: ['exe'] }] });
+    if (!entry.ready) throw Error(featureText('overlayBuildFirst'));
+    const picked = await dialog.showOpenDialog(window(), { title: featureText('overlayTestGameTitle'), properties: ['openFile'], filters: [{ name: featureText('overlayTestExeFilter'), extensions: ['exe'] }] });
     if (picked.canceled) return null;
-    const confirm = await dialog.showMessageBox(window(), { type: 'warning', title: 'Overlay test — not a DLSS installation',
-      message: 'Confirm the game is closed and already uses ReShade with add-on support. Keep DLSS 5 Swapper Plus open while testing the built-in overlay.',
-      detail: `${picked.filePaths[0]}\n\nOnly a uniquely named overlay add-on is copied next to this executable. No existing DLLs or configuration files are replaced by installation. No Vulkan registry changes. Avoid online / anti-cheat games.\n\nThis overlay automatically connects through an undocumented, exact-build v4.7 adapter that temporarily redirects its UI dispatch. This may be incompatible with other add-ons. RenoDX itself saves settings you change. This is not NVIDIA's official SDK or overlay.`,
-      buttons: ['Cancel', 'Install test overlay'], defaultId: 0, cancelId: 0 });
+    const confirm = await dialog.showMessageBox(window(), { type: 'warning', title: featureText('overlayTestTitle'),
+      message: featureText('overlayTestConfirm'),
+      detail: `${picked.filePaths[0]}\n\n${featureText('overlayTestDetail')}`,
+      buttons: [featureText('cancel'), featureText('overlayTestAccept')], defaultId: 0, cancelId: 0 });
     return confirm.response === 1 ? library().install(id, picked.filePaths[0]) : null;
   });
   handle('uninstall', async id => {
-    const confirm = await dialog.showMessageBox(window(), { type: 'question', message: 'Is the test game closed?', detail: 'Remove only the unchanged overlay this app copied. Keep ReShade, DLSS, presets, and every original file.', buttons: ['Cancel', 'Remove test overlay'], defaultId: 0, cancelId: 0 });
+    const confirm = await dialog.showMessageBox(window(), { type: 'question', message: featureText('overlayUninstallAsk'), detail: featureText('overlayUninstallDetail'), buttons: [featureText('cancel'), featureText('overlayUninstallAccept')], defaultId: 0, cancelId: 0 });
     if (confirm.response === 1) library().uninstall(id);
   });
   handle('source', async () => {

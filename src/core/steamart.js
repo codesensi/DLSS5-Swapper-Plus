@@ -65,9 +65,20 @@ function pick(rows, query) {
   return bestScore > 10 ? best : null;
 }
 
+// `netFetch` is Electron's net.fetch, injected from main.js: it honours the
+// system proxy, which plain Node fetch ignores - on networks where the store
+// is only reachable through a proxy, that is the difference between the
+// store API working and timing out.
+let netFetch = null;
+const setFetch = (fn) => { netFetch = typeof fn === 'function' ? fn : null; };
+
 async function getJson(url) {
   await throttle();
-  const res = await fetch(url, { headers: { 'Accept-Language': 'en' } });
+  const fetcher = netFetch || fetch;
+  const res = await fetcher(url, {
+    headers: { 'Accept-Language': 'en' },
+    signal: AbortSignal.timeout(8000)
+  });
   if (!res.ok) throw new Error(`Steam replied ${res.status}`);
   return res.json();
 }
@@ -93,7 +104,6 @@ async function detailsFor(appid) {
     const d = row.data;
     return {
       name: d.name || null,
-      summary: d.short_description || null,
       released: (d.release_date && /\d{4}/.test(d.release_date.date || ''))
         ? Number((d.release_date.date.match(/\d{4}/) || [])[0])
         : null,
@@ -121,7 +131,6 @@ async function look(name, appid) {
   return {
     appid: id,
     name: (info && info.name) || searchName || name,
-    summary: (info && info.summary) || null,
     released: (info && info.released) || null,
     rating: (info && info.rating) || null,
     genres: (info && info.genres) || [],
@@ -145,4 +154,4 @@ async function download(url, dest) {
 // Nothing to configure, so it is always on.
 const available = () => true;
 
-module.exports = { available, look, download, cleanName };
+module.exports = { available, look, download, cleanName, setFetch };

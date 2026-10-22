@@ -96,7 +96,8 @@
       "installerHeaderIcon": "build/icon.ico",
       "deleteAppDataOnUninstall": true,
       "artifactName": "DLSS5-Swapper-Plus-Setup-${version}.exe",
-      "include": "build/installer.nsh"
+      "include": "build/installer.nsh",
+      "installerLanguages": ["en_US", "zh_CN", "zh_TW", "ja_JP", "ko_KR"]
     }
   },
   "packageManager": "pnpm@12.14.0"

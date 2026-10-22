@@ -38,10 +38,19 @@ function log(message) {
   renderLog();
 }
 
+// Translated activity-log lines. The key is stored instead of the finished
+// string, so switching languages re-renders the log in the new language
+// instead of leaving lines frozen in the language of the moment they were
+// written (dynamic text such as error.message still goes through log()).
+function logT(key, ...args) {
+  state.log.push({ t: new Date().toLocaleTimeString('en-GB'), k: key, args });
+  renderLog();
+}
+
 function renderLog() {
   $('copyLog').disabled = state.log.length === 0;
   $('log').innerHTML = state.log.length
-    ? state.log.slice(-40).map((e) => `<div class="log-row"><i></i><span class="t">[${e.t}]</span><span class="m">${esc(e.m)}</span></div>`).join('')
+    ? state.log.slice(-40).map((e) => `<div class="log-row"><i></i><span class="t">[${e.t}]</span><span class="m">${esc(e.k !== undefined ? t(e.k, ...(e.args || [])) : e.m)}</span></div>`).join('')
     : `<p class="empty">${t('logEmpty')}</p>`;
   $('log').scrollTop = $('log').scrollHeight;
 }
@@ -372,9 +381,9 @@ async function renderAddons() {
   const set = async (b, file, on) => {
     b.disabled = true;
     const res = await window.lab.addonToggle(file, on);
-    if (!res.ok) { log(res.message); b.disabled = false; return; }
+    if (!res.ok) { const translated = res.code && t(res.code); log(translated && translated !== res.code ? translated : res.message); b.disabled = false; return; }
     // Only reported when one build had to step aside for another's file name.
-    if (res.replaced) log(t('addonNameClash', res.replaced));
+    if (res.replaced) logT('addonNameClash', res.replaced);
     renderAddons();
   };
   // Each switch stands on its own: turning one on leaves the others as they are.
@@ -612,7 +621,7 @@ async function scanAll() {
     renderRecent();
   }
   setStatus(t('ready'), 100);
-  log(t('libReady', state.games.length, state.games.filter((g) => g.cached && g.cached.dx12).length));
+  logT('libReady', state.games.length, state.games.filter((g) => g.cached && g.cached.dx12).length);
   fetchArt();
 }
 
@@ -636,7 +645,7 @@ async function fetchArt() {
     setStatus(t('fetchingArt'), (++done / missing.length) * 100);
   }
   setStatus(t('ready'), 100);
-  log(t('artFound', missing.filter((g) => g.poster && g.poster.tall).length, missing.length));
+  logT('artFound', missing.filter((g) => g.poster && g.poster.tall).length, missing.length);
 }
 
 async function load() {
@@ -646,12 +655,12 @@ async function load() {
   state.newDlss = (await window.lab.details(state.games[0] ? state.games[0].dir : '')).newDlss;
   renderGames();
   renderRecent();
-  log(`Found ${state.games.length} games across ${new Set(state.games.map((g) => g.launcher)).size} sources`);
+  logT('foundGames', state.games.length, new Set(state.games.map((g) => g.launcher)).size);
   await scanAll();
 }
 
 async function pickGame(dir) {
-  log(`Scanning: ${dir}`);
+  logT('scanningDir', dir);
   const cached = await window.lab.scan(dir);
   let game = state.games.find((g) => g.dir === dir);
   if (!game) {
@@ -662,7 +671,7 @@ async function pickGame(dir) {
   if (game) {
     game.cached = cached;
     renderGames();
-    log(`Game: ${cached.exe || '—'} (${cached.api || 'unknown'})`);
+    logT('gameExe', cached.exe || '—', cached.api || 'unknown');
     openSheet(dir);
   }
 }
@@ -877,7 +886,7 @@ async function openSheet(dir, keepLog = false) {
   if (!keepLog) jobLines = [];
 
   $('overlay').classList.remove('hidden');
-  $('sheet').innerHTML = '<div class="pad" style="color:var(--dim)">Reading the folder…</div>';
+  $('sheet').innerHTML = `<div class="pad" style="color:var(--dim)">${t('readingFolder')}</div>`;
 
   const [d, art] = await Promise.all([
     window.lab.details(dir),
@@ -920,8 +929,6 @@ async function openSheet(dir, keepLog = false) {
           <div class="path">${esc(g.dir)}</div>
         </div>
       </div>
-
-      ${info && info.summary ? `<p class="summary">${esc(info.summary.slice(0, 260))}${info.summary.length > 260 ? '…' : ''}</p>` : ''}
 
       ${exePicker(d, dir)}
       ${installOptions(d, pick, dir)}
@@ -1099,7 +1106,7 @@ async function runJob(kind, dir) {
 
   if (res.ok) {
     jobLog(kind === 'install' ? `done - ${res.replaced} replaced, ${res.added} added` : 'done - originals restored');
-    log(`${kind === 'install' ? 'Installed' : 'Restored'}: ${dir}`);
+    logT('jobDone', kind, dir);
     if ($('view-history').classList.contains('active')) await renderHistory();
     // Recent Games tracks what was actually swapped, not what was browsed.
     state.recents = await window.lab.touch(dir);
@@ -1153,6 +1160,13 @@ function applyLang(code) {
   for (const node of document.querySelectorAll('[data-i18n]')) {
     node.textContent = t(node.dataset.i18n);
   }
+  // Tooltips and ARIA labels are attributes, not text content.
+  for (const node of document.querySelectorAll('[data-i18n-title]')) {
+    node.setAttribute('title', t(node.dataset.i18nTitle));
+  }
+  for (const node of document.querySelectorAll('[data-i18n-aria]')) {
+    node.setAttribute('aria-label', t(node.dataset.i18nAria));
+  }
   // Anything drawn from data has to be rebuilt, not just relabelled.
   renderLog();
   renderRecent();
@@ -1162,6 +1176,12 @@ function applyLang(code) {
   if (view && view.id === 'view-settings') renderSettings();
   if (view && view.id === 'view-addons') renderAddons();
   if (view && view.id === 'view-overlays') window.overlayLab.render();
+  // The update notice was written into the corner once, in the language of
+  // the moment it appeared, so a later switch left it behind. The answer is
+  // cached in the main process, so asking again is free.
+  showUpdateNotice();
+  // The Aperture masthead is built once too; its labels follow the language.
+  if (window.theme2) window.theme2.syncLang();
   if (sheetGame) openSheet(sheetGame.dir, true);
 }
 
@@ -1283,7 +1303,7 @@ async function performGameAction(action, dir) {
       if (state.games.includes(game)) game.cached = scan;
       renderGames();
       renderRecent();
-      log(t('menuScanned', game.name));
+      logT('menuScanned', game.name);
     } else if (action === 'poster') {
       const url = await window.lab.setPoster(dir);
       if (url && state.games.includes(game)) {
@@ -1302,7 +1322,7 @@ async function performGameAction(action, dir) {
       renderRecent();
     }
   } catch (error) {
-    log(t('menuActionFailed', game.name, error.message));
+    logT('menuActionFailed', game.name, error.message);
   } finally {
     if (locksCard) cardActionsBusy.delete(dir);
   }
@@ -1348,7 +1368,7 @@ function showGameMenu(game, position, { busy = false } = {}) {
     menu.innerHTML = `
       <div class="ctx-head">
         <span class="ctx-art">${art ? `<img src="${esc(art)}" alt="">` : `<i>${esc(menuInitials(game.name))}</i>`}</span>
-        <span class="ctx-name"><b>${esc(game.name)}</b>${game.summary ? `<small>${esc(game.summary)}</small>` : ''}</span>
+        <span class="ctx-name"><b>${esc(game.name)}</b></span>
       </div>
       ${MENU_ITEMS.map(group => `<div class="ctx-group">${group.map(id => `
         <button type="button" role="menuitem" data-menu="${id}"${disabled.has(id) ? ' disabled' : ''}>
@@ -1403,7 +1423,7 @@ async function openGameMenu(card, position) {
     })) return;
     if (action) await performGameAction(action, dir);
   } catch (error) {
-    log(t('menuActionFailed', card.getAttribute('aria-label'), error.message));
+    logT('menuActionFailed', card.getAttribute('aria-label'), error.message);
   } finally {
     contextMenuOpen = false;
     // Avoid stealing focus from the game sheet or a confirmation dialog.
@@ -1505,7 +1525,6 @@ document.addEventListener('drop', (e) => e.preventDefault());
   // Nothing this app installs is on disk. Saying so now beats letting somebody
   // pick a game, choose a route and press Install before finding out (#220).
   if (boot.payloadMissing) log(boot.payloadMissing);
-  showUpdateNotice();
   state.logo = boot;
   paintBrand();
   state.art = (await window.lab.artStatus()).available;

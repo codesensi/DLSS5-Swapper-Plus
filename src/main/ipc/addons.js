@@ -42,7 +42,7 @@ function register(ctx) {
       list = list.filter((f) => f !== file);
     } else {
       const row = addonLibrary().find((r) => r.path === file);
-      if (!row) return { ok: false, message: 'That build is no longer there' };
+      if (!row) return { ok: false, code: 'errBuildGone', message: 'That build is no longer there' };
       const name = path.basename(file).toLowerCase();
       const clash = list.find((f) => f !== file && path.basename(f).toLowerCase() === name);
       list = list.filter((f) => f !== clash && f !== file);
@@ -61,8 +61,8 @@ function register(ctx) {
   // the window is filled in and confirmed.
   ipcMain.handle('addon-pick', async () => {
     const res = await dialog.showOpenDialog(ctx.winLayer.getWindow(), {
-      title: 'Add an add-on build',
-      filters: [{ name: 'ReShade add-on', extensions: ['addon64', 'addon'] }],
+      title: ctx.featureText('addonBuildPickTitle'),
+      filters: [{ name: ctx.featureText('addonBuildFilter'), extensions: ['addon64', 'addon'] }],
       properties: ['openFile']
     });
     if (res.canceled || !res.filePaths.length) return null;

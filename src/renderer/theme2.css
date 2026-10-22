@@ -426,7 +426,6 @@
   transition: color var(--fast) var(--ease), border-color var(--fast) var(--ease), transform var(--fast) var(--spring);
 }
 :root[data-skin="two"] .t2-tag:hover { color: var(--text); border-color: color-mix(in srgb, var(--accent) 45%, var(--hair)); transform: translateY(-2px); }
-:root[data-skin="two"] .t2-summary { max-width: 62ch; font-size: 14px; line-height: 1.7; color: var(--muted); animation: t2-rise .5s var(--spring) both .2s; }
 :root[data-skin="two"] .t2-hero-actions { display: flex; gap: 12px; align-items: center; animation: t2-rise .5s var(--spring) both .26s; }
 :root[data-skin="two"] .t2-btn.big { padding: 15px 30px; font-size: 15px; border-radius: 16px; display: inline-flex; align-items: center; gap: 10px; }
 :root[data-skin="two"] .t2-btn.circle { width: 52px; height: 52px; padding: 0; display: grid; place-items: center; border-radius: 16px; }
@@ -660,8 +659,7 @@
   :root[data-skin="two"] .t2-poster,
   :root[data-skin="two"] .t2-title,
   :root[data-skin="two"] .t2-tags,
-  :root[data-skin="two"] .t2-summary,
-  :root[data-skin="two"] .t2-hero-actions,
+:root[data-skin="two"] .t2-hero-actions,
   :root[data-skin="two"] .sheet,
   :root[data-skin="two"] .t2-palette-box,
   :root[data-skin="two"] .t2-result { animation: none; }
@@ -1483,7 +1481,6 @@
 :root[data-skin="two"] .t2-tags { animation: t2-aperture-in .5s var(--t2-ease) both .1s; }
 :root[data-skin="two"] .t2-tag { padding: 5px 8px; border-radius: 5px; color: rgba(255,255,255,.72); border-color: rgba(255,255,255,.2); background: rgba(8,10,9,.34); backdrop-filter: blur(8px); font: 650 10px/1.2 ui-monospace, monospace; }
 :root[data-skin="two"] .t2-tag:hover { transform: none; color: #fff; border-color: rgba(255,255,255,.36); }
-:root[data-skin="two"] .t2-summary { max-width: 50ch; color: rgba(255,255,255,.7); font-size: 13px; line-height: 1.65; animation: t2-aperture-in .5s var(--t2-ease) both .14s; }
 :root[data-skin="two"] .t2-hero-actions { animation: t2-aperture-in .5s var(--t2-ease) both .18s; }
 :root[data-skin="two"] .t2-btn.big { padding: 13px 24px; border-radius: 8px; }
 :root[data-skin="two"] .t2-btn.circle { width: 46px; height: 46px; border-radius: 8px; border-color: rgba(255,255,255,.2); color: #fff; background: rgba(8,10,9,.36); }
@@ -2168,7 +2165,6 @@
   letter-spacing: 0;
   backdrop-filter: blur(16px) saturate(1.2);
 }
-:root[data-skin="two"] .t2-summary { max-width: 54ch; color: rgba(255,255,255,.72); font-size: 13px; line-height: 1.62; }
 :root[data-skin="two"] .t2-close {
   top: 20px;
   inset-inline-end: 20px;
@@ -2963,7 +2959,6 @@
   color: rgba(238,245,255,.88);
   backdrop-filter: none;
 }
-:root[data-skin="two"]:has(#overlay:not(.hidden)) .t2-summary { max-width: 43ch; font-size: 13px; line-height: 1.5; color: rgba(234,242,252,.8); }
 :root[data-skin="two"]:has(#overlay:not(.hidden)) .t2-hero-actions {
   z-index: 3;
   inset: auto auto 32px 70px;
@@ -3235,10 +3230,6 @@
 }
 :root[data-skin="two"] .gp-title {
   font-size: 34px; font-weight: 750; letter-spacing: -.02em; line-height: 1.12; margin-bottom: 12px;
-}
-:root[data-skin="two"] .gp-sub {
-  font-size: 13.5px; line-height: 1.6; color: var(--gp-muted); max-width: 46ch; margin-bottom: 14px;
-  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
 }
 :root[data-skin="two"] .gp-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
 :root[data-skin="two"] .gp-chip {
