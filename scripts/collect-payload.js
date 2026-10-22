@@ -11,7 +11,9 @@ const feederRelease = require('../src/core/feeder-release');
 const renodx = require('../src/core/renodx-release');
 
 const ROOT = path.resolve(__dirname, '..');
-const PAYLOAD = path.join(ROOT, 'payload');
+// All build outputs (staging folders and electron-builder's own output) live
+// under dist/, keeping the source root free of generated directories.
+const PAYLOAD = path.join(ROOT, 'dist', 'payload');
 const CACHE = path.join(ROOT, 'vendor', 'component-cache');
 
 // Pinned downloads keep release builds reproducible and are SHA-256 checked
@@ -261,7 +263,7 @@ copyFile(addon, path.join(PAYLOAD, 'renodx-dlss5.addon64'));
 
 // Preserve support for bundled optional builds, but never bring back the old
 // DX12/DX11/DX9 companion that duplicates the integrated routes.
-const EXTRAS = path.join(ROOT, 'addons');
+const EXTRAS = path.join(ROOT, 'dist', 'addons');
 fs.rmSync(EXTRAS, { recursive: true, force: true });
 fs.mkdirSync(EXTRAS, { recursive: true });
 const base = path.basename(addon).toLowerCase();
@@ -321,7 +323,7 @@ console.log(`  (${extras} optional add-on build${extras === 1 ? '' : 's'} bundle
 
 // The in-game overlay's native add-on, built by scripts/build-overlay.ps1.
 // Staged like the payload so electron-builder ships it as resources/overlay.
-const OVERLAY_BIN = path.join(ROOT, 'overlay-bin');
+const OVERLAY_BIN = path.join(ROOT, 'dist', 'overlay-bin');
 fs.rmSync(OVERLAY_BIN, { recursive: true, force: true });
 const overlayBuilds = [
   path.join(ROOT, 'dist', 'overlay', 'dlss5-lab-overlay.addon64')

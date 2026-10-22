@@ -76,7 +76,7 @@ function saveOperation(dir, manifest, action, send) {
 // optional add-on. Other bundled or user-added builds still appear in the
 // Add-ons screen, and an `addons` folder beside the executable remains valid.
 function addonFolders() {
-  if (!app.isPackaged) return [path.join(__dirname, 'addons')];
+  if (!app.isPackaged) return [path.join(__dirname, 'dist', 'addons')];
   return [
     path.join(process.resourcesPath, 'addons'),
     path.join(path.dirname(app.getPath('exe')), 'addons')
@@ -208,7 +208,7 @@ function addonLibrary() {
 function payload(raw) {
   // Installed, the payload rides along as an extra resource; from source it
   // sits beside main.js.
-  for (const dir of [path.join(process.resourcesPath || '', 'payload'), path.join(__dirname, 'payload')]) {
+  for (const dir of [path.join(process.resourcesPath || '', 'payload'), path.join(__dirname, 'dist', 'payload')]) {
     const probe = scanSource(dir);
     if (probe.ok) {
       const setup = fs.readdirSync(dir).find((f) => /^ReShade_Setup_.*_Addon\.exe$/i.test(f));

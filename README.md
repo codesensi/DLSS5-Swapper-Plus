@@ -1,284 +1,69 @@
-> ## 简体中文汉化版
-><img width="1920" height="1290" alt="5d9c4fd481b91308dd3527d23fd9a9c3" src="https://github.com/user-attachments/assets/167c0a1b-02f7-4788-bf55-0f444e14a684" />
-<img width="1920" height="1290" alt="a6bbd8324a12833cbfc990455e60eca2" src="https://github.com/user-attachments/assets/374d7936-da64-4198-81dc-34fca83358c1" />
-<img width="574" height="763" alt="f750c551d0960309b1b9ca425d6d6658" src="https://github.com/user-attachments/assets/a6cbf681-3cf8-424e-a71b-81b70f14e3e6" />
-<img width="579" height="937" alt="07a37bca5717b268ae48a38e56ae421f" src="https://github.com/user-attachments/assets/3e429419-3119-4a31-9f07-7845925472f4" />
+# DLSS5-Swapper-Plus
 
-> 本仓库是 [DLSS 5 Swapper](https://github.com/rakanki911/DLSS5-Swapper) 的**第三方简体中文汉化版**，
-> 基于原版 **v2.2.7** 制作，由 **EverChangAn** 汉化补全。
->
-> - **汉化代码**：默认分支 `main` 即为汉化版
-> - **下载**：[Releases](../../releases) —— 免安装版 / 汉化补丁
-> - **B 站**：[@显卡长安](https://space.bilibili.com/5199773)
->
-> ### 汉化了什么
->
-> 全部界面文案，约 **630 条**：主界面 219、主进程共享字典 86、社区聊天 59、
-> 社区实测游戏 130、游戏内叠加层约 136。原版中文覆盖率 37.5%，现为 100%。
->
-> 此外修复了几个上游缺陷：
->
-> - 游戏内叠加层面板此前无法接收应用语言设置，导致所有非英语用户在游戏内看到的面板均为英文；
-> - 上游 2.2.9 新增的界面元素缺少中文翻译（缺 52 个词典键，"Hotkey""Create theme" 等甚至硬编码英文），已全部补全；
-> - 游戏图标右键菜单弹出前会等待社区报告同步的网络往返（最长 10 秒），已改为后台同步、菜单即时弹出；
-> - 社区/聊天的错误提示永远显示主进程写死的英文（词典翻译形同虚设），已改为按错误码映射本地化文案。
->
-> ### 与原版的关系
->
-> 原版由 **Rakan Alkhaldi** 开发，基于 **MIT 许可证**发布。本汉化版为衍生作品，
-> 同样遵循 MIT 许可证，**非官方发布**，与原作者无隶属关系。
->
-> ### 从源码打包
->
-> **环境要求**：Windows 10/11、Node.js ≥ 18（建议 20+）、pnpm；构建过程需要访问
-> GitHub（下载 pinned 组件）与 reshade.me。
->
-> **1. 安装依赖**
->
-> ```cmd
-> pnpm install
-> ```
->
-> **2. 准备素材**（`scripts/collect-payload.js` 会校验，缺了会拒绝继续）
->
-> - ReShade Addon 版安装器 `ReShade_Setup_6.8.0_Addon.exe`，放到 `vendor\`
->   （脚本也会按 Downloads / OneDrive Downloads / 桌面的顺序自动查找）。
->   注意：官网下载在部分 Windows TLS 环境下会被 schannel 拒绝，可改用浏览器或
->   Node fetch 下载，并核对 SHA-256 与 `src/core/reshade-release.js` 中的 pin。
-> - 一个包含 `streamline\` 子目录和 `nvngx_dlssnr.dll` 的 DLSS 5 目录作为
->   payload 源（命令行参数传入，或放到桌面等默认搜索位置）。
->
-> **3. 构建 overlay 工具链**（首次需要；下载 zig 0.14.1 与 ReShade 6.8.0 SDK 到 `tools\`）
->
-> ```cmd
-> pnpm run overlay:prepare
-> pnpm run overlay:build
-> ```
->
-> **4. 收集 payload**（下载 DLSS5-Feeder 1.17.0 等 pinned 组件到 `vendor\component-cache`，
-> 全部经 SHA-256 校验；`pnpm run build` 的 prebuild 钩子会自动执行，可跳过）
->
-> ```cmd
-> pnpm run payload
-> ```
->
-> **5. 打包**（electron-builder，NSIS 安装版 + 便携版一起产出）
->
-> ```cmd
-> pnpm run build
-> ```
->
-> 产物在 `dist\`：`DLSS5-Swapper-Setup-<版本>.exe` 与
-> `DLSS5-Swapper-<版本>-portable.exe`。只想要便携版用 `pnpm run build:portable`。
->
-> **常见问题**
->
-> - **zig/makensis 报 `unable to make temporary file` / `!tempfile:`**：
->   系统 `%TEMP%` 对构建进程不可写（如杀软按进程拦截）。把临时目录重定向到项目内：
->
->   ```cmd
->   mkdir tools\tmp 2>nul & set TEMP=%CD%\tools\tmp& set TMP=%CD%\tools\tmp& pnpm run build
->   ```
->
-> - **下载 pinned 组件超时**：Node 的 fetch 不读系统代理，需要显式指定
->   （端口按实际代理调整）：
->
->   ```cmd
->   set NODE_USE_ENV_PROXY=1& set HTTPS_PROXY=http://127.0.0.1:7897& pnpm run payload
->   ```
->
-> - **原生依赖重建失败**：可加 `--config.npmRebuild=false` 跳过（本项目运行时
->   无需编译原生模块）。
-> - **安装器报 `Error writing temporary file`**：同样是杀软按进程拦截新 exe
->   写 `%TEMP%`，把 `dist\` 加入杀软信任区即可。
->
-> **改前端 JS 后的快速补丁**（不必重新打包整个应用）：
->
-> ```cmd
-> node node_modules\@electron\asar\bin\asar.js extract dist\win-unpacked\resources\app.asar tools\asar-work
-> copy /y src\renderer\i18n.js tools\asar-work\src\renderer\
-> node node_modules\@electron\asar\bin\asar.js pack tools\asar-work app.asar
-> ```
->
-> 把生成的 `app.asar` 覆盖到安装目录的 `resources\` 下，重启应用即生效。
->
-> ---
->
-> *以下为原项目 README 原文。*
+一个管理 DLSS 5（神经渲染）游戏插件的 Windows 桌面工具：扫描本机游戏库，一键安装/替换 DLSS5 运行时、RenoDX 与 OptiScaler 组件，并在游戏内提供 ImGui 悬浮控制面板。
 
+## 来源与致谢
 
+本项目基于 [rakanki911/DLSS5-Swapper](https://github.com/rakanki911/DLSS5-Swapper) 删库前最后公开的 **v2.2.9** 版本二次开发而来——原仓库已不可访问，本仓库保留了这一基线并持续维护。
 
-<p align="center">
-  <img src="docs/banner.png" alt="DLSS 5 Swapper" width="100%">
-</p>
+简体中文本地化最初来自 [EverChangAn/DLSS5-Swapper-zh-CN](https://github.com/EverChangAn/DLSS5-Swapper-zh-CN)，在此之上做了措辞与界面体验上的进一步打磨，感谢原作者的翻译工作。
 
-<h1 align="center">DLSS 5 Swapper</h1>
+## 构建与打包
 
-<p align="center">
-  Install and manage DLSS 5 Neural Rendering for compatible games and emulators.
-</p>
+### 前置条件
 
-<p align="center">
-  <a href="https://github.com/rakanki911/DLSS5-Swapper/releases/latest"><img src="https://img.shields.io/github/v/release/rakanki911/DLSS5-Swapper?color=8fd400&label=release" alt="Latest release"></a>
-  <a href="https://github.com/rakanki911/DLSS5-Swapper/releases"><img src="https://img.shields.io/github/downloads/rakanki911/DLSS5-Swapper/total?color=8fd400&label=downloads&cacheSeconds=300" alt="Total downloads"></a>
-  <img src="https://img.shields.io/badge/Windows-10%20%2F%2011-8fd400" alt="Windows 10/11">
-  <img src="https://img.shields.io/badge/languages-38-8fd400" alt="38 languages">
-  <a href="https://buymeacoffee.com/rakanki911"><img src="https://img.shields.io/badge/support-555" alt="Support"></a>
-  <a href="https://buymeacoffee.com/rakanki911"><img height="20" src="https://cdn.buymeacoffee.com/buttons/v2/lato-yellow.png" alt="Buy me a coffee"></a>
-</p>
+- **必须使用管理员权限的 PowerShell**。本项目的工作区可能存在完整性级别被压低（Low IL）的目录，普通权限终端会导致 zig 编译报 `AccessDenied`、Electron 启动即崩溃（0xC0000005）等难以定位的错误。
+- Node.js ≥ 24（Node 26 已验证），pnpm ≥ 12。
+- **DLSS SDK 分发（手动准备）**：`nvngx_dlssnr.dll` 等受 NVIDIA 许可证限制，不随构建下载，需本机自备。将 DLSS 分发内容（DLSS5 神经渲染 + DLSS SR/RR/FG + **Streamline 运行时**，不只 DLSS5）**平铺**放入 `vendor\dlss-streamline\`（DLL 直接位于该目录，不要套子目录），或用 `pnpm run payload -- <目录>` 指定，找不到即退出。
+- **ReShade_Setup_\*_Addon.exe（可选）**：payload 优先扫描 `vendor\reshade-setup\`，找到即用；本地没有时自动下载**钉死的 6.8.0**（与 SDK 头文件同版本，SHA-256 校验，缓存于 `vendor\component-cache\`）。若手动放置其他版本，须与 `vendor\toolchain\reshade\` 内 SDK 版本一致，否则悬浮层 ABI 可能错位。
+- **可选附加悬浮层（可选）**：需要捆绑其他 `.addon64` 时放入 `vendor\addons\`（各放一级子目录），通常留空即可。
 
-## Download
+### 当前验证过的打包环境
 
-[**Windows Installer**](https://github.com/rakanki911/DLSS5-Swapper/releases/latest) ·
-[**Portable**](https://github.com/rakanki911/DLSS5-Swapper/releases/latest) ·
-[Checksums](https://github.com/rakanki911/DLSS5-Swapper/releases/latest)
-
-Both are on the latest release page, with `SHA256SUMS.txt` beside them.
-
-<p align="center">
-  <img src="https://raw.githubusercontent.com/rakanki911/DLSS5-Swapper/7415065e5c5437441d0e0b0a0362d0ada6d86e15/docs/screenshots/01-home.png" alt="Home" width="100%">
-</p>
-
-## Features
-
-- **Easy installation:** native DLSS games, or compatible non-DLSS games through DLSS5-Feeder.
-- **Your library:** Steam, Epic, GOG, modern Xbox Game Pass folders, and manually added games/emulators.
-- **Search and filters:** combine title, graphics API, DLSS status/version and add-ons; click counters to filter.
-- **Flexible layout:** group by store or show everything in one list, with game artwork and light/dark themes.
-- **Controlled scanning:** full-drive scanning is **off by default**. Added folders still scan normally; enable all-drive discovery or remove scan folders in Settings.
-- **Right-click shortcuts:** open/copy folder, rescan, change cover, restore originals or hide a game.
-- **Backups and History:** restore original files, keep installation records, and copy History/activity/install logs.
-- **Save diagnostics:** one file with the install log, the game’s own ReShade and Feeder logs, the manifest and your driver - shown to you before it is written, and ready to attach to a report.
-- **In-game overlay:** press **F8** to open the app's own panel over the running game and move the real DLSS Neural Rendering sliders while you play. Supports the **DLSS5-Feeder** and **RenoDX** routes only, and it knows both RenoDX builds the app ships (6.5.3 and the older 4.7). Drag the grip in its bottom right corner to resize it; each game remembers its own size.
-- **Rendering API override:** optional, per game, with **Automatic** as the default; detection is never overwritten.
-- **Custom add-ons:** the Add-ons page remains available alongside the integrated installation routes.
-- **Multipass neural rendering:** an installation route that runs the neural pass up to ten times per frame, on DX12, DX11 and 64-bit DX9 - including games with no DLSS of their own.
-- **Community (BETA):** read what worked for other people, narrowed to the games on your PC and the graphics card in it, leave your own report, and talk it over underneath it. Opt-in, and everything you leave can be edited, deleted or withdrawn.
-- **Community chat:** one live room for everyone using the app - screenshots, game cards, replies with mentions and reactions.
-
-## New in 2.2.9
-
-Four faults from the tracker, fixed at the cause. Every one of them was reported by somebody in it.
-
-| | |
+| 项目 | 版本 |
 |---|---|
-| **The installer crashed before it opened** | On some machines the setup died instantly with `0xc0000005`, no window and no prompt, while the portable build was fine. The installer framework read past the end of a path Windows handed it. Fixed upstream, and this release is built with the fixed version ([#344]) |
-| **Restore originals went dead with the files still in the game** | A finished restore renames the backup record aside, and everything that decides whether a game has anything installed read only the live one. The app now offers the newest retired record whose files are still in the game, and restores from the same backups ([#325]) |
-| **dgVoodoo2 flagged by antivirus** | Upstream released 2.87.5 precisely because engines flag 2.87.4, and the app was pinned to 2.87.4 ([#390]) |
-| **ReShade never started in a wrapped DirectX 8/9 game** | Inside dgVoodoo the game is a DirectX 11 one, and some setups load only `d3d11.dll`. The **ReShade file** choice is offered for these games now ([#343], [#374]) |
+| Windows | Windows 11（内核 10.0.26300） |
+| PowerShell | 7.6.7 |
+| Node.js | v26.12.0 |
+| pnpm | 12.14.0 |
 
-[#325]: https://github.com/rakanki911/DLSS5-Swapper/issues/325
-[#343]: https://github.com/rakanki911/DLSS5-Swapper/issues/343
-[#344]: https://github.com/rakanki911/DLSS5-Swapper/issues/344
-[#374]: https://github.com/rakanki911/DLSS5-Swapper/issues/374
-[#390]: https://github.com/rakanki911/DLSS5-Swapper/issues/390
+低版本组合未测试，不保证通过。
 
-## Earlier releases
+### 网络配置（国内环境）
 
-Each one is written up in full - what broke, why, and what was changed.
+**给 Node 配置临时代理**（payload 会经 Node fetch 下载 Feeder/RenoDX 等组件，Node 默认不走系统代理）：
 
-| | |
-|---|---|
-| **2.2.8** | [A second theme, and every add-on brought current](docs/releases/v2.2.8.md) - a whole second design, DLSS5-Feeder 1.17.0, RenoDX 6.5.3, a second OptiScaler build per game, and ten faults fixed |
-| **2.2.7** | [Find the reviews that matter to you](docs/releases/v2.2.7.md) - filter by your card, reviews for your games, notifications, and eight faults fixed |
-| **2.2.6** | [Community chat](docs/releases/v2.2.6.md) - one live room for everyone, and the right add-on on every route |
-| **2.2.5** | [Multipass](docs/releases/v2.2.5.md) - the neural pass up to ten times per frame, plus nine faults fixed at the cause |
-| **2.2.4** | [The Community page](docs/releases/v2.2.4.md) - compare notes with everyone else, plus eight faults fixed at the cause |
-| **2.2.3** | [Six reported faults, fixed at the cause](docs/releases/v2.2.3.md) - OptiScaler on older cards, a game's own stale shader compiler, the overlay on a scaled display |
-| **2.2.2** | [The reports people sent](docs/releases/v2.2.2.md) - games it could not find, installs it refused, the overlay's own page |
-| **2.2.1** | [The Overlay page](docs/releases/v2.2.1.md) - themes you can write yourself, and a preview that runs before you choose |
-| **2.2.0** | [Optional OptiScaler and a smarter library](docs/releases/v2.2.0.md) |
+```powershell
+$env:HTTPS_PROXY = 'http://192.168.2.4:7890'   # 换成你的代理端口
+$env:NODE_USE_ENV_PROXY = '1'                # Node 24+ 原生开关
+```
 
-Every release also carries its own notes and downloads on the
-[releases page](https://github.com/rakanki911/DLSS5-Swapper/releases).
+**给 Electron 配置临时加速镜像**（Electron 与 electron-builder 的二进制默认从 GitHub 下载，国内极慢）：
 
-## Compatibility
+```powershell
+$env:ELECTRON_MIRROR = 'https://npmmirror.com/mirrors/electron/'
+$env:ELECTRON_BUILDER_BINARIES_MIRROR = 'https://npmmirror.com/mirrors/electron-builder-binaries/'
+```
 
-| Category | Support |
-| --- | --- |
-| **System** | Windows 10/11 x64; compatible 32-bit and 64-bit games |
-| **ReShade / Feeder GPUs** | RTX 20 / 30 / 40 / 50; older-series support is reported by the bundled modified runtime's author |
-| **OptiScaler GPUs** | 64-bit games with native DLSS enabled. The bundled neural model runs on **Blackwell** (RTX 50 / RTX PRO Blackwell); an older card needs a modded `nvngx_dlssnr.dll` you supply, which is never overwritten. Driver **616.56** or newer |
-| **DirectX 12** | Native DLSS, Feeder, or eligible OptiScaler games |
-| **DirectX 11** | Feeder for 32/64-bit games; eligible OptiScaler games |
-| **DirectX 9 / 8** | DX9: 32/64-bit; DX8: 32-bit, through dgVoodoo2 → DX11 → Feeder |
-| **Vulkan / OpenGL** | ReShade/Feeder; eligible Vulkan games can also use OptiScaler |
-| **DirectX 10** | Not directly supported by Feeder; choose DX11 when available |
-| **In-game overlay** | 64-bit DirectX 11 / 12 games with ReShade add-on support; **DLSS5-Feeder and RenoDX only** |
+以上均为**当前会话临时变量**，关闭终端即失效，不影响系统全局配置。
 
-OptiScaler's DX11/Vulkan path uses a DX12 bridge with FSR output by default.
-For Vulkan backend changes, **restore originals first**. OptiScaler is not the emulator/non-DLSS route.
+### 打包流程
 
-## Emulators
+在**管理员 PowerShell** 中按顺序执行：
 
-Select the emulator folder and its active renderer, then use **ReShade/Feeder**.
+```powershell
+pnpm install              # 1. 安装依赖
+pnpm run icon             # 2. 生成游戏图标
+pnpm run overlay:prepare  # 3. 准备悬浮层构建素材
+pnpm run overlay:build    # 4. 编译悬浮层
+pnpm run payload          # 5. 下载/校验/组装运行时组件
+pnpm run build            # 6. 打包安装版 + 便携版
+```
 
-<table>
-  <tr><th colspan="3">Emulators</th></tr>
-  <tr><td>DuckStation</td><td>PCSX2</td><td>RPCS3</td></tr>
-  <tr><td>Dolphin</td><td>PPSSPP</td><td>Xenia</td></tr>
-  <tr><td>Cemu</td><td>Ryujinx</td><td>yuzu / suyu / Eden / Citron / Sudachi</td></tr>
-  <tr><td>shadPS4</td><td>Azahar / Citra / Lime3DS</td><td>melonDS</td></tr>
-  <tr><td>Flycast</td><td>xemu</td><td>Vita3K</td></tr>
-  <tr><td>RetroArch</td><td>mGBA</td><td>Snes9x</td></tr>
-  <tr><td>Play!</td><td></td><td></td></tr>
-</table>
+### 注意点
 
-Compatibility varies by renderer and game. Xenia HUD correction remains experimental.
+- **产物挪出工作区再运行**：`dist\` 下生成的安装器/便携版可能被压上低完整性标签，双击安装会报 `Error writing temporary file`。把 exe 复制到项目目录之外（如 Downloads）再双击即可。
+- **版本全部 SHA-256 钉死**：Feeder/RenoDX/dgVoodoo 等组件的下载地址与摘要钉在 `src\core\*-release.js` 与 `scripts\collect-payload.js` 中，payload 构建时逐个校验，并交叉核对 overlay 内编译的组件指纹（不一致直接拒构建）。升级组件时需同步更新钉点与 overlay 头文件。
+- **组件下载缓存**：所有下载落在 `vendor\component-cache\`，摘要一致则秒过；手动下载组件放置于此可跳过联网。悬浮层工具链（zig、ReShade SDK 头）由 `overlay:prepare` 生成到 `vendor\toolchain\`，版本钉在 `scripts\prepare-overlay.ps1` 一处，第二次运行零下载。
 
-## 38 languages
 
-<table>
-  <tr><th colspan="4">All 38 languages</th></tr>
-  <tr><td>English</td><td>العربية</td><td>简体中文</td><td>繁體中文</td></tr>
-  <tr><td>Español</td><td>Português</td><td>Русский</td><td>Deutsch</td></tr>
-  <tr><td>Français</td><td>日本語</td><td>한국어</td><td>Italiano</td></tr>
-  <tr><td>Türkçe</td><td>Polski</td><td>Українська</td><td>Nederlands</td></tr>
-  <tr><td>Čeština</td><td>Magyar</td><td>Română</td><td>Ελληνικά</td></tr>
-  <tr><td>Svenska</td><td>Dansk</td><td>Norsk</td><td>Suomi</td></tr>
-  <tr><td>ไทย</td><td>Tiếng Việt</td><td>Bahasa Indonesia</td><td>Bahasa Melayu</td></tr>
-  <tr><td>Filipino</td><td>हिन्दी</td><td>বাংলা</td><td>فارسی</td></tr>
-  <tr><td>اردو</td><td>Български</td><td>Српски</td><td>Hrvatski</td></tr>
-  <tr><td>Slovenčina</td><td>Català</td><td></td><td></td></tr>
-</table>
-
-**Arabic, Persian and Urdu support right-to-left layout.**
-
-## Screenshots
-
-<p><img src="https://raw.githubusercontent.com/rakanki911/DLSS5-Swapper/7415065e5c5437441d0e0b0a0362d0ada6d86e15/docs/screenshots/02-games.png" alt="Games" width="100%"></p>
-<p><img src="https://raw.githubusercontent.com/rakanki911/DLSS5-Swapper/7415065e5c5437441d0e0b0a0362d0ada6d86e15/docs/screenshots/03-library.png" alt="Library" width="100%"></p>
-<p><img src="https://raw.githubusercontent.com/rakanki911/DLSS5-Swapper/7415065e5c5437441d0e0b0a0362d0ada6d86e15/docs/screenshots/04-game.png" alt="Game details" width="100%"></p>
-<p><img src="docs/screenshots/07-overlay.png" alt="The Overlay page with the Emerald, Azure and Amethyst themes" width="100%"></p>
-
-## Before installing
-
-- **Anti-cheat:** red warning and optional confirmation, not a blanket block. Injection can cause crashes or account bans; the app never bypasses anti-cheat.
-- **Requirements:** Feeder needs Visual C++ runtimes (x64, plus x86 for 32-bit games). Some components download on first use.
-- **Compatibility is not guaranteed.** Keep backups; existing mods may conflict. Not every reported game crash is fixed.
-- **Linux/Proton:** experimental community source only; no Linux binaries in this release.
-
-## Community and privacy
-
-- Opening the Community page downloads public game reports. A live connection
-  count is held only in memory; no connection identifiers are stored.
-- A report is sent only after you review and submit the fields shown in its
-  dialog: game, route, rendering API, result, optional comment, GPU, driver,
-  CPU, OS and app version.
-- The app uses a random install ID to prevent duplicate votes. The server stores
-  only its hash. **Remove my community activity** hides all your reports and
-  replies and resets your public community profile.
-- The owner-only administrator access code is verified by the community server
-  and stored locally with Windows encrypted storage. It is never written to the
-  public profile or the normal community settings file.
-
-## Support
-
-DLSS 5 Swapper is free and MIT licensed. If it saved you an evening of
-fiddling, you can buy me a coffee.
-
-<p><a href="https://buymeacoffee.com/rakanki911"><img height="44" src="https://cdn.buymeacoffee.com/buttons/v2/lato-yellow.png" alt="Buy me a coffee"></a></p>
-
----
-
-Built by **Rakan Alkhaldi** · MIT · [Third-party credits and licences](THIRD_PARTY_NOTICES.md)

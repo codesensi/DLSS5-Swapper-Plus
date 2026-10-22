@@ -41,21 +41,21 @@
     ],
     "extraResources": [
       {
-        "from": "payload",
+        "from": "dist/payload",
         "to": "payload",
         "filter": [
           "**/*"
         ]
       },
       {
-        "from": "addons",
+        "from": "dist/addons",
         "to": "addons",
         "filter": [
           "**/*"
         ]
       },
       {
-        "from": "overlay-bin",
+        "from": "dist/overlay-bin",
         "to": "overlay",
         "filter": [
           "**/*"

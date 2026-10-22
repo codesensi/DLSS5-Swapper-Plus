@@ -10,7 +10,7 @@ test('from source it still says the thing a developer needs', () => {
   const { code, message } = missingPayload({ packaged: false, appRoot: 'C:\\src\\app', resourcesPath: 'ignored' });
   assert.equal(code, 'errPayloadMissing');
   assert.match(message, /pnpm run payload/);
-  assert.ok(message.includes('C:\\src\\app\\payload'), message);
+  assert.ok(message.includes('C:\\src\\app\\dist\\payload'), message);
 });
 
 test('an installed copy is told about antivirus, never about npm', () => {
