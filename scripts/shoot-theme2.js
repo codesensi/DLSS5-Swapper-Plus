@@ -11,7 +11,7 @@ const path = require('node:path');
 const version = require('../package.json').version;
 if (typeof app.setVersion === 'function') app.setVersion(version);
 else app.getVersion = () => version;
-app.setName('DLSS 5 Swapper');
+app.setName('DLSS 5 Swapper Plus');
 
 require('../main.js');
 

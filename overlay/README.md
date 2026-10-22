@@ -25,11 +25,11 @@ ReShade's font or widget theme. **Not NVIDIA's official overlay or SDK.**
   DLLs, presets, ReShade configuration, or Vulkan registry entries.
 - Remove only the unchanged add-on this app installed. Original imports remain.
 - Built-in x64 native ReShade add-on: **F8 by default** opens a compact, independent panel;
-  **Escape** closes it and dragging the header moves it. **Home -> DLSS 5 Swapper**
+  **Escape** closes it and dragging the header moves it. **Home -> DLSS 5 Swapper Plus**
   also offers an open button. Original ReShade and RenoDX tabs
   are kept. Built against ReShade **6.8.0 / API 20 / ImGui 1.92.5**.
 - Mouse clicks/drags and keyboard controls are forwarded through a bounded,
-  local named pipe. Only changed frames are uploaded. **Keep DLSS 5 Swapper running**;
+  local named pipe. Only changed frames are uploaded. **Keep DLSS 5 Swapper Plus running**;
   one test game connects at a time. Closing the app disconnects the UI safely.
 - The installed overlay **automatically connects to the verified RenoDX
   v4.7 build**; there is no connect button. Unsupported binaries remain refused.
@@ -99,7 +99,7 @@ is written directly: the original callback performs its own atomic updates and
 configuration saves. Original ReShade/RenoDX panels remain registered.
 
 Installing this experimental overlay enables automatic connection while
-DLSS 5 Swapper is running. Merely connecting reads settings: it does not enable NR or
+DLSS 5 Swapper Plus is running. Merely connecting reads settings: it does not enable NR or
 change chosen settings. UI changes are persisted by RenoDX itself. Closing the app
 stops UI control, without turning NR off or undoing chosen settings.
 No NVIDIA SDK download, game-file replacement or automatic binary loading is

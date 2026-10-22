@@ -67,7 +67,7 @@ function section(title, body) {
 function report({ gameDir, exeDir, userData, facts = {}, now = new Date() }) {
   const found = sources({ gameDir, exeDir, userData });
   const head = [
-    `DLSS 5 Swapper diagnostics`,
+    `DLSS 5 Swapper Plus diagnostics`,
     `generated: ${now.toISOString()}`,
     ...Object.entries(facts)
       .filter(([, value]) => value !== undefined && value !== null && value !== '')

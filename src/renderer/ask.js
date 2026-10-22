@@ -1,6 +1,6 @@
 'use strict';
 // The app's own way of asking. window.confirm draws the operating system's box:
-// it cannot be styled, it says "dlss5-swapper" in the corner whatever the app
+// it cannot be styled, it says "dlss5-swapper-plus" in the corner whatever the app
 // is called, and it looks nothing like the thing it interrupts. This is the
 // same question in the app's own hand.
 //

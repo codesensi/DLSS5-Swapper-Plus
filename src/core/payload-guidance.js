@@ -18,7 +18,7 @@ const path = require('node:path');
 // The portable build unpacks itself here on every launch. The name is fixed as
 // of 2.2.4 so an antivirus exclusion survives an upgrade - which also means a
 // half-extracted folder survives one, and deleting it is the first thing to try.
-const PORTABLE_DIR = 'DLSS5-Swapper';
+const PORTABLE_DIR = 'DLSS5-Swapper-Plus';
 
 function missingPayload({ packaged, resourcesPath, appRoot, portable = false, temp = null }) {
   // Installed, the payload rides along under resourcesPath; from source it is

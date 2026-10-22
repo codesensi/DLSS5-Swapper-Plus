@@ -75,9 +75,9 @@ function createOverlayLibrary(root, builtinFile, forbiddenRoots = []) {
   }
   function builtin() {
     const ready = fs.existsSync(builtinFile);
-    return { id: 'builtin', name: 'DLSS 5 Swapper Controls', builtin: true, architecture: 64, ready,
+    return { id: 'builtin', name: 'DLSS 5 Swapper Plus Controls', builtin: true, architecture: 64, ready,
       sha256: ready ? readNative(builtinFile).sha256 : null,
-      file: builtinFile, description: 'F8: compact panel. Keep DLSS 5 Swapper open. RenoDX v4.7 + Feeder 0.12.0 x64 controls connect automatically. Feeder + Overlay can be installed together from Games. Original tool windows stay available.' };
+      file: builtinFile, description: 'F8: compact panel. Keep DLSS 5 Swapper Plus open. RenoDX 6.5.3 + Feeder 1.19.0 x64 controls connect automatically. Feeder + Overlay can be installed together from Games. Original tool windows stay available.' };
   }
   function resolve(id) { return id === 'builtin' ? builtin() : custom(id); }
   function installation(recordId) {
