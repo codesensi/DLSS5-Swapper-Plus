@@ -6,8 +6,8 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-const { createOverlayLibrary } = require('../src/overlays');
-const gameOverlay = require('../src/game-overlay');
+const { createOverlayLibrary } = require('../src/core/overlays');
+const gameOverlay = require('../src/core/game-overlay');
 
 // realpathSync only answers for a directory that exists, and the library
 // resolves install targets the same way.

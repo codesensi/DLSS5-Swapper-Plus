@@ -108,7 +108,7 @@ test('nothing treats the route as OptiScaler, which has a different installer', 
 // Tool through it did not work in a real game; the route itself does, and the
 // tool's own page on Home is where its controls live.
 test('the panel does not claim this route', () => {
-  const overlay = require('../src/game-overlay');
+  const overlay = require('../src/core/game-overlay');
   for (const label of ['DirectX 11', 'DirectX 12']) {
     const list = overlay.routes({ bitness: 64, api: 'dxgi', apiLabel: label });
     assert.ok(!list.includes('renodx'), label + ': ' + list);

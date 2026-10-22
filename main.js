@@ -11,9 +11,9 @@ const crypto = require('crypto');
 const os = require('os');
 const diagnostics = require('./src/core/diagnostics');
 const { scanGame } = require('./src/core/scan.js');
-const { discover, folder, dedupe, isInside, steam } = require('./src/library');
+const { discover, folder, dedupe, isInside, steam } = require('./src/core/library');
 const { contextForSteamGame, createSetupRunner } = require('./src/core/proton');
-const art = require('./src/steamart');
+const art = require('./src/core/steamart');
 const { backupRoot, saveActiveManifest, writeTracked, makeReShadeConfigWritable } = require('./src/core/apply.js');
 const { scanSource } = require('./src/core/scan.js');
 const pe = require('./src/core/pe.js');
@@ -415,7 +415,7 @@ if (!singleInstance) {
 // The same overlay library the Overlay page manages, so an install picks up
 // exactly the build shown there.
 function overlayLibrary() {
-  const { createOverlayLibrary } = require('./src/overlays');
+  const { createOverlayLibrary } = require('./src/core/overlays');
   const root = path.resolve(__dirname);
   const builtin = app.isPackaged
     ? path.join(process.resourcesPath, 'overlay', 'dlss5-lab-overlay.addon64')
@@ -444,13 +444,13 @@ app.whenReady().then(async () => {
   if (!singleInstance) return;
   // Registered here rather than at load: main.js is exercised in a plain vm
   // context by the tests, where src modules are stubbed and cannot be called.
-  require('./src/overlay-ipc')({ app, ipcMain, dialog, shell, window: () => win, bridge: () => overlayBridge });
+  require('./src/main/overlay-ipc')({ app, ipcMain, dialog, shell, window: () => win, bridge: () => overlayBridge });
   createWindow();
   // The icon is there from launch, not only after the first close - somebody
   // who wants the app parked in the tray wants to see that it is.
   if (loadState().closeToTray !== false) ensureTray();
   try {
-    overlayBridge = await require('./src/overlay-bridge')({ BrowserWindow, userData: app.getPath('userData'), getLang: () => loadState().lang });
+    overlayBridge = await require('./src/main/overlay-bridge')({ BrowserWindow, userData: app.getPath('userData'), getLang: () => loadState().lang });
     if (quitting) overlayBridge.close();
   } catch (error) {
     if (!quitting) console.error('Overlay bridge:', error.message);
@@ -1441,11 +1441,11 @@ ipcMain.handle('install', (event, dir, exePath, requestedRoute, requestedApi) =>
   // The in-game overlay rides along with the install when it is switched on and
   // the executable is one it supports. Prepared before anything is written, so
   // an unsupported build refuses the install rather than half-finishing it.
-  const gameOverlay = require('./src/game-overlay');
+  const gameOverlay = require('./src/core/game-overlay');
   let overlayWanted = false;
   // An unreadable preference means the overlay is off. A DLSS install must not
   // fail because of it.
-  try { overlayWanted = require('./src/overlay-preferences').read(app.getPath('userData')).enabled === true; } catch {}
+  try { overlayWanted = require('./src/main/overlay-preferences').read(app.getPath('userData')).enabled === true; } catch {}
 
   let overlayPlan = null;
   if (overlayWanted) {
@@ -1536,7 +1536,7 @@ ipcMain.handle('install', (event, dir, exePath, requestedRoute, requestedApi) =>
     return { ok: true, replaced: manifest.replaced.length, added: manifest.added.length };
   } catch (err) {
     // Drop stale overlay records whose bytes the rollback already removed.
-    try { require('./src/game-overlay').cleanupMissing(overlayLibrary(), dir); } catch {}
+    try { require('./src/core/game-overlay').cleanupMissing(overlayLibrary(), dir); } catch {}
     return { ok: false, code: err.code, message: err.message };
   }
 }));

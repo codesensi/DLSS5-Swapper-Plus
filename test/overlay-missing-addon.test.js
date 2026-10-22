@@ -6,9 +6,9 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-const { createOverlayLibrary } = require('../src/overlays');
+const { createOverlayLibrary } = require('../src/core/overlays');
 const { writePe } = require('./fixtures/pe');
-const gameOverlay = require('../src/game-overlay');
+const gameOverlay = require('../src/core/game-overlay');
 
 // The add-on the game loads is a file inside this app, and antivirus takes it:
 // reported as Trojan:Win32/Kepavll!rfn, a machine-learning verdict on an

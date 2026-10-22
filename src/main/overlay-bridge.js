@@ -24,7 +24,7 @@ module.exports = async function startOverlayBridge({ BrowserWindow, userData, id
   let server = null;
   let runtimeStatus = null, commandTime = 0, commandCount = 0;
   const win = new BrowserWindow({ show: false, width: protocol.WIDTH, height: 900, transparent: true, frame: false,
-    webPreferences: { preload: path.join(__dirname, '../overlay-preload.js'), offscreen: true, contextIsolation: true, sandbox: true, nodeIntegration: false, backgroundThrottling: false, spellcheck: false } });
+    webPreferences: { preload: path.join(__dirname, '../../overlay-preload.js'), offscreen: true, contextIsolation: true, sandbox: true, nodeIntegration: false, backgroundThrottling: false, spellcheck: false } });
   const preferenceChanged=(dir,value)=>{if(dir===userData&&!closed&&!win.isDestroyed())win.webContents.send('lab-overlay-preferences',value);};
   const control = (event, command) => {
     if (closed || !client || event.sender !== win.webContents) return;
@@ -93,7 +93,7 @@ module.exports = async function startOverlayBridge({ BrowserWindow, userData, id
     win.webContents.executeJavaScript(`document.documentElement.lang=${JSON.stringify(code)};`).catch(() => {});
   };
   try {
-  await win.loadFile(path.join(__dirname, 'renderer/overlay-panel.html'));
+  await win.loadFile(path.join(__dirname, '../renderer/overlay-panel.html'));
   syncLang();
   win.webContents.send('lab-overlay-preferences',preferences.read(userData));
   preferences.events.on('change',preferenceChanged);

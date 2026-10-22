@@ -15,7 +15,7 @@ require.cache[electronPath] = {
   exports: { ipcMain: { on() {}, removeListener() {} } }
 };
 
-const startBridge = require('../src/overlay-bridge.js');
+const startBridge = require('../src/main/overlay-bridge.js');
 
 // The bridge needs a window to render the panel into; these tests are about the
 // pipe, so a stand-in that never paints is enough.

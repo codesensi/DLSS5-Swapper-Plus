@@ -6,7 +6,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-const library = require('../src/library.js');
+const library = require('../src/core/library.js');
 
 function tempRoot(t) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'dlss5-xbox-library-'));

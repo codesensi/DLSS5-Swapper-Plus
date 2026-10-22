@@ -4,7 +4,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const path = require('path');
 
-const { isInside, filterExcluded } = require('../src/library');
+const { isInside, filterExcluded } = require('../src/core/library');
 
 test('excluded scan roots remove only games inside the selected folder', () => {
   const root = path.join('D:\\', 'Games');

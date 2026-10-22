@@ -1,9 +1,9 @@
 'use strict';
 const path = require('node:path');
-const { createOverlayLibrary } = require('./overlays');
+const { createOverlayLibrary } = require('../core/overlays');
 
 module.exports = function registerOverlayIpc({ app, ipcMain, dialog, shell, window, bridge = () => null }) {
-  const appRoot = path.resolve(__dirname, '..');
+  const appRoot = path.resolve(__dirname, '..', '..');
   // Installed, the built add-on rides along as an extra resource; from source it
   // is whatever scripts/build-overlay.ps1 last produced.
   const builtin = () => (app.isPackaged

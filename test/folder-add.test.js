@@ -8,7 +8,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const library = require('../src/library');
+const library = require('../src/core/library');
 
 const temp = (t) => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'swapper-folder-'));
@@ -73,9 +73,9 @@ test('a swept-up library root is never added as a game', (t) => {
     'steamapps/common/Some Game/Some Game.exe',
     'steamapps/appmanifest_1.acf'
   ]);
-  assert.deepEqual(library ? require('../src/library').folder(library, 'Steam', true) : null, [],
+  assert.deepEqual(library ? require('../src/core/library').folder(library, 'Steam', true) : null, [],
     'the shelf itself is not a game');
   // The same folder chosen by hand is a different question, and still answered.
-  const byHand = require('../src/library').folder(library, 'My folders', false).map((g) => g.name);
+  const byHand = require('../src/core/library').folder(library, 'My folders', false).map((g) => g.name);
   assert.deepEqual(byHand, ['steamapps'], 'listed whole, because they know what they put there');
 });

@@ -6,7 +6,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-const library = require('../src/library.js');
+const library = require('../src/core/library.js');
 
 // A stand-in for reg.exe holding what Ubisoft Connect actually writes: one key
 // per game, the folder in InstallDir with forward slashes.

@@ -5,7 +5,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { steam } = require('../src/library');
+const { steam } = require('../src/core/library');
 const { protonCandidates } = require('../src/core/proton');
 
 test('Linux Steam discovery finds Proton game libraries and their prefix', (t) => {

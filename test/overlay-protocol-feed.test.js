@@ -5,7 +5,7 @@
 // said nothing about why. These hold the contract to the shape instead.
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const protocol = require('../src/overlay-protocol');
+const protocol = require('../src/main/overlay-protocol');
 
 const tool = (i, over = {}) => ({
   id: 301 + i, kind: i === 0 ? 1 : 0, effect: 'Feeder 0.15.1', name: 'Control ' + i,
