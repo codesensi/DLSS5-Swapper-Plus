@@ -18,7 +18,7 @@
     "overlay:build": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build-overlay.ps1",
     "overlay:prepare": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/prepare-overlay.ps1"
   },
-  "author": "Rakan Alkhaldi",
+  "author": "codesensi",
   "license": "MIT",
   "dependencies": {
     "extract-zip": "^2.0.1"
@@ -75,7 +75,7 @@
         "deb"
       ],
       "category": "Game",
-      "maintainer": "Rakan Alkhaldi",
+      "maintainer": "codesensi",
       "icon": "app_iocn.png",
       "artifactName": "DLSS5-Swapper-Plus-${version}-${arch}.${ext}"
     },
