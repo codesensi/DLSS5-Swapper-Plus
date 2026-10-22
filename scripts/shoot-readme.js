@@ -1,8 +1,8 @@
 'use strict';
 
-// README screenshots, taken from the real app against the real server so the
-// pictures are of the thing itself rather than a mock. Dark theme, one wide
-// window, and every shot waits on what it is photographing rather than a clock.
+// README screenshots, taken from the real app so the pictures are of the thing
+// itself rather than a mock. Dark theme, one wide window, and every shot waits
+// on what it is photographing rather than a clock.
 const { app, BrowserWindow } = require('electron');
 const fs = require('node:fs');
 const path = require('node:path');
@@ -49,71 +49,24 @@ app.whenReady().then(async () => {
     throw new Error('never became true: ' + why);
   };
 
-  const dumped = async (label) => {
-    const seen = await run(`JSON.stringify({
-      dialogs: [...document.querySelectorAll('dialog')].filter(d => d.open).map(d => d.id),
-      cards: document.querySelectorAll('[data-community-card]').length,
-      notice: document.getElementById('communityNotice').textContent.trim().slice(0, 60),
-      replies: document.querySelectorAll('.community-reply, [data-reply]').length,
-      threads: document.querySelectorAll('[data-thread]').length,
-      composer: !!document.querySelector('.community-composer')
-    })`);
-    console.log('  [' + label + ']', seen);
-  };
-
   // Dark theme through the same path the button uses, so nothing is faked.
   await run(`state.theme = 'dark'; document.documentElement.dataset.theme = 'dark'; paintBrand(); window.lab.setTheme('dark'); true`);
   await wait(400);
 
-  await run(`show('community'); true`);
-  // The grid, once it is the grid and not the word "Loading": cards present,
-  // the notice cleared, and every piece of artwork actually decoded.
-  // Let the library settle first: a progress bar in the corner reading
-  // "Fetching art..." is not what the page looks like in use.
-  await settle(`$('statusText').textContent === t('ready')`, 'library idle');
-  await settle(`document.querySelectorAll('[data-community-card]').length >= 6
-    && !document.getElementById('communityNotice').textContent.trim()
-    && [...document.querySelectorAll('#communityCards img')].every(i => i.complete && i.naturalWidth > 0)`, 'community grid');
-  await wait(1200);
-  await dumped('grid');
-  await shot('10-community.png');
-
-  // A card that has both a report and a comment on it, so the thread is real.
-  const key = await run(`(() => {
-    const cards = [...document.querySelectorAll('[data-community-card]')];
-    // One whose report carries prose, not just hardware chips: the card badge
-    // counts those, so "1 comment" is the promise of something to read.
-    const wanted = cards.find(c => /[1-9]\d* comment/.test(c.textContent));
-    return (wanted || cards[0]).dataset.communityCard;
-  })()`);
-  console.log('  card:', key);
-  await run(`document.querySelector('[data-community-card="' + ${JSON.stringify(key)} + '"]').click(); true`);
-  await settle(`document.getElementById('communityCardDialog').open && document.querySelectorAll('[data-thread]').length > 0`, 'card opened');
-  await settle(`[...document.querySelectorAll('#communityCardDialog img')].every(i => i.complete && i.naturalWidth > 0)`, 'card artwork');
-  await wait(900);
-  await dumped('card');
-  await shot('11-community-card.png');
-
-  await run(`document.getElementById('communityCardDialog').close(); true`);
-  await settle(`!document.getElementById('communityCardDialog').open`, 'card closed');
-  await wait(500);
-
-  // The menu the app draws itself, on a game this install has already reported:
-  // that is the one that says Edit and Remove rather than Send.
+  // The menu the app draws itself on a game card, over a library that has
+  // settled: a progress bar in the corner reading "Fetching art..." is not
+  // what the page looks like in use.
   await run(`show('games'); true`);
+  await settle(`$('statusText').textContent === t('ready')`, 'library idle');
   await settle(`document.querySelectorAll('#groups .card').length > 0`, 'game cards');
-  const picked = await run(`(() => {
-    const cards = [...document.querySelectorAll('#groups .card')];
-    const mine = cards.find(c => window.communityUi.reportFor(c.dataset.dir));
-    const card = mine || cards[0];
+  await run(`(() => {
+    const card = document.querySelector('#groups .card');
     card.scrollIntoView({ block: 'center' });
-    return JSON.stringify({ dir: card.dataset.dir, reported: !!mine });
+    return true;
   })()`);
-  console.log('  menu on:', picked);
   await wait(600);
   await run(`(() => {
-    const dir = ${JSON.stringify('')} + JSON.parse(${JSON.stringify(picked)}).dir;
-    const card = [...document.querySelectorAll('#groups .card')].find(c => c.dataset.dir === dir);
+    const card = document.querySelector('#groups .card');
     const box = card.getBoundingClientRect();
     card.dispatchEvent(new MouseEvent('contextmenu', {
       bubbles: true, cancelable: true,
@@ -123,44 +76,21 @@ app.whenReady().then(async () => {
   })()`);
   await settle(`!document.getElementById('gameMenu').hidden && document.getElementById('gameMenu').offsetHeight > 0`, 'game menu');
   await wait(700);
-  await dumped('menu');
   await shot('12-games-menu.png');
   await run(`document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); true`);
   await wait(500);
-  await run(`show('community'); true`);
-  await settle(`document.querySelectorAll('[data-community-card]').length >= 6`, 'back on community');
-  await wait(600);
 
-  await run(`document.getElementById('communityCardDialog').close(); true`);
-  await settle(`!document.getElementById('communityCardDialog').open`, 'card closed');
-  await wait(600);
-
-  // The report sheet, on a game from the real library, so it wears that game's
-  // own colours the way it does in use.
-  const dir = await run(`(state.games.find(g => g.poster) || state.games[0] || {}).dir || null`);
-  if (dir) {
-    console.log('  report sheet for:', dir);
-    await run(`window.communityUi.openReport(${JSON.stringify(dir)}); true`);
-    await settle(`document.getElementById('communityReportDialog').open`, 'report dialog');
-    await settle(`[...document.querySelectorAll('#communityReportDialog img')].every(i => i.complete && i.naturalWidth > 0)`, 'report artwork');
-    await wait(1200);
-    await dumped('report');
-    await shot('13-community-report.png');
-  } else console.log('  no game in the library for the report sheet');
-
-  // Settings: the name and icon a person is signed with, and the switch that
-  // decides whether Windows says anything at all.
+  // Settings: the switch that decides whether Windows says anything at all.
   await run(`document.querySelectorAll('dialog[open]').forEach(d => d.close()); show('settings'); true`);
   await settle(`document.getElementById('settings').textContent.length > 200`, 'settings drawn');
   await run(`(() => {
     const block = [...document.querySelectorAll('#settings *')]
-      .find(el => /community|notification/i.test(el.textContent) && el.children.length && el.textContent.length < 900);
+      .find(el => /notification/i.test(el.textContent) && el.children.length && el.textContent.length < 900);
     if (block) block.scrollIntoView({ block: 'center' });
     return true;
   })()`);
   await wait(900);
-  await dumped('settings');
-  await shot('14-settings-community.png');
+  await shot('14-settings.png');
 
   console.log('done');
   app.exit(0);

@@ -1,8 +1,7 @@
 'use strict';
-// The community server files every report's graphics card under a model name,
-// so "NVIDIA GeForce RTX 5080" and "RTX 5080" are one card. The app needs the
-// same answer for its own card - to offer "My card" in the filter - so this is
-// the server's function, kept identical; a test compares the two.
+// GPU model names arrive in many spellings for the same hardware, so
+// "NVIDIA GeForce RTX 5080" and "RTX 5080" normalise to one key. The library
+// and diagnostics views use this to group and match cards consistently.
 (function (root) {
   const NOISE = /\b(?:NVIDIA|AMD|ATI|Intel|GeForce|Graphics|GPU|Series)\b/gi;
   const FAMILY = new Map([['rtx', 'RTX'], ['gtx', 'GTX'], ['rx', 'RX'], ['xt', 'XT'], ['xtx', 'XTX'],

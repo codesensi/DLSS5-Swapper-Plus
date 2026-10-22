@@ -63,7 +63,7 @@ const S = {
     hideConfirm: (name) => `Hide ${name} from the list? Nothing on disk changes and any installation stays. You can bring it back from Settings.`,
     optiDownloading: 'Downloading and verifying OptiScaler…', optiVerified: (version) => `Official OptiScaler release verified: ${version}.`,
     backendSwitching: 'Saving settings and switching backend…', backendRecovered: 'Interrupted switch recovered.',
-    navHome: 'Home', navGames: 'Games', navCommunity: 'Community', navHistory: 'History', navSettings: 'Settings', navAbout: 'About',
+    navHome: 'Home', navGames: 'Games', navHistory: 'History', navSettings: 'Settings', navAbout: 'About',
     navOverlay: 'Overlay',
     ready: 'Ready', scanning: 'Scanning…', fetchingArt: 'Fetching art…',
     unsupportedRendererHint: 'Native DirectX 10 is not supported by Feeder. Select the game’s DirectX 11 mode if available. This renderer cannot be installed automatically.',
@@ -79,7 +79,7 @@ const S = {
     notesTitle: 'Notes about this game', notesWarning: 'Warning — read before installing',
     diagnosticsSaved: (n) => `Diagnostics saved with ${n} log file${n === 1 ? '' : 's'}. Attach it to your report.`,
     menuDetails: 'View game details', menuOpen: 'Open game folder', menuCopyPath: 'Copy folder path',
-    menuScan: 'Rescan this game', menuPoster: 'Change cover', menuCommunity: 'Add to community-tested games', menuCommunityEdit: 'Edit my community report', menuCommunityRemove: 'Delete my community report', menuCommunityRemoved: 'Community report for {0} deleted', menuHide: 'Hide from library (keep files)',
+    menuScan: 'Rescan this game', menuPoster: 'Change cover', menuHide: 'Hide from library (keep files)',
     menuConfirmRestore: 'Restore the original files for this game?',
     menuRestoreHint: 'Close the game first. Files installed by Swapper will be removed and backed-up originals restored.',
     menuNoBackup: 'No active backup is available for this game.',
@@ -90,10 +90,6 @@ const S = {
     historyLoadFailed: 'Could not load history. Reopen this page to try again.',
     overlaySkipped: (error) => `The in-game overlay will not be installed: ${error}. The rest of the install carries on.`,
     errNoWriteAccess: 'Windows will not let this app write to the game folder, so nothing was changed. Games installed under Program Files are protected: run DLSS 5 Swapper Plus as administrator, or move the game to another folder.',
-    sheetCommunityTitle: 'What the community found', sheetCommunityOpen: 'Open reports',
-    sheetCommunityNone: 'No community reports for this game yet - after installing, you could be the first.',
-    sheetCommunityCounts: (reports, comments) => `${reports} report${reports === 1 ? '' : 's'} · ${comments} comment${comments === 1 ? '' : 's'}`,
-    communityWorking: 'Working', communityMixed: 'Mixed', communityBroken: 'Not working',
     overlayNotForRoute: (why, api) => `The in-game overlay will not be installed: ${why === 'bits' ? 'it works on 64-bit games only, and this game is 32-bit'
       : why === 'multipass' ? 'the multipass route has its own page in game (press Home). The overlay works with Native DLSS (RenoDX) and Feeder'
       : why === 'optiscaler' ? 'OptiScaler has its own menu in game (press Insert). The overlay works with Native DLSS (RenoDX) and Feeder'
@@ -104,7 +100,6 @@ const S = {
     t2SetupTitle: 'Set up DLSS 5',
     t2Cards: 'Cards',
     t2List: 'List',
-    t2Signal: 'Community signal',
     t2System: 'System / Live',
     t2Updated: 'Updated',
     t2ViewAll: 'View all',
@@ -192,7 +187,6 @@ The install will go through. If the neural pass never appears in game, 616.56 is
     setTray: 'Keep running in the system tray', setTrayHint: 'Closing the window hides it to the tray instead of quitting. Use Quit in the tray menu to exit.',
     trayShow: 'Open DLSS 5 Swapper Plus', trayQuit: 'Quit',
     setAutoScan: 'Scan all drives automatically', setAutoScanHint: 'Off by default. User-added folders are always scanned.',
-    setNotices: 'Community notifications', setNoticesHint: 'Tell me when somebody replies to my comment, mentions me, or comments on a game I follow.',
     setGroupGames: 'Group games by store', setGroupGamesHint: 'Turn off to show all games and emulators in one alphabetical grid, without store sections.',
     setFolders: 'Scanned folders', setAdd: 'Add', setLibrary: 'Library file', setReset: 'Reset',
     setRoots: 'Found on your drives',
@@ -246,7 +240,7 @@ The install will go through. If the neural pass never appears in game, 616.56 is
     hideConfirm: (name) => `إخفاء ${name} من القائمة؟ لا يتغيّر شيء على القرص ويبقى أي تثبيت كما هو. يمكنك إعادتها من الإعدادات.`,
     optiDownloading: 'جارٍ تنزيل OptiScaler والتحقق منه…', optiVerified: (version) => `تم التحقق من إصدار OptiScaler الرسمي: ${version}.`,
     backendSwitching: 'جارٍ حفظ الإعدادات وتبديل المسار…', backendRecovered: 'تم استرداد التبديل المنقطع.',
-    navHome: 'الرئيسية', navGames: 'الألعاب', navCommunity: 'المجتمع', navHistory: 'السجل', navSettings: 'الإعدادات', navAbout: 'عن البرنامج',
+    navHome: 'الرئيسية', navGames: 'الألعاب', navHistory: 'السجل', navSettings: 'الإعدادات', navAbout: 'عن البرنامج',
     navOverlay: 'الأوفرلاي',
     ready: 'جاهز', scanning: 'جارٍ الفحص…', fetchingArt: 'جلب الصور…',
     unsupportedRendererHint: 'Feeder لا يدعم DirectX 10 مباشرة. اختر وضع DirectX 11 داخل اللعبة إن توفر؛ لا يمكن التثبيت تلقائياً على واجهة الرسوم هذه.',
@@ -262,7 +256,7 @@ The install will go through. If the neural pass never appears in game, 616.56 is
     notesTitle: 'ملاحظات عن هذه اللعبة', notesWarning: 'تحذير — اقرأه قبل التثبيت',
     diagnosticsSaved: (n) => `حُفظ التشخيص ومعه ${n} ملف سجل. أرفقه مع بلاغك.`,
     menuDetails: 'عرض تفاصيل اللعبة', menuOpen: 'فتح مجلد اللعبة', menuCopyPath: 'نسخ مسار المجلد',
-    menuScan: 'إعادة فحص هذه اللعبة', menuPoster: 'تغيير الغلاف', menuCommunity: 'إضافة إلى الألعاب المختبرة من المجتمع', menuCommunityEdit: 'تعديل تقييمي في المجتمع', menuCommunityRemove: 'حذف تقييمي من المجتمع', menuCommunityRemoved: 'تم حذف تقييم {0} من المجتمع', menuHide: 'إخفاء من المكتبة (بدون حذف الملفات)',
+    menuScan: 'إعادة فحص هذه اللعبة', menuPoster: 'تغيير الغلاف', menuHide: 'إخفاء من المكتبة (بدون حذف الملفات)',
     menuConfirmRestore: 'هل تريد إرجاع الملفات الأصلية لهذه اللعبة؟',
     menuRestoreHint: 'أغلق اللعبة أولًا. ستُزال الملفات التي ثبّتها Swapper وتُستعاد الملفات الأصلية من النسخة الاحتياطية.',
     menuNoBackup: 'لا توجد نسخة احتياطية نشطة لهذه اللعبة.',
@@ -273,10 +267,6 @@ The install will go through. If the neural pass never appears in game, 616.56 is
     historyLoadFailed: 'تعذّر تحميل الهستري. أعد فتح الصفحة للمحاولة مرة أخرى.',
     overlaySkipped: (error) => `لن يُثبَّت الأوفرلاي داخل اللعبة: ${error}. وبقية التثبيت مستمرة.`,
     errNoWriteAccess: 'ويندوز لا يسمح للبرنامج بالكتابة في مجلد اللعبة، فلم يتغيّر شيء. الألعاب المثبّتة داخل Program Files محمية: شغّل DLSS 5 Swapper Plus كمسؤول، أو انقل اللعبة إلى مجلد آخر.',
-    sheetCommunityTitle: 'ماذا وجد المجتمع', sheetCommunityOpen: 'افتح التقارير',
-    sheetCommunityNone: 'لا توجد تقارير من المجتمع لهذه اللعبة بعد - بعد التثبيت، يمكنك أن تكون الأول.',
-    sheetCommunityCounts: (reports, comments) => `${reports} تقرير · ${comments} تعليق`,
-    communityWorking: 'تعمل', communityMixed: 'نتائج مختلطة', communityBroken: 'لا تعمل',
     overlayNotForRoute: (why, api) => `لن يُثبَّت الأوفرلاي داخل اللعبة: ${why === 'bits' ? 'يعمل على ألعاب 64-بت فقط، وهذه اللعبة 32-بت'
       : why === 'multipass' ? 'مسار multipass له صفحته داخل اللعبة (زر Home)، والأوفرلاي يعمل مع Native DLSS (RenoDX) و Feeder'
       : why === 'optiscaler' ? 'OptiScaler له قائمته داخل اللعبة (زر Insert)، والأوفرلاي يعمل مع Native DLSS (RenoDX) و Feeder'
@@ -287,7 +277,6 @@ The install will go through. If the neural pass never appears in game, 616.56 is
     t2SetupTitle: 'تهيئة DLSS 5',
     t2Cards: 'بطاقات',
     t2List: 'قائمة',
-    t2Signal: 'إشارة المجتمع',
     t2System: 'النظام / مباشر',
     t2Updated: 'آخر تحديث',
     t2ViewAll: 'عرض الكل',
@@ -335,7 +324,6 @@ The install will go through. If the neural pass never appears in game, 616.56 is
     historySaveWarning: 'تعذّرت قراءة أو حفظ الهستري بالكامل. السجلات المتاحة ظاهرة؛ انسخها قبل إغلاق البرنامج وتحقّق من صلاحيات مجلد بيانات التطبيق.',
     gamesTitle: 'الألعاب', addGame: 'أضف لعبة', addFolder: 'أضف مجلداً', rescan: 'إعادة فحص',
     searchGames: 'البحث عن لعبة', searchGamesHint: 'ابحث باسم اللعبة…',
-    setNotices: 'إشعارات المجتمع', setNoticesHint: 'نبّهني عندما يرد أحد على تعليقي أو يشير إليّ أو يعلّق على لعبة أتابعها.',
     setGroupGames: 'تقسيم الألعاب حسب المتجر', setGroupGamesHint: 'أوقفه لعرض كل الألعاب والمحاكيات في شبكة واحدة مرتبة بالاسم، بدون أقسام المتاجر.',
     filterDlss: 'حالة DLSS', filterAddon: 'الإضافة', clearFilters: 'مسح الفلاتر',
     allApis: 'كل واجهات الرسوم', allDlss: 'كل حالات DLSS', allAddons: 'كل حالات الإضافة',
@@ -438,7 +426,7 @@ The install will go through. If the neural pass never appears in game, 616.56 is
     feedVkLayerReady: (rel) => `Vulkan 互操作层已安装。如果游戏内未出现 DLSS 5，请通过 ${rel} 启动游戏。`, neuralModelKept: (rel) => `已保留你现有的 ${rel}；未用随附模型覆盖它。`,
 
     // ===== 隐藏游戏与导航 =====
-    setHidden: '已隐藏的游戏', setHiddenNone: '没有隐藏的游戏。', setUnhide: '重新显示', hideTitle: '隐藏此游戏？', navCommunity: '社区',
+    setHidden: '已隐藏的游戏', setHiddenNone: '没有隐藏的游戏。', setUnhide: '重新显示', hideTitle: '隐藏此游戏？',
     hideConfirm: (name) => `从列表中隐藏 ${name}？磁盘上的文件不会有任何变化，已安装的内容也会保留。可随时在设置中恢复显示。`,
 
     // ===== 渲染器兼容性提示 =====
@@ -454,7 +442,6 @@ The install will go through. If the neural pass never appears in game, 616.56 is
 
     // ===== 游戏右键菜单 =====
     menuDetails: '查看游戏详情', menuOpen: '打开游戏文件夹', menuCopyPath: '复制文件夹路径', menuScan: '重新扫描此游戏', menuPoster: '更换封面', menuHide: '从游戏库中隐藏（保留文件）',
-    menuCommunity: '加入社区实测游戏', menuCommunityEdit: '编辑我的社区报告', menuCommunityRemove: '删除我的社区报告', menuCommunityRemoved: '已删除 {0} 的社区报告',
     menuConfirmRestore: '为此游戏还原原文件？', menuRestoreHint: '请先关闭游戏。Swapper 安装的文件将被移除，并还原已备份的原文件。', menuNoBackup: '此游戏没有可用的有效备份。',
     menuScanned: name => `扫描已更新：${name}`, menuActionFailed: (name, error) => `${name}：${error}`,
 
@@ -463,11 +450,6 @@ The install will go through. If the neural pass never appears in game, 616.56 is
     historySaveWarning: '历史记录未能完整读取或保存。当前显示的是可用条目；请在关闭程序前将其复制出来，并检查应用数据文件夹的访问权限。',
     overlaySkipped: (error) => `游戏内叠加层将不会安装：${error}。其余安装继续进行。`,
     errNoWriteAccess: 'Windows 不允许本程序写入游戏文件夹，因此未做任何更改。安装在 Program Files 下的游戏受保护：请以管理员身份运行 DLSS 5 Swapper Plus，或将游戏移动到其他文件夹。',
-
-    // ===== 社区反馈摘要 =====
-    sheetCommunityTitle: '社区反馈结果', sheetCommunityOpen: '查看报告', sheetCommunityNone: '此游戏暂无社区报告 — 安装之后，你可以成为第一个提交的人。',
-    sheetCommunityCounts: (reports, comments) => `${reports} 条报告 · ${comments} 条评论`,
-    communityWorking: '可用', communityMixed: '结果不一', communityBroken: '不可用',
 
     // ===== 搜索与筛选 =====
     searchGames: '搜索游戏', searchGamesHint: '按游戏名称搜索…', filterDlss: 'DLSS 状态', filterAddon: '插件', clearFilters: '清除筛选',
@@ -490,7 +472,6 @@ The install will go through. If the neural pass never appears in game, 616.56 is
     // ===== 设置项 =====
     setTray: '保持系统托盘运行', setTrayHint: '关闭窗口时将其隐藏到托盘而不是退出。可使用托盘菜单中的「退出」来结束程序。', trayShow: '打开 DLSS 5 Swapper Plus', trayQuit: '退出',
     setAutoScan: '自动扫描所有磁盘', setAutoScanHint: '默认关闭。手动添加的文件夹始终会被扫描。',
-    setNotices: '社区通知', setNoticesHint: '当有人回复我的评论、提到我，或评论我关注的游戏时通知我。',
     setGroupGames: '按商店分组显示游戏', setGroupGamesHint: '关闭后，所有游戏和模拟器将按字母顺序合并显示，不再按商店分区。',
 
     // ===== 主题与安全图形（设置页）=====
@@ -504,7 +485,7 @@ The install will go through. If the neural pass never appears in game, 616.56 is
     sheetSetup: 'DLSS 安装', sheetFacts: '详情', sheetFiles: '游戏内文件', sheetActivity: '活动',
 
     // ===== 主题 2 · Aperture 界面 =====
-    t2SetupTitle: '设置 DLSS 5', t2Cards: '卡片', t2List: '列表', t2Signal: '社区反馈', t2System: '系统 / 实时',
+    t2SetupTitle: '设置 DLSS 5', t2Cards: '卡片', t2List: '列表', t2System: '系统 / 实时',
     t2Updated: '更新于', t2ViewAll: '查看全部', t2Search: '搜索游戏、启动器或文件夹…', t2SearchHint: '输入游戏或页面名称',
     t2Move: '移动', t2Open: '打开', t2Page: '页面', t2NoMatch: '没有匹配的名称', t2Play: '启动', t2PlayFailed: '无法从此处启动该游戏。',
     t2About: '简介', t2Setup: 'DLSS 5 安装', t2Ready: '可安装', t2NotReady: '暂不可安装',
