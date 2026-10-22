@@ -197,8 +197,8 @@ The install will go through. If the neural pass never appears in game, 616.56 is
     setFolders: 'Scanned folders', setAdd: 'Add', setLibrary: 'Library file', setReset: 'Reset',
     setRoots: 'Found on your drives',
     setPosters: 'Posters', setSaved: (n) => `${n} saved`, setLang: 'Language',
-    aboutTitle: 'DLSS 5 Swapper Plus', aboutBody: 'Puts DLSS 5 Neural Rendering into your games, and takes it back out whenever you want.', aboutBy: 'Built by codesensi', aboutLocalized: 'Localization: bilibili: ',
-    supportBody: 'DLSS 5 Swapper Plus is free and MIT licensed. If it saved you an evening of fiddling, you can buy me a coffee - or scan the code with your phone.',
+    aboutTitle: 'DLSS 5 Swapper Plus', aboutBody: 'Puts DLSS 5 Neural Rendering into your games, and takes it back out whenever you want.', aboutBy: 'Built by codesensi',
+    supportBody: 'DLSS 5 Swapper Plus is free and MIT licensed.',
     agoNow: 'just now', agoMin: (n) => `${n} min ago`, agoHour: (n) => `${n} h ago`, agoDay: (n) => `${n} d ago`,
     artFound: (a, b) => `Artwork: ${a} of ${b} found`, libReady: (n, d) => `Library ready — ${n} games, ${d} on DirectX 12`,
     olHotkeyTitle: 'Overlay hotkey',
@@ -381,7 +381,7 @@ The install will go through. If the neural pass never appears in game, 616.56 is
     setRoots: 'مكتشفة في أقراصك',
     setPosters: 'البوسترات', setSaved: (n) => `${n} محفوظ`, setLang: 'اللغة',
     aboutTitle: 'DLSS 5 Swapper Plus', aboutBody: 'يضع DLSS 5 في ألعابك، ويرجّعها كما كانت متى شئت.', aboutBy: 'من تطوير codesensi',
-    supportBody: 'البرنامج مجاني ومفتوح المصدر برخصة MIT. إن وفّر عليك عناءً فبإمكانك دعمي بفنجان قهوة - أو امسح الرمز بجوالك.',
+    supportBody: 'البرنامج مجاني ومفتوح المصدر برخصة MIT.',
     agoNow: 'الآن', agoMin: (n) => `قبل ${n} دقيقة`, agoHour: (n) => `قبل ${n} ساعة`, agoDay: (n) => `قبل ${n} يوم`,
     artFound: (a, b) => `الصور: ${a} من ${b}`, libReady: (n, d) => `المكتبة جاهزة — ${n} لعبة، ${d} على DirectX 12`
   },
@@ -411,7 +411,7 @@ The install will go through. If the neural pass never appears in game, 616.56 is
     setFolders: '已扫描的文件夹', setAdd: '添加', setLibrary: '库文件', setReset: '重置',
     setRoots: '在磁盘上找到',
     setPosters: '封面', setSaved: (n) => `已保存 ${n} 个`, setLang: '语言',
-    aboutTitle: 'DLSS 5 Swapper Plus', aboutBody: '为你的游戏装上 DLSS 5，也能随时还原。', aboutBy: '由 codesensi 开发', aboutLocalized: '汉化补全: bilibili: ',
+    aboutTitle: 'DLSS 5 Swapper Plus', aboutBody: '为你的游戏装上 DLSS 5，也能随时还原。', aboutBy: '由 codesensi 开发',
     agoNow: '刚刚', agoMin: (n) => `${n} 分钟前`, agoHour: (n) => `${n} 小时前`, agoDay: (n) => `${n} 天前`,
     artFound: (a, b) => `封面：${b} 个中找到 ${a} 个`, libReady: (n, d) => `库已就绪 — ${n} 个游戏，${d} 个使用 DirectX 12`,
     olHotkeyTitle: '叠加层热键', olKeyHelp: '点击输入框，然后按下你的快捷键。支持 Ctrl、Alt 和 Shift。Home / Escape 保留给 ReShade。',
@@ -531,7 +531,7 @@ The install will go through. If the neural pass never appears in game, 616.56 is
     multipassNext: (dlss) => dlss === 'yes'
       ? '多通道已安装。在游戏内按 Home 打开 RenoDX DLSS 标签页（最后一个，不是首页）：Pass Count 和所有其他设置都在那里。请在游戏自身设置中保持 DLSS 开启。'
       : '多通道已安装。在游戏内按 Home 打开 RenoDX DLSS 标签页（最后一个，不是首页）。该游戏没有自带 DLSS，因此在该页面关闭 Require DLSS 并把 Hook Method 设为 Present。Pass Count 也在同一标签页。',
-    supportBody: 'DLSS 5 Swapper Plus 免费且基于 MIT 许可证。如果它为你省下了一晚上的折腾，可以请我喝杯咖啡 — 或用手机扫描二维码。',
+    supportBody: 'DLSS 5 Swapper Plus 免费且基于 MIT 许可证。',
   },
   es: {
     navHome: 'Inicio', navGames: 'Juegos', navHistory: 'Historial', navSettings: 'Ajustes', navAbout: 'Acerca de',

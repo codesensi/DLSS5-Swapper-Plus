@@ -4,7 +4,6 @@
 const links = Object.freeze({
   github: 'https://github.com/codesensi/DLSS5-Swapper-Plus',
   releases: 'https://github.com/codesensi/DLSS5-Swapper-Plus/releases/latest',
-  coffee: 'https://buymeacoffee.com/rakanki911',
   bilibili: 'https://space.bilibili.com/5199773'
 });
 function projectUrl(key) {
