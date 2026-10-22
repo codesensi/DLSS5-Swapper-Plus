@@ -6,13 +6,13 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const assert = require('node:assert/strict');
-const opti = require('../src/core/optiscaler');
-const manager = require('../src/core/backend-manager');
-const { scanSource, scanGame } = require('../src/core/scan');
-const { digest } = require('../src/core/runtime-components');
-const ini = require('../src/core/feeder-config');
-const pe = require('../src/core/pe');
-const journal = require('../src/core/file-journal');
+const opti = require('../../src/core/optiscaler');
+const manager = require('../../src/core/backend-manager');
+const { scanSource, scanGame } = require('../../src/core/scan');
+const { digest } = require('../../src/core/runtime-components');
+const ini = require('../../src/core/feeder-config');
+const pe = require('../../src/core/pe');
+const journal = require('../../src/core/file-journal');
 
 function fakeExe(file) {
   const bytes = Buffer.alloc(300 * 1024);
@@ -25,8 +25,8 @@ function fakeExe(file) {
 (async () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'opti-payload-test-'));
   try {
-    const source = scanSource(path.join(__dirname, '../payload'));
-    const optiRoot = await opti.ensureOptiScaler(path.join(__dirname, '../vendor/runtime-tests'));
+    const source = scanSource(path.join(__dirname, '../../payload'));
+    const optiRoot = await opti.ensureOptiScaler(path.join(__dirname, '../../vendor/runtime-tests'));
     for (const route of ['native', 'feeder']) {
       const dir = path.join(root, route);
       fs.mkdirSync(dir);
@@ -101,7 +101,7 @@ function fakeExe(file) {
     // neural pass silently does nothing.
     {
       const presr = opti.releaseFor('0.8.92-presr');
-      const forkRoot = await opti.ensureOptiScaler(path.join(__dirname, '../vendor/runtime-tests'), presr.version);
+      const forkRoot = await opti.ensureOptiScaler(path.join(__dirname, '../../vendor/runtime-tests'), presr.version);
       const dir = path.join(root, 'presr');
       fs.mkdirSync(dir);
       const exePath = path.join(dir, 'Game.exe'); fakeExe(exePath);

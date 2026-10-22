@@ -7,10 +7,10 @@ const path = require('path');
 const crypto = require('crypto');
 const extractZip = require('extract-zip');
 const { execFileSync } = require('child_process');
-const feederRelease = require('../src/core/feeder-release');
-const renodx = require('../src/core/renodx-release');
+const feederRelease = require('../../src/core/feeder-release');
+const renodx = require('../../src/core/renodx-release');
 
-const ROOT = path.resolve(__dirname, '..');
+const ROOT = path.resolve(__dirname, '..', '..');
 // All build outputs (staging folders and electron-builder's own output) live
 // under dist/, keeping the source root free of generated directories.
 const PAYLOAD = path.join(ROOT, 'dist', 'payload');
@@ -227,7 +227,7 @@ async function collectFeeder(source) {
     `DLSS5-Feeder v${feederRelease.version} — https://github.com/jlrouzies-fr/DLSS5-Feeder`,
     'VORT shaders b410b9f0c0fbb83c8cb42164aaf1655fab386f4a — https://github.com/vortigern11/vort_Shaders',
     'ReShade headers ee30868391d4ad103db60489820102d8fd40e3c1 — https://github.com/crosire/reshade-shaders',
-    `dgVoodoo2 v${require('../src/core/runtime-components').DGVOODOO_VERSION} — downloaded at runtime; not bundled — https://github.com/dege-diosg/dgVoodoo2`,
+    `dgVoodoo2 v${require('../../src/core/runtime-components').DGVOODOO_VERSION} — downloaded at runtime; not bundled — https://github.com/dege-diosg/dgVoodoo2`,
     `RenoDX DLSS5 add-on v${renodx.CONSUMER.version} — https://github.com/clshortfuse/renodx`,
     `RenoDX DLSS Tool add-on ${renodx.MULTIPASS.version} — https://github.com/clshortfuse/renodx`,
     ''
@@ -321,7 +321,7 @@ async function extracted(component, folder) {
 }
 console.log(`  (${extras} optional add-on build${extras === 1 ? '' : 's'} bundled)`);
 
-// The in-game overlay's native add-on, built by scripts/build-overlay.ps1.
+// The in-game overlay's native add-on, built by scripts/build/build-overlay.ps1.
 // Staged like the payload so electron-builder ships it as resources/overlay.
 const OVERLAY_BIN = path.join(ROOT, 'dist', 'overlay-bin');
 fs.rmSync(OVERLAY_BIN, { recursive: true, force: true });

@@ -10,14 +10,14 @@ const path = require('node:path');
 // Electron is started on a script rather than on the app folder, so it reports
 // its own version for app.getVersion() - 33.4.11 turned up in the report sheet
 // where 2.2.4 belongs. The real one is put back before anything reads it.
-const version = require('../package.json').version;
+const version = require('../../package.json').version;
 if (typeof app.setVersion === 'function') app.setVersion(version);
 else app.getVersion = () => version;
 app.setName('DLSS 5 Swapper Plus');
 
-require('../main.js');
+require('../../main.js');
 
-const OUT = path.join(__dirname, '..', 'docs', 'screenshots');
+const OUT = path.join(__dirname, '..', '..', 'docs', 'screenshots');
 const WIDTH = 1680, HEIGHT = 1020;
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 

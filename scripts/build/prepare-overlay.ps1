@@ -1,5 +1,5 @@
 $ErrorActionPreference = 'Stop'
-$appRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
+$appRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..'))
 # Toolchain versions are declared HERE and nowhere else. build-overlay.ps1 only
 # ever looks under vendor\toolchain with version-less folder names, so bumping
 # a version means editing this block alone.

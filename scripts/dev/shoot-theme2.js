@@ -8,14 +8,14 @@ const { app, BrowserWindow } = require('electron');
 const fs = require('node:fs');
 const path = require('node:path');
 
-const version = require('../package.json').version;
+const version = require('../../package.json').version;
 if (typeof app.setVersion === 'function') app.setVersion(version);
 else app.getVersion = () => version;
 app.setName('DLSS 5 Swapper Plus');
 
-require('../main.js');
+require('../../main.js');
 
-const OUT = process.env.SHOT_DIR || path.join(__dirname, '..', 'docs', 'screenshots', 'theme2');
+const OUT = process.env.SHOT_DIR || path.join(__dirname, '..', '..', 'docs', 'screenshots', 'theme2');
 const WIDTH = 1680, HEIGHT = 1020;
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const die = (why) => { console.error(why); app.exit(1); };

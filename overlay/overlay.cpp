@@ -1,5 +1,5 @@
 // Which %APPDATA% folder holds the bridge endpoint, the hotkey preferences
-// and the pipe name. scripts/build-overlay.ps1 passes it as a bare token
+// and the pipe name. scripts/build/build-overlay.ps1 passes it as a bare token
 // (-DLAB_OVERLAY_PROFILE=dlss5-swapper-plus) because quotes in a -D flag do not
 // survive the shell; the widening happens here instead.
 #ifndef LAB_OVERLAY_PROFILE

@@ -22,7 +22,7 @@ const PORTABLE_DIR = 'DLSS5-Swapper-Plus';
 
 function missingPayload({ packaged, resourcesPath, appRoot, portable = false, temp = null }) {
   // Installed, the payload rides along under resourcesPath; from source it is
-  // staged under dist/ by scripts/collect-payload.js.
+  // staged under dist/ by scripts/build/collect-payload.js.
   const directory = path.join(packaged ? resourcesPath : appRoot, 'dist', 'payload');
   if (!packaged) {
     return {

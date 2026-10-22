@@ -330,8 +330,8 @@ test('the add-ons are the current ones, pinned in one place each', () => {
   assert.match(renodx.CONSUMER.archive[1], /RankFTW\/rhi-repo/);
   assert.match(renodx.MULTIPASS.version, /^SF 26\.1003/);
   // The build no longer depends on a file sitting on one machine's desktop.
-  const script = read('scripts', 'collect-payload.js');
-  assert.match(script, /require\('\.\.\/src\/core\/renodx-release'\)/);
+  const script = read('scripts', 'build', 'collect-payload.js');
+  assert.match(script, /require\('\.\.\/\.\.\/src\/core\/renodx-release'\)/);
   assert.doesNotMatch(script, /const RENODX_ADDONS = Object\.freeze/, 'the inline digest map is gone');
   assert.match(script, /await extracted\(release\.archive/);
 });
@@ -380,5 +380,5 @@ test('the F8 panel knows the RenoDX build the app ships', () => {
   // nothing in it was otherwise silent about the reason.
   assert.match(bridge, /NR_LAB_BRIDGE build=%s active=%d controls=%s reason=/);
   // And the build refuses to ship a consumer the overlay cannot drive.
-  assert.match(read('scripts', 'collect-payload.js'), /assertOverlayKnowsConsumer\(\);/);
+  assert.match(read('scripts', 'build', 'collect-payload.js'), /assertOverlayKnowsConsumer\(\);/);
 });

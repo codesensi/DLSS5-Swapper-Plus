@@ -1,12 +1,12 @@
 param([switch]$Smoke, [switch]$RenoDxProbe)
 $ErrorActionPreference = 'Stop'
-$appRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
+$appRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..'))
 # The add-on reads its endpoint, hotkey file and pipe name from this %APPDATA%
 # folder. It must match the app's userData directory or the overlay loads in the
 # game and then waits for a bridge that is writing somewhere else.
 $overlayProfile = 'dlss5-swapper-plus'
 # The SDK and compiler live under vendor\toolchain with version-less folder
-# names; the versions themselves are pinned in scripts/prepare-overlay.ps1.
+# names; the versions themselves are pinned in scripts/build/prepare-overlay.ps1.
 $zig = Join-Path $appRoot 'vendor/toolchain/zig/zig.exe'
 $sdk = Join-Path $appRoot 'vendor/toolchain/reshade'
 if (!(Test-Path -LiteralPath $zig) -or !(Test-Path -LiteralPath (Join-Path $sdk 'reshade.hpp'))) { throw 'Run pnpm run overlay:prepare first.' }

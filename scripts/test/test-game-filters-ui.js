@@ -12,7 +12,7 @@ app.setPath('userData', fs.mkdtempSync(path.join(os.tmpdir(), 'dlss5-filter-ui-'
 const timeout = setTimeout(() => { console.error('UI test timed out'); app.exit(1); }, 60000);
 
 app.whenReady().then(async () => {
-  const gameMenu = require('../src/core/game-menu');
+  const gameMenu = require('../../src/core/game-menu');
   const nativeMenu = Menu.buildFromTemplate(gameMenu.template({
     name: 'Game & Emulator', labels: gameMenu.labelsFor({ open: 'فتح مجلد اللعبة' }), busy: false, restorable: true
   }, () => {}));
@@ -21,7 +21,7 @@ app.whenReady().then(async () => {
   const win = new BrowserWindow({
     show: false, width: 1280, height: 900,
     webPreferences: {
-      preload: path.join(__dirname, '../test/fixtures/game-filters-preload.js'),
+      preload: path.join(__dirname, '../../test/fixtures/game-filters-preload.js'),
       contextIsolation: true, nodeIntegration: false, backgroundThrottling: false
     }
   });
@@ -29,7 +29,7 @@ app.whenReady().then(async () => {
   win.webContents.on('console-message', (_event, level, message) => {
     if (level >= 3) { errors.push(message); console.error('[renderer]', message); }
   });
-  await win.loadFile(path.join(__dirname, '../src/renderer/index.html'));
+  await win.loadFile(path.join(__dirname, '../../src/renderer/index.html'));
   const run = (code) => win.webContents.executeJavaScript(code);
   await run(`new Promise(resolve => {
     const check = () => state.games.length === 9 && $('statusText').textContent === t('ready')
@@ -106,7 +106,7 @@ app.whenReady().then(async () => {
   assert.equal(await run(`$('gameDlss').value`), 'version:2.2.16');
   await run(`state.games.pop(); state.games[0].cached.dlss = '2.2.16'; renderGames()`);
 
-  const output = path.join(__dirname, '../dist/ui-tests');
+  const output = path.join(__dirname, '../../dist/ui-tests');
   fs.mkdirSync(output, { recursive: true });
   await clear();
   await search('truck');

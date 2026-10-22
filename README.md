@@ -89,17 +89,17 @@ node --test test/apply.test.js test/scan.test.js   # 任选几个
 
 ```powershell
 pnpm install              # 1. 安装依赖
-pnpm run icon             # 2. 生成游戏图标（build\icon.ico，每机一次）
-pnpm run overlay:prepare  # 3. 准备悬浮层构建素材（zig + ReShade SDK，每版本一次）
+pnpm run icon             # 2. 生成游戏图标
+pnpm run overlay:prepare  # 3. 准备悬浮层构建素材
 pnpm run overlay:build    # 4. 编译悬浮层
-pnpm run payload          # 5. 下载/校验/组装运行时组件（build 的 prebuild 钩子会自动执行）
-pnpm run build            # 6. 打包安装版 + 便携版（产物在 dist\）
+pnpm run payload          # 5. 下载/校验/组装运行时组件
+pnpm run build            # 6. 打包安装版 + 便携版
 ```
 
 ### 注意点
 
 - **产物挪出工作区再运行**：`dist\` 下生成的安装器/便携版可能被压上低完整性标签，双击安装会报 `Error writing temporary file`。把 exe 复制到项目目录之外（如 Downloads）再双击即可。
-- **版本全部 SHA-256 钉死**：Feeder/RenoDX/dgVoodoo 等组件的下载地址与摘要钉在 `src\core\*-release.js` 与 `scripts\collect-payload.js` 中，payload 构建时逐个校验，并交叉核对 overlay 内编译的组件指纹（不一致直接拒构建）。升级组件时需同步更新钉点与 overlay 头文件。
-- **组件下载缓存**：所有下载落在 `vendor\component-cache\`，摘要一致则秒过；手动下载组件放置于此可跳过联网。悬浮层工具链（zig、ReShade SDK 头）由 `overlay:prepare` 生成到 `vendor\toolchain\`，版本钉在 `scripts\prepare-overlay.ps1` 一处，第二次运行零下载。
+- **版本全部 SHA-256 钉死**：Feeder/RenoDX/dgVoodoo 等组件的下载地址与摘要钉在 `src\core\*-release.js` 与 `scripts\build\collect-payload.js` 中，payload 构建时逐个校验，并交叉核对 overlay 内编译的组件指纹（不一致直接拒构建）。升级组件时需同步更新钉点与 overlay 头文件。
+- **组件下载缓存**：所有下载落在 `vendor\component-cache\`，摘要一致则秒过；手动下载组件放置于此可跳过联网。悬浮层工具链（zig、ReShade SDK 头）由 `overlay:prepare` 生成到 `vendor\toolchain\`，版本钉在 `scripts\build\prepare-overlay.ps1` 一处，第二次运行零下载。
 
 
