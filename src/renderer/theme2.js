@@ -434,7 +434,7 @@
               </div>
               <div class="gp-log">
                 <span class="gp-log-mark">${icon(ICONS.check, 14)}</span>
-                <div class="job" id="job" role="status" aria-live="polite">${esc(jobLines.join('\n') || t('jobReady'))}</div>
+                <div class="job" id="job" role="status" aria-live="polite">${esc(jobLines.map(jobLineText).join('\n') || t('jobReady'))}</div>
                 <time class="gp-time">${esc(stamp)}</time>
               </div>
             </section>

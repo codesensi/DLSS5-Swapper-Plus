@@ -873,10 +873,16 @@ async function showUpdateNotice() {
   link.classList.remove('hidden');
 }
 
+// A line is either a ready string or {k, args} translated at draw time - the
+// same deal renderLog gets, so a language switch re-renders old lines too.
+function jobLineText(line) {
+  return typeof line === 'string' ? line : t(line.k, ...line.args);
+}
+
 function jobLog(line) {
   jobLines.push(line);
   const box = document.querySelector('.job');
-  if (box) { box.textContent = jobLines.join('\n'); box.scrollTop = box.scrollHeight; }
+  if (box) { box.textContent = jobLines.map(jobLineText).join('\n'); box.scrollTop = box.scrollHeight; }
   if ($('copyJob')) $('copyJob').disabled = jobLines.length === 0;
 }
 
@@ -973,19 +979,19 @@ function renderSheet(dir, d, info) {
         <button class="btn-restore" id="doRestore"${d.hasBackup ? '' : ' disabled'}>${t('restore')}</button>
       </div>
       <div class="job-toolbar"><button class="ghost sm" id="copyJob"${jobLines.length ? '' : ' disabled'}>${t('copyLog')}</button><button class="ghost sm" id="saveDiag">${t('saveDiagnostics')}</button></div>
-      <div class="job" id="job" role="status" aria-live="polite" data-title="${esc(t('sheetActivity'))}">${esc(jobLines.join('\n') || t('jobReady'))}</div>
+      <div class="job" id="job" role="status" aria-live="polite" data-title="${esc(t('sheetActivity'))}">${esc(jobLines.map(jobLineText).join('\n') || t('jobReady'))}</div>
     </div>`;
 
   if (modernSheet) window.theme2.wireSheet(sheetContext);
   $('sheetClose').onclick = closeSheet;
-  $('copyJob').onclick = () => copyText([sheetGame.name, sheetGame.dir, '', ...jobLines].join('\n'));
+  $('copyJob').onclick = () => copyText([sheetGame.name, sheetGame.dir, '', ...jobLines.map(jobLineText)].join('\n'));
   // Everything an issue report needs, in one file, instead of four asked for
   // one at a time.
   $('saveDiag').onclick = async () => {
     const button = $('saveDiag');
     button.disabled = true;
     try {
-      const r = await window.lab.saveDiagnostics(sheetGame.dir, jobLines.join('\n'));
+      const r = await window.lab.saveDiagnostics(sheetGame.dir, jobLines.map(jobLineText).join('\n'));
       if (r && r.ok) $('statusText').textContent = t('diagnosticsSaved', r.count);
       else if (r && r.message) $('statusText').textContent = r.message;
     } catch (e) { $('statusText').textContent = e.message; } finally { button.disabled = false; }
@@ -1082,7 +1088,7 @@ async function runJob(kind, dir) {
   document.querySelectorAll('#sheet select, #exeSelect, #sheetClose').forEach(e => { e.disabled = true; });
   install.textContent = kind === 'install' ? t('installing') : t('install');
   jobLines = [];
-  jobLog(kind === 'install' ? '--- installing ---' : '--- restoring ---');
+  jobLog(kind === 'install' ? t('jobInstalling') : t('jobRestoring'));
 
   const pick = sheetDetails ? chosenExe(sheetDetails, dir) : null;
 
@@ -1124,7 +1130,7 @@ async function runJob(kind, dir) {
   install.textContent = t('install');
 
   if (res.ok) {
-    jobLog(kind === 'install' ? `done - ${res.replaced} replaced, ${res.added} added` : 'done - originals restored');
+    jobLog(kind === 'install' ? t('jobDoneInstall', res.replaced, res.added) : t('jobDoneRestore'));
     logT('jobDone', kind, dir);
     if ($('view-history').classList.contains('active')) await renderHistory();
     // Recent Games tracks what was actually swapped, not what was browsed.
@@ -1136,7 +1142,7 @@ async function runJob(kind, dir) {
     setTimeout(() => { if (sheetGame?.dir === dir) openSheet(dir, true); }, 400);
   } else {
     const translated = res.code && t(res.code);
-    jobLog(res.cancelled ? t('operationCancelled') : 'failed: ' + (translated && translated !== res.code ? translated : (res.message || res.code)));
+    jobLog(res.cancelled ? t('operationCancelled') : t('jobFailed') + (translated && translated !== res.code ? translated : (res.message || res.code)));
     if (!res.cancelled && res.message && translated && translated !== res.code && res.message !== res.code) jobLog(res.message);
     install.disabled = false;
     // A failed external ReShade setup can still have changed files. Re-read
@@ -1513,9 +1519,14 @@ document.addEventListener('keydown', (e) => {
 // DirectX 11 games that ignore dxgi.dll (#328), and the wrapped DirectX 8/9
 // ones that become DirectX 11 inside dgVoodoo (#343).
 const RESHADE_PROXY_APIS = ['dxgi', 'd3d8', 'd3d9', 'ddraw'];
-const SPOKEN_JOB_CODES = new Set(['historySaveWarning', 'driverNeuralFault', 'oldShaderCompiler', 'overlaySkipped', 'feedVkLayerReady', 'neuralModelKept', 'rivalConsumerSetAside', 'overlayNotForRoute', 'multipassNext', 'forwarderRetired', 'optiDownloading', 'optiVerified', 'restoreRecovered']);
+const SPOKEN_JOB_CODES = new Set(['historySaveWarning', 'driverNeuralFault', 'oldShaderCompiler', 'overlaySkipped', 'feedVkLayerReady', 'neuralModelKept', 'rivalConsumerSetAside', 'overlayNotForRoute', 'multipassNext', 'forwarderRetired', 'optiDownloading', 'optiVerified', 'restoreRecovered', 'addonInstalled', 'antiCheatRiskAccepted', 'legacyWrapperReady', 'motionProviderReady', 'motionProviderFallback']);
+// Job lines are stored as {code, params} and only translated when drawn, so a
+// language switch re-renders the whole activity log in the new language -
+// including the lines that arrived before the switch. Codes nobody has
+// translations for (addonInstalled and the other raw progress markers) keep
+// their technical code + JSON form.
 window.lab.onJob((e) => jobLog(SPOKEN_JOB_CODES.has(e.code)
-  ? t(e.code, ...Object.values(e.params || {}))
+  ? { k: e.code, args: Object.values(e.params || {}) }
   : `${e.code} ${JSON.stringify(e.params)}`));
 
 const zone = $('dropZone');
