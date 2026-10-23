@@ -38,7 +38,10 @@ function createWindowLayer({ app, BrowserWindow, appRoot, loadState, ensureTray,
       webPreferences: {
         preload: path.join(appRoot, 'preload.js'),
         contextIsolation: true,
-        nodeIntegration: false
+        nodeIntegration: false,
+        // The preload only bridges IPC and one webUtils call, both available
+        // inside the sandbox - same shape as the overlay panel's window.
+        sandbox: true
       }
     });
     created.loadFile(path.join(appRoot, 'src', 'renderer', 'index.html'));

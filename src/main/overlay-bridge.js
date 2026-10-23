@@ -1,11 +1,33 @@
 'use strict';
 const fs = require('node:fs');
+const os = require('node:os');
 const path = require('node:path');
 const net = require('node:net');
 const crypto = require('node:crypto');
+const { execFileSync } = require('node:child_process');
 const protocol = require('./overlay-protocol');
 const preferences=require('./overlay-preferences');
 const { ipcMain } = require('electron');
+
+// The endpoint file names the pipe and carries its token. It sits in the
+// user's profile, whose default ACL already excludes other users, but
+// %APPDATA% can be redirected and every other process running as this user
+// (browsers in a weaker job, installed services) may still read it. The add-on
+// identifies itself by holding the pipe, not by proving it read this file, so
+// the file is tightened to the current user and the current session only -
+// best effort: a failure never stops the bridge, it just leaves the file with
+// its inherited ACL.
+function restrictEndpoint(endpoint) {
+  if (process.platform === 'win32') {
+    try {
+      // Remove inherited entries, then grant this user full control and
+      // SYSTEM read. icacli is icacls's stable alias through localization.
+      execFileSync('icacls', [endpoint, '/inheritance:r', '/grant:r', `${os.userInfo().username}:F`, 'SYSTEM:(R)'], { timeout: 4000, windowsHide: true });
+    } catch (error) { console.warn('Lab overlay endpoint ACL:', error.message); }
+  } else {
+    try { fs.chmodSync(endpoint, 0o600); } catch { /* mode already set at write */ }
+  }
+}
 
 module.exports = async function startOverlayBridge({ BrowserWindow, userData, idleTakeoverMs = 5000, getLang }) {
   const token = crypto.randomBytes(16).toString('hex');
@@ -153,7 +175,7 @@ module.exports = async function startOverlayBridge({ BrowserWindow, userData, id
               if (!socket.negotiated) { socket.negotiated = true; socket.write(protocol.helloReply(e.value)); }
               continue;
             }
-            if ((e.value >>> 0) === socket.sequence) { socket.inFlight = false; if (latest.readUInt32LE(8) !== socket.sequence) sendLatest(); }
+            if ((e.value >>> 0) === socket.sequence) { socket.inFlight = false; if (latest && latest.readUInt32LE(8) !== socket.sequence) sendLatest(); }
             continue;
           }
           if (e.action === 2) mouseDown = true;
@@ -178,6 +200,7 @@ module.exports = async function startOverlayBridge({ BrowserWindow, userData, id
     server.on('error', error => { console.error('Lab overlay transport:', error.message); close(); });
     fs.mkdirSync(userData, { recursive: true });
     fs.writeFileSync(endpoint, token, { mode: 0o600 });
+    restrictEndpoint(endpoint);
   } catch (error) { close(); throw error; }
   // What the Overlay page shows instead of leaving someone to guess why the
   // panel in the game says it is still waiting.

@@ -1,7 +1,9 @@
 'use strict';
 
 const $ = (id) => document.getElementById(id);
-const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+// Five characters, same as overlay-gallery.js:14 - a lone ' would otherwise
+// break out of attributes quoted with '.
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
 const { t, setLang, getLang, dirOf, LANGS } = window.i18n;
 const state = { games: [], recents: [], history: [], newDlss: null, log: [], theme: 'light', skin: 'one', rail: 'off', lang: 'en', brand: {}, groupGamesByStore: true };
