@@ -7,7 +7,7 @@
 // ./src/core/* directly: everything under src/main/ receives its
 // dependencies injected, which keeps the require stubs in the tests
 // effective all the way down.
-const { app, BrowserWindow, ipcMain, dialog, shell, clipboard, Menu, Tray, nativeImage } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, shell, clipboard, Menu, Tray, nativeImage, net } = require('electron');
 const fs = require('fs');
 const path = require('path');
 const { pathToFileURL } = require('url');
