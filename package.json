@@ -34,7 +34,7 @@
       "main.js",
       "preload.js",
       "overlay-preload.js",
-      "THIRD_PARTY_NOTICES.md",
+      "docs/THIRD_PARTY_NOTICES.md",
       "src/**/*",
       "assets/**/*",
       "package.json"

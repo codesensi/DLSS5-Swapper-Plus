@@ -4,13 +4,12 @@
 
 ## 来源与致谢
 
-本项目基于 [rakanki911/DLSS5-Swapper](https://github.com/rakanki911/DLSS5-Swapper) 删库前最后公开的 **v2.2.9** 版本二次开发而来——原仓库已不可访问，本仓库保留了这一基线并持续维护。
+- 本项目基于 [rakanki911/DLSS5-Swapper](https://github.com/rakanki911/DLSS5-Swapper) 删库前最后公开的 **v2.2.9** 版本二次开发而来——原仓库已不可访问，本仓库保留了这一基线并持续维护。
+- 简体中文本地化最初来自 [EverChangAn/DLSS5-Swapper-zh-CN](https://github.com/EverChangAn/DLSS5-Swapper-zh-CN)，在此之上做了措辞与界面体验上的进一步打磨，感谢原作者的翻译工作。
 
-简体中文本地化最初来自 [EverChangAn/DLSS5-Swapper-zh-CN](https://github.com/EverChangAn/DLSS5-Swapper-zh-CN)，在此之上做了措辞与界面体验上的进一步打磨，感谢原作者的翻译工作。
+## 一、开发与构建
 
-## 构建与打包
-
-### 前置条件
+### 1.前置条件
 
 - **必须使用管理员权限的 PowerShell**。本项目的工作区可能存在完整性级别被压低（Low IL）的目录，普通权限终端会导致 zig 编译报 `AccessDenied`、Electron 启动即崩溃（0xC0000005）等难以定位的错误。
 - Node.js ≥ 24（Node 26 已验证），pnpm ≥ 12。
@@ -18,7 +17,7 @@
 - **ReShade_Setup_\*_Addon.exe（可选）**：payload 优先扫描 `vendor\reshade-setup\`，找到即用；本地没有时自动下载**钉死的 6.8.0**（与 SDK 头文件同版本，SHA-256 校验，缓存于 `vendor\component-cache\`）。若手动放置其他版本，须与 `vendor\toolchain\reshade\` 内 SDK 版本一致，否则悬浮层 ABI 可能错位。
 - **可选附加悬浮层（可选）**：需要捆绑其他 `.addon64` 时放入 `vendor\addons\`（各放一级子目录），通常留空即可。
 
-### 当前验证过的打包环境
+### 2.当前验证过的打包环境
 
 | 项目 | 版本 |
 |---|---|
@@ -29,71 +28,55 @@
 
 低版本组合未测试，不保证通过。
 
-### 网络配置（国内环境）
+### 3.网络配置（可选）
 
-**给 Node 配置临时代理**（payload 会经 Node fetch 下载 Feeder/RenoDX 等组件，Node 默认不走系统代理）：
+- **给 Node 配置临时代理**（payload 会经 Node fetch 下载 Feeder/RenoDX 等组件，Node 默认不走系统代理）：
 
 ```powershell
-$env:HTTPS_PROXY = 'http://192.168.2.4:7890'   # 换成你的代理端口
-$env:NODE_USE_ENV_PROXY = '1'                # Node 24+ 原生开关
+# 换成你的代理端口
+$env:HTTPS_PROXY = 'http://192.168.2.4:7890'
+# Node 24+ 原生开关
+$env:NODE_USE_ENV_PROXY = '1'
 ```
 
-**给 Electron 配置临时加速镜像**（Electron 与 electron-builder 的二进制默认从 GitHub 下载，国内极慢）：
+- **给 Electron 配置临时加速镜像**（Electron 与 electron-builder 的二进制默认从 GitHub 下载）：
 
 ```powershell
 $env:ELECTRON_MIRROR = 'https://npmmirror.com/mirrors/electron/'
 $env:ELECTRON_BUILDER_BINARIES_MIRROR = 'https://npmmirror.com/mirrors/electron-builder-binaries/'
 ```
 
-以上均为**当前会话临时变量**，关闭终端即失效，不影响系统全局配置。
+`注：网络配置均为当前会话临时变量，关闭终端即失效，不影响系统全局配置。`
 
-### 开发与测试
+### 4.本地开发
 
-日常开发**不需要打包**：源码直接跑，改完即验。
-
-```powershell
-pnpm start                 # 启动应用（Electron 直接跑源码，改 JS/CSS 后重启即生效）
-```
-
-改悬浮层 C++（`overlay\*.cpp/.hpp`）后只需两步验证游戏内面板：
+**全量测试**
 
 ```powershell
-pnpm run overlay:build     # 重编悬浮层（~30s，缓存在 vendor\toolchain\zig-cache）
-pnpm start                 # 重启应用，悬浮层页会拿到新编译的 addon64
+pnpm test
 ```
 
-**测试命令**（Node ≥ 24 自带 test runner，无需打包）：
+启动应用
 
 ```powershell
-pnpm test                                          # 全量测试（65 个文件，node --test）
-pnpm run test:payload                              # 真实 payload 冒烟：合成游戏目录上走完安装/恢复全流程
-pnpm run test:optiscaler                           # OptiScaler 组件同样验证
-node --test test/release-228.test.js               # 单跑某个测试文件
-node --test test/apply.test.js test/scan.test.js   # 任选几个
+pnpm start
 ```
 
-测试分层说明：
-
-| 层级 | 命令 | 验什么 |
-|---|---|---|
-| 单元/契约 | `pnpm test` | 主进程与核心模块逻辑，纯内存夹具 |
-| 集成 | `test:payload` / `test:optiscaler` | 在合成游戏目录上真实执行 apply/restore，校验 PE 架构与配置改写（不启动游戏） |
-| 构建期 | `pnpm run payload` | 跨 pin 交叉校验（overlay 指纹 ↔ 组件摘要），不一致直接拒构建 |
-| 人工 | 游戏内 F8 | 神经通道、滑条联动、日志面板——唯一需要真机的环节 |
-
-注意：`test:payload`/`test:optiscaler` 依赖 `pnpm run payload` 先跑过（读 `dist\payload\`）；`test:optiscaler` 首次会经 `vendor\runtime-tests\components\` 下载/解压测试组件（已钉哈希）。
-
-### 打包流程
+### 5.构建打包
 
 在**管理员 PowerShell** 中按顺序执行：
 
 ```powershell
-pnpm install              # 1. 安装依赖
-pnpm run icon             # 2. 生成游戏图标
-pnpm run overlay:prepare  # 3. 准备悬浮层构建素材
-pnpm run overlay:build    # 4. 编译悬浮层
-pnpm run payload          # 5. 下载/校验/组装运行时组件
-pnpm run build            # 6. 打包安装版 + 便携版
+# 1. 安装依赖
+pnpm install
+# 2. 生成应用图标
+pnpm run icon
+# 3. 准备悬浮层构建素材
+pnpm run overlay:prepare
+# 4. 编译悬浮层
+pnpm run overlay:build
+# 5. 打包安装版 + 便携版
+pnpm run build
 ```
 
 ### 注意点
