@@ -141,7 +141,11 @@ async function look(name, appid) {
 }
 
 async function download(url, dest) {
-  const res = await fetch(url);
+  // Same channel and the same ceiling as the JSON calls: without a timeout a
+  // black-holed CDN connection hangs at the OS-level TCP timeout, and without
+  // the proxy-aware fetcher a proxied network can never fetch artwork at all.
+  const fetcher = netFetch || fetch;
+  const res = await fetcher(url, { signal: AbortSignal.timeout(8000) });
   if (!res.ok) throw new Error(`download failed (${res.status})`);
   const buf = Buffer.from(await res.arrayBuffer());
   // A missing asset can come back as a tiny placeholder rather than a 404.

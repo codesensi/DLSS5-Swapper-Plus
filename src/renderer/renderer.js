@@ -890,19 +890,31 @@ async function openSheet(dir, keepLog = false) {
   $('overlay').classList.remove('hidden');
   $('sheet').innerHTML = `<div class="pad" style="color:var(--dim)">${t('readingFolder')}</div>`;
 
-  const [d, art] = await Promise.all([
-    window.lab.details(dir),
-    window.lab.artFetch(dir, g.name, g.appid)
-  ]);
+  const d = await window.lab.details(dir);
   if (sheetGame !== g) return;
   sheetDetails = d;
+  renderSheet(dir, d);
+
+  // The Steam look-up is deliberately not awaited together with the scan: on a
+  // blocked network it can stall for the better part of a minute, and the page
+  // should not hold the facts hostage to artwork. When the art lands, the very
+  // same page is drawn again - no rescan - now with cover, hero and title.
+  window.lab.artFetch(dir, g.name, g.appid).then((art) => {
+    const info = art && !art.error && !art.none ? art : null;
+    if (sheetGame !== g || !info) return;
+    renderSheet(dir, sheetDetails, info);
+  }).catch(() => { });
+}
+
+function renderSheet(dir, d, info) {
+  const g = sheetGame;
+  if (!g) return;
   if (!exeChoice.has(dir) && d.installedExe) {
     const installed = d.exes.find((item) => item.rel.toLowerCase() === String(d.installedExe).toLowerCase());
     if (installed) exeChoice.set(dir, installed.path);
   }
   if (!routeChoice.has(dir) && d.installedRoute) routeChoice.set(dir, d.installedRoute);
 
-  const info = art && !art.error && !art.none ? art : null;
   const cover = (info && info.cover) || (g.poster && g.poster.tall ? g.poster.url : null);
   const hero = (info && info.hero) || (g.poster && !g.poster.tall ? g.poster.url : null);
   const upToDate = Boolean(d.newDlss && d.currentDlss && d.currentDlss.version === d.newDlss);

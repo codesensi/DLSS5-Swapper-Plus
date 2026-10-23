@@ -23,3 +23,20 @@ test('main.js destructures net from electron and guards the injection', () => {
   assert.match(source, /typeof net !== 'undefined'/, 'the vm-safe guard stays');
   assert.match(source, /art\.setFetch\(net\.fetch\)/);
 });
+
+test('every proxy-bound channel receives the injection', () => {
+  // Three modules talk to the network on their own: the Steam artwork store,
+  // the component downloader (OptiScaler, dgVoodoo, LumeniteFX) and the
+  // update check. Each was found once fetching through Node's own fetch,
+  // which ignores the system proxy and dies on proxy-only networks.
+  const source = fs.readFileSync(path.join(ROOT, 'main.js'), 'utf8');
+  assert.match(source, /components\.setFetch\(net\.fetch\)/,
+    'runtime-components downloads honour the proxy');
+  assert.match(source, /fetch:\s*typeof net !== 'undefined'/,
+    'the update check prefers net.fetch');
+  const components = fs.readFileSync(path.join(ROOT, 'src', 'core', 'runtime-components.js'), 'utf8');
+  assert.match(components, /const fetcher = netFetch \|\| fetch;/,
+    'fetchBytes falls back to Node fetch only when nothing was injected');
+  assert.match(components, /module\.exports = \{[^}]*setFetch[^}]*\}/,
+    'setFetch is exported for the composition root');
+});

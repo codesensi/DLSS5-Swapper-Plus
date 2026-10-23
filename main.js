@@ -24,7 +24,11 @@ const art = require('./src/core/steamart');
 if (typeof net !== 'undefined' && typeof net.fetch === 'function') art.setFetch(net.fetch);
 const { saveActiveManifest, writeTracked, makeReShadeConfigWritable } = require('./src/core/apply.js');
 const pe = require('./src/core/pe.js');
-const { ensureLumenite, ensureDgVoodoo, missingVCRuntime } = require('./src/core/runtime-components.js');
+const components = require('./src/core/runtime-components.js');
+const { ensureLumenite, ensureDgVoodoo, missingVCRuntime } = components;
+// The component downloads (OptiScaler, dgVoodoo, LumeniteFX) ride the same
+// proxy-aware channel; without it a proxied network can never fetch them.
+if (typeof net !== 'undefined' && typeof net.fetch === 'function') components.setFetch(net.fetch);
 const componentCode = (error, fallback) => (error && error.code === 'componentRemoved' ? 'componentQuarantined' : fallback);
 const installRoutes = require('./src/shared/install-routes');
 const renderingApi = require('./src/shared/rendering-api');
@@ -126,8 +130,15 @@ const showWindow = winLayer.showWindow;
 // exactly as they did when the window lived in this file.
 function createWindow() { return winLayer.createWindow(); }
 // The update lookup runs where the tests inject their fetch, so the context's
-// own fetch is passed through rather than reached for globally.
-const update = createUpdate({ app, fetch: typeof fetch === 'function' ? fetch : undefined });
+// own fetch is passed through rather than reached for globally. Electron's
+// net.fetch goes first for the same reason as above: GitHub is proxy-only on
+// some networks, and Node's own fetch would never know.
+const update = createUpdate({
+  app,
+  fetch: typeof net !== 'undefined' && typeof net.fetch === 'function'
+    ? net.fetch
+    : typeof fetch === 'function' ? fetch : undefined
+});
 
 // The same overlay library the Overlay page manages, so an install picks up
 // exactly the build shown there.

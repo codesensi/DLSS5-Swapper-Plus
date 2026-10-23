@@ -9,6 +9,14 @@ const crypto = require('crypto');
 const extractZip = require('extract-zip');
 const pe = require('./pe');
 
+// `netFetch` is Electron's net.fetch, injected from main.js: it honours the
+// system proxy, which plain Node fetch ignores. The component archives come
+// from GitHub, which on a proxied network is reachable only through that
+// proxy - without the injection every component download fails no matter how
+// long the transfer timeout is.
+let netFetch = null;
+const setFetch = (fn) => { netFetch = typeof fn === 'function' ? fn : null; };
+
 // 2.87.5 exists because 2.87.4 is flagged by antivirus engines - upstream
 // titled the release "Hopefully an AV-undetected version" - and people were
 // left with a wrapper their own machine quarantined (#390). Same archive
@@ -56,7 +64,8 @@ function cached(file, expected) {
 }
 
 async function fetchBytes(url) {
-  const response = await fetch(url, {
+  const fetcher = netFetch || fetch;
+  const response = await fetcher(url, {
     headers: { 'User-Agent': 'DLSS5-Swapper/2.1' },
     // A component is tens of megabytes. Two minutes was a timeout for the
     // connection, not for the transfer, and slow or filtered links lost
@@ -136,4 +145,4 @@ async function ensureLumenite(cacheRoot) {
   return root;
 }
 
-module.exports = { DGVOODOO_VERSION: DGVOODOO.version, LUMENITE, DGVOODOO, ensureLumenite, ensureDgVoodoo, missingVCRuntime, digest, download, fetchBytes, fetchVerified, cached };
+module.exports = { DGVOODOO_VERSION: DGVOODOO.version, LUMENITE, DGVOODOO, ensureLumenite, ensureDgVoodoo, missingVCRuntime, digest, download, fetchBytes, fetchVerified, cached, setFetch };
