@@ -36,11 +36,18 @@ function register(ctx) {
   const { loadState, saveState, stateFile, keyFor, SCAN_RULES, apiPreference } = ctx;
   const { payload, describe, addonLibrary } = ctx.addons;
 
+  // Launching a game runs an executable on the renderer's behalf, so only a
+  // folder that is already part of the library may be launched: the same
+  // whitelist the 'open' channel checks against. Anything else - a downloaded
+  // exe, a system folder - is refused, whatever executable it holds.
   ipcMain.handle('launch-game', async (_event, dir) => {
-    if (typeof dir !== 'string' || !path.isAbsolute(dir)) return { ok: false, message: 'errApiChoice' };
-    const known = ctx.cache.lastGames.find((game) => keyFor(game.dir) === keyFor(dir));
-    if (known && known.appid) {
-      await shell.openExternal(`steam://rungameid/${String(known.appid).replace(/[^0-9]/g, '')}`);
+    if (typeof dir !== 'string' || !path.isAbsolute(dir)) return { ok: false, code: 'errOpenOutsideLibrary' };
+    const state = loadState();
+    const known = ctx.knownFolders(state, ctx.cache.lastGames).some((row) => keyFor(row.dir) === keyFor(dir));
+    if (!known) return { ok: false, code: 'errOpenOutsideLibrary', message: 'errOpenOutsideLibrary' };
+    const game = ctx.cache.lastGames.find((game) => keyFor(game.dir) === keyFor(dir));
+    if (game && game.appid) {
+      await shell.openExternal(`steam://rungameid/${String(game.appid).replace(/[^0-9]/g, '')}`);
       return { ok: true, via: 'steam' };
     }
     try {
