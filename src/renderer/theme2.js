@@ -497,7 +497,14 @@
     };
     for (const id of ['t2More', 't2FolderOpen', 'gpExeFolder']) {
       const button = q('#' + id);
-      if (button) button.onclick = () => window.lab.open(game.dir);
+      // The main process refuses folders outside the library; the code it
+      // returns is translated here, the way launch failures already are.
+      if (button) button.onclick = async () => {
+        const error = await window.lab.open(game.dir);
+        // The main process refuses folders outside the library; translate the
+        // code the same way launch failures are translated above.
+        if (error) log(t(error));
+      };
     }
     const viewAll = q('#gpViewAll');
     if (viewAll) viewAll.onclick = () => { closeSheet(); show('games'); };

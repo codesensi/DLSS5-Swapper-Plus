@@ -185,7 +185,20 @@ function register(ctx) {
     return true;
   });
 
-  ipcMain.handle('open', (_event, dir) => shell.openPath(dir));
+  // Opening a folder is a request the renderer can make for any path it is
+  // handed, so only paths that are already part of the library may pass: the
+  // scanned games, the folders the library watches, and one level inside them
+  // (the same rows history shows). Anything else - Windows, the drive root,
+  // a downloaded .exe - is refused rather than opened.
+  function knownFolderSet(state) {
+    return new Set(ctx.knownFolders(state, ctx.cache.lastGames).map((row) => keyFor(row.dir)));
+  }
+  ipcMain.handle('open', (_event, dir) => {
+    if (typeof dir !== 'string' || !path.isAbsolute(dir)) return 'errOpenOutsideLibrary';
+    const state = loadState();
+    if (!knownFolderSet(state).has(keyFor(dir))) return 'errOpenOutsideLibrary';
+    return shell.openPath(dir);
+  });
   ipcMain.handle('open-project', async (_event, destination) => {
     const url = ctx.projectUrl(destination);
     if (!url) return false;

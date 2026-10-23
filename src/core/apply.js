@@ -1062,7 +1062,18 @@ async function restore(gameDir, onLog) {
   let manifestPath = path.join(backupRoot(gameDir), MANIFEST);
   let manifest = null;
   if (fs.existsSync(manifestPath)) {
-    manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+    // A manifest cut short by a power loss or an antivirus quarantine used to
+    // throw here and leave the restore permanently broken, even though the
+    // retired record in the same folder often still describes the install.
+    try {
+      manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+    } catch {
+      const recovered = recoverableManifest(gameDir);
+      if (!recovered) throw fail('errBackupInvalid');
+      manifestPath = recovered.path;
+      manifest = recovered.manifest;
+      log('restoreRecovered', { date: manifest.date, route: manifest.route || null });
+    }
   } else {
     const recovered = recoverableManifest(gameDir);
     if (!recovered) throw fail('errNoBackup');

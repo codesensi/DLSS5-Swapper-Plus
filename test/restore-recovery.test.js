@@ -88,3 +88,29 @@ test('a live manifest is still the one that is used', async (t) => {
   // And it is retired under the one name the recovery looks for.
   assert.ok(fs.readdirSync(backup).some((name) => /^manifest\.json\.done-\d+$/.test(name)));
 });
+
+test('a truncated live manifest falls back to the retired record', async (t) => {
+  const { dir, backup, manifest } = retiredInstall(t, { retire: false });
+  // An earlier finished restore leaves a good retired record beside the live
+  // one; a power loss then cuts the live one short.
+  fs.writeFileSync(path.join(backup, 'manifest.json.done-1788000000000'), JSON.stringify(manifest));
+  fs.writeFileSync(path.join(backup, 'manifest.json'), '{"version":1, mod');  // cut short
+
+  const lines = [];
+  await apply.restore(dir, (event) => lines.push(event.code));
+  assert.ok(lines.includes('restoreRecovered'), 'it says where the record came from');
+  assert.ok(lines.includes('restoreDone'));
+  assert.equal(fs.readFileSync(path.join(dir, 'dxgi.dll'), 'utf8'), 'the original dxgi');
+  assert.equal(fs.existsSync(path.join(dir, 'renodx-dlss5.addon64')), false);
+});
+
+test('a truncated live manifest with nothing to recover reports a readable error', async (t) => {
+  // The fixture with retire:false has no retired record, so truncating the
+  // live manifest leaves nothing to fall back to - the restore must say the
+  // backup is broken rather than throw an uncaught parse error.
+  const { dir, backup } = retiredInstall(t, { retire: false });
+  fs.writeFileSync(path.join(backup, 'manifest.json'), '{"version":1, mod');  // cut short
+
+  await assert.rejects(apply.restore(dir), (error) => error.code === 'errBackupInvalid');
+  assert.equal(fs.readFileSync(path.join(dir, 'dxgi.dll'), 'utf8'), 'ReShade, much larger than the original');
+});

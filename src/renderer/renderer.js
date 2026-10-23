@@ -1290,7 +1290,7 @@ async function performGameAction(action, dir) {
       await openSheet(dir);
     } else if (action === 'open') {
       const error = await window.lab.open(dir);
-      if (error) throw new Error(error);
+      if (error) throw new Error(t(error.code || error));
     } else if (action === 'restore') {
       // The native menu already requested confirmation. Re-read the actual
       // backup before reusing the existing guarded restore/history/log flow.
