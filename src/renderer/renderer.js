@@ -4,7 +4,7 @@ const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
 const { t, setLang, getLang, dirOf, LANGS } = window.i18n;
-const state = { games: [], recents: [], history: [], newDlss: null, log: [], theme: 'light', skin: 'one', rail: 'off', lang: 'en', logo: {}, groupGamesByStore: true };
+const state = { games: [], recents: [], history: [], newDlss: null, log: [], theme: 'light', skin: 'one', rail: 'off', lang: 'en', brand: {}, groupGamesByStore: true };
 const filters = { query: '', api: 'all', dlss: 'all', addon: 'all' };
 const gameFilters = window.gameFilters;
 
@@ -1143,7 +1143,7 @@ document.querySelector('.link[data-view]').onclick = () => show('games');
 
 // The wordmark is black artwork, so the dark theme gets the lifted copy.
 function paintBrand() {
-  const art = state.theme === 'dark' ? (state.logo.logoDark || state.logo.logoLight) : state.logo.logoLight;
+  const art = state.theme === 'dark' ? (state.brand.logoDark || state.brand.logoLight) : state.brand.logoLight;
   $('brand').innerHTML = art
     ? `<img src="${art}" alt="DLSS 5 Swapper Plus">`
     : '<b style="font-size:19px">DLSS 5 Swapper Plus</b>';
@@ -1525,7 +1525,7 @@ document.addEventListener('drop', (e) => e.preventDefault());
   // Nothing this app installs is on disk. Saying so now beats letting somebody
   // pick a game, choose a route and press Install before finding out (#220).
   if (boot.payloadMissing) log(boot.payloadMissing);
-  state.logo = boot;
+  state.brand = boot;
   paintBrand();
   state.art = (await window.lab.artStatus()).available;
   // Artwork comes from Steam's public store endpoints, so there is nothing to
