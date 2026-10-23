@@ -26,6 +26,10 @@ A Windows desktop tool for managing DLSS 5 (neural rendering) game plugins: it s
 
 For the layering rules, the vm test contract and the composition-root invariants, see [docs/architecture.md](docs/architecture.md).
 
+## Changelog
+
+For the version changelog, see [CHANGELOG.md](CHANGELOG.md).
+
 ## 1. Development & Build
 
 ### 1. Prerequisites

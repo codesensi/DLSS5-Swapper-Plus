@@ -26,6 +26,10 @@
 
 分层依赖约定、vm 测试契约与不可破坏的组合根规则见 [docs/architecture.md](docs/architecture.md)。
 
+## 更新日志
+
+版本更新日志见 [CHANGELOG.md](CHANGELOG.md)。
+
 ## 一、开发与构建
 
 ### 1.前置条件
