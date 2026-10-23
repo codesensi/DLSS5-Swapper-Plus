@@ -884,11 +884,16 @@ async function openSheet(dir, keepLog = false) {
   if (jobRunning) return;
   const g = state.games.find((x) => x.dir === dir);
   if (!g) return;
+  // A page already showing this game is a refresh - after an install or a
+  // restore ends, or a skin, language or API-override change. Wiping it back
+  // to "reading folder" while the rescan runs read as a flash on every
+  // install, so the old page stays up until the new facts arrive.
+  const refresh = sheetGame && sheetGame.dir === dir;
   sheetGame = g;
   if (!keepLog) jobLines = [];
 
   $('overlay').classList.remove('hidden');
-  $('sheet').innerHTML = `<div class="pad" style="color:var(--dim)">${t('readingFolder')}</div>`;
+  if (!refresh) $('sheet').innerHTML = `<div class="pad" style="color:var(--dim)">${t('readingFolder')}</div>`;
 
   const d = await window.lab.details(dir);
   if (sheetGame !== g) return;
