@@ -1,5 +1,7 @@
 # DLSS5-Swapper-Plus
 
+> [English](README_EN.md) | 简体中文
+
 一个管理 DLSS 5（神经渲染）游戏插件的 Windows 桌面工具：扫描本机游戏库，一键安装/替换 DLSS5 运行时、RenoDX 与 OptiScaler 组件，并在游戏内提供 ImGui 悬浮控制面板。
 
 ## 来源与致谢
