@@ -223,7 +223,9 @@ app.whenReady().then(async () => {
   if (!singleInstance) return;
   // Registered here rather than at load: main.js is exercised in test
   // sandboxes, where src modules are stubbed and cannot be called.
-  require('./src/main/overlay-ipc')({ app, ipcMain, dialog, shell, window: () => winLayer.getWindow(), bridge: () => overlayBridge, featureText });
+  // The overlay install/uninstall write into game folders, so they honour
+  // the same busy flag as the install/restore handlers on the Games page.
+  require('./src/main/overlay-ipc')({ app, ipcMain, dialog, shell, window: () => winLayer.getWindow(), bridge: () => overlayBridge, featureText, isMutationBusy: () => ctx.install.isMutationBusy() });
   winLayer.createWindow();
   // The icon is there from launch, not only after the first close - somebody
   // who wants the app parked in the tray wants to see that it is.
