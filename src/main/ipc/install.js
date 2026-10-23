@@ -281,8 +281,8 @@ function register(ctx) {
     // The in-game overlay rides along with the install when it is switched on and
     // the executable is one it supports. Prepared before anything is written, so
     // an unsupported build refuses the install rather than half-finishing it.
+    const overlay = ctx.gameOverlay;
     function planOverlay() {
-      const overlay = ctx.gameOverlay;
       let wanted = false;
       // An unreadable preference means the overlay is off. A DLSS install must not
       // fail because of it.
