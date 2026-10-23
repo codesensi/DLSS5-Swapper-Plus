@@ -1143,7 +1143,7 @@ document.querySelector('.link[data-view]').onclick = () => show('games');
 
 // The wordmark is black artwork, so the dark theme gets the lifted copy.
 function paintBrand() {
-  const art = state.theme === 'dark' ? (state.logo.logoDark || state.logo.logo) : state.logo.logo;
+  const art = state.theme === 'dark' ? (state.logo.logoDark || state.logo.logoLight) : state.logo.logoLight;
   $('brand').innerHTML = art
     ? `<img src="${art}" alt="DLSS 5 Swapper Plus">`
     : '<b style="font-size:19px">DLSS 5 Swapper Plus</b>';

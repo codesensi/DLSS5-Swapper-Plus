@@ -51,7 +51,7 @@ function register(ctx) {
       rail: state.rail === 'on' ? 'on' : 'off',
       lang: state.lang || defaultLocale(),
       groupGamesByStore: state.groupGamesByStore !== false,
-      logo: asUrl('logo.png'),
+      logoLight: asUrl('logo-light.png'),
       logoDark: asUrl('logo-dark.png')
     };
   });
