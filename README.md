@@ -9,6 +9,23 @@
 - 本项目基于 [rakanki911/DLSS5-Swapper](https://github.com/rakanki911/DLSS5-Swapper) 删库前最后公开的 **v2.2.9** 版本二次开发而来——原仓库已不可访问，本仓库保留了这一基线并持续维护。
 - 简体中文本地化最初来自 [EverChangAn/DLSS5-Swapper-zh-CN](https://github.com/EverChangAn/DLSS5-Swapper-zh-CN)，在此之上做了措辞与界面体验上的进一步打磨，感谢原作者的翻译工作。
 
+## 目录结构
+
+| 目录 | 职责 |
+|---|---|
+| `main.js` | 组合根：装配各层、注册 IPC（唯一直接 require `src/core` 的入口） |
+| `src\core\` | 纯 Node 逻辑层（扫描/安装/备份/manifest），禁止依赖 electron，全部可直测 |
+| `src\main\` | 主进程集成层（窗口/托盘/状态/overlay 桥）+ `ipc\` 五个按域拆分的 register(ctx) 模块 |
+| `src\shared\` | 主进程与渲染进程共用代码（feature-i18n、install-routes 等） |
+| `src\renderer\` | 渲染层（经典脚本）：i18n、两套主题、overlay 面板/画廊 |
+| `overlay\` | 游戏内注入端（C++ AddOn 插件），见其 README.md |
+| `scripts\{build,test,dev}\` | 构建、payload 测试与一次性开发脚本 |
+| `docs\` | 架构约定与运维手册（architecture、overlay-protocol、vulkan-layer-recovery、install-manifest、i18n） |
+| `vendor\` | 本地准备的 DLSS 分发与组件下载缓存（不入库） |
+| `dist\` | electron-builder 产物目录（不入库） |
+
+分层依赖约定、vm 测试契约与不可破坏的组合根规则见 [docs/architecture.md](docs/architecture.md)。
+
 ## 一、开发与构建
 
 ### 1.前置条件

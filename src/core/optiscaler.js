@@ -7,6 +7,12 @@ const pe = require('./pe');
 const ini = require('./feeder-config');
 const { cached, fetchVerified } = require('./runtime-components');
 const { safePath } = require('./file-journal');
+// Tracked-install accounting shared with apply.js. It only leans on pe and
+// file-journal, so the top-level require is safe - no apply.js seam, no cycle.
+const {
+  originalPath, trackBeforeWrite, saveActiveManifest,
+  beginManifest, copyTracked, writeTracked
+} = require('./manifest-tracker');
 // More than one pinned build, because upgrading one broke a game and there was
 // no way back: No Man's Sky runs on 0.1.1.5 and crashes on 0.2.0-patch1, and
 // the only cure anybody had was to keep an old copy of the whole app (#238).
@@ -141,7 +147,6 @@ function copyPlan(root, api, release = RELEASE) {
 function checkConflicts(gameDir, exePath, manifest, api) {
   // Inspect the baseline too: switching restores it before installing. Never
   // silently clobber another proxy, OptiScaler install or ASI loader.
-  const { originalPath } = require('./apply');
   const exeDir = path.dirname(exePath);
   const added = new Set((manifest?.added || []).map(f => f.toLowerCase()));
   const replacements = new Map((manifest?.replaced || []).map(f => [f.rel.toLowerCase(), f]));
@@ -177,7 +182,6 @@ function checkConflicts(gameDir, exePath, manifest, api) {
 // stop the pass without a word in any log. It is retired the way any replaced
 // file is, so Restore originals still puts the game back exactly as it was.
 async function retireForwarder(manifest, gameDir, exeDir, log) {
-  const { trackBeforeWrite, saveActiveManifest } = require('./apply');
   const file = path.join(exeDir, FORWARDED.forwarder);
   if (!fs.existsSync(file)) return;
   const rel = await trackBeforeWrite(manifest, gameDir, file, { kind: 'optiscaler' });
@@ -187,7 +191,6 @@ async function retireForwarder(manifest, gameDir, exeDir, log) {
   log({ code: 'forwarderRetired', params: { rel } });
 }
 async function install(config, log) {
-  const { beginManifest, copyTracked, writeTracked, saveActiveManifest } = require('./apply');
   const { gameDir, exePath, api, optiRoot, source } = config;
   // Which build this game asked for. #238 gave every game its own choice, and
   // the manifest recorded the default no matter what was installed.

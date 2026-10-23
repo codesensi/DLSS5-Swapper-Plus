@@ -9,6 +9,23 @@ A Windows desktop tool for managing DLSS 5 (neural rendering) game plugins: it s
 - This project is a fork of [rakanki911/DLSS5-Swapper](https://github.com/rakanki911/DLSS5-Swapper) **v2.2.9** — the last publicly released version before the original repository went offline. This repository preserves that baseline and continues to maintain it.
 - The Simplified Chinese localization originally came from [EverChangAn/DLSS5-Swapper-zh-CN](https://github.com/EverChangAn/DLSS5-Swapper-zh-CN), with further wording and UI polish on top. Many thanks to the original translator.
 
+## Repository Layout
+
+| Path | Responsibility |
+|---|---|
+| `main.js` | Composition root: wires the layers together and registers IPC (the only entry that requires `src/core` directly) |
+| `src\core\` | Pure-Node logic layer (scanning, install, backup, manifests) — no electron allowed, fully unit-testable |
+| `src\main\` | Main-process integration layer (window, tray, state, overlay bridge) + `ipc\` with five `register(ctx)` modules split by domain |
+| `src\shared\` | Code shared between main and renderer (feature-i18n, install-routes, …) |
+| `src\renderer\` | Renderer (classic scripts): i18n, both themes, overlay panel/gallery |
+| `overlay\` | In-game injector (C++ AddOn plugin), see its README.md |
+| `scripts\{build,test,dev}\` | Build scripts, payload tests and one-off dev tools |
+| `docs\` | Architecture and operations manuals (architecture, overlay-protocol, vulkan-layer-recovery, install-manifest, i18n) |
+| `vendor\` | Locally prepared DLSS distribution and component download cache (not committed) |
+| `dist\` | electron-builder output (not committed) |
+
+For the layering rules, the vm test contract and the composition-root invariants, see [docs/architecture.md](docs/architecture.md).
+
 ## 1. Development & Build
 
 ### 1. Prerequisites

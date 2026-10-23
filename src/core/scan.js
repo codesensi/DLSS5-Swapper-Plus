@@ -10,6 +10,14 @@ const emulators = require('./emulators');
 const crypto = require('crypto');
 const feederRelease = require('./feeder-release');
 const { safePath } = require('./file-journal');
+// Safe at the top level: optiscaler.js leans only on pe, feeder-config,
+// runtime-components, file-journal and manifest-tracker, none of which come
+// back this way. The apply.js seam below is the one late require that stays.
+const optiscaler = require('./optiscaler');
+// Manifest bookkeeping (backups, retired records, recovery) lives apart from
+// the install/restore flows, so this edge is a tree too - scan never needs
+// apply.js at all any more.
+const tracker = require('./manifest-tracker');
 
 const SKIP_DIRS = new Set([
   '_dlss5_backup', 'reshade-shaders', 'host64', 'node_modules', '.git',
@@ -681,7 +689,10 @@ async function scanGame(gameDir) {
         // one of them reaches the neural runtime through a forwarder DLL, and
         // the pre-SR fork opens it directly and has none. Requiring a forwarder
         // from every build reported the fork's own install as absent.
-        const layout = require('./optiscaler').releaseFor(install.optiscaler.version).layout;
+        // Top-level require now: manifest-tracker took the manifest workload
+        // out of the old scan -> apply -> scan triangle, and optiscaler.js
+        // never pointed back this way, so the edge is a tree again.
+        const layout = optiscaler.releaseFor(install.optiscaler.version).layout;
         const needed = ['nvngx_dlssnr.dll', 'OptiScaler.ini', layout.forwarder].filter(Boolean);
         install.optiscaler.installed = pe.versionMentions(hook, 'OptiScaler') &&
           needed.every(name => fs.existsSync(path.join(exeDir, name)));
@@ -690,7 +701,7 @@ async function scanGame(gameDir) {
   }
   let recoverable = null;
   if (!fs.existsSync(activeManifest)) {
-    try { recoverable = require('./apply').recoverableManifest(gameDir); } catch {}
+    try { recoverable = tracker.recoverableManifest(gameDir); } catch {}
   }
   let reshade = chosen ? inspectReShade(path.dirname(chosen.path)) : inspectReShade(gameDir);
   if (!reshade.installed && install && install.vulkanLayer &&

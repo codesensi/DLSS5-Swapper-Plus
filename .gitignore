@@ -5,4 +5,3 @@ build/icon.png
 *.log
 vendor/
 /.idea/
-/docs/

@@ -15,60 +15,27 @@ const vulkanLayer = require('./vulkan-layer');
 const journal = require('./file-journal');
 const compatibility = require('./compatibility');
 const crypto = require('crypto');
+// Manifest bookkeeping lives in its own module so optiscaler.js can use it
+// without reaching through this file - which would rebuild the scan/apply
+// cycle that used to be suppressed with late require() calls.
+const tracker = require('./manifest-tracker');
 
-const BACKUP_DIR = '_DLSS5_Backup';
-const MANIFEST = 'manifest.json';
+const BACKUP_DIR = tracker.BACKUP_DIR;
+const MANIFEST = tracker.MANIFEST;
+
+const beginManifest = tracker.beginManifest;
+const saveActiveManifest = tracker.saveActiveManifest;
+const originalPath = tracker.originalPath;
+const copyTracked = tracker.copyTracked;
+const writeTracked = tracker.writeTracked;
+const relKey = tracker.relKey;
+const rememberAdded = tracker.rememberAdded;
+const rememberReplacement = tracker.rememberReplacement;
+// trackBeforeWrite keeps a local function wrapper further down, so no alias
+// here - it would collide with the function declaration.
 
 function backupRoot(gameDir) {
-  return path.join(gameDir, BACKUP_DIR);
-}
-
-function originalPath(gameDir, manifest, rel) {
-  const prefix = manifest.backupPrefix || '';
-  if (prefix && !/^originals\/[a-f0-9-]+$/.test(prefix)) throw fail('errBackupInvalid');
-  return journal.safePath(backupRoot(gameDir), path.join(prefix, rel));
-}
-
-const relKey = (rel) => path.normalize(String(rel)).toLowerCase();
-
-// An active manifest describes the machine state from before the first swap,
-// not merely the most recent click on Install. Reusing it is what makes a
-// second install (or an upgrade to a newer payload) still restore the genuine
-// originals instead of forgetting files that were already up to date.
-function beginManifest(gameDir, exePath, api) {
-  const manifestPath = path.join(backupRoot(gameDir), MANIFEST);
-  let previous = null;
-  if (fs.existsSync(manifestPath)) {
-    try {
-      previous = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
-    } catch {
-      throw fail('errBackupInvalid');
-    }
-    if (!previous || previous.version !== 1) throw fail('errBackupInvalid');
-  }
-
-  return {
-    ...(previous || {}),
-    version: 1,
-    backupPrefix: previous ? (previous.backupPrefix || '') : `originals/${crypto.randomUUID()}`,
-    date: new Date().toISOString(),
-    game: { dir: gameDir, exe: path.relative(gameDir, exePath), api },
-    replaced: Array.isArray(previous && previous.replaced) ? [...previous.replaced] : [],
-    added: Array.isArray(previous && previous.added) ? [...previous.added] : [],
-    addedDirs: Array.isArray(previous && previous.addedDirs) ? [...previous.addedDirs] : [],
-    reshade: {
-      installedByUs: false,
-      file: null,
-      filesAdded: [],
-      ...((previous && previous.reshade) || {})
-    }
-  };
-}
-
-async function saveActiveManifest(gameDir, manifest) {
-  await journal.capture(gameDir, path.join(backupRoot(gameDir), MANIFEST));
-  await fs.promises.mkdir(backupRoot(gameDir), { recursive: true });
-  await journal.atomicJson(path.join(backupRoot(gameDir), MANIFEST), manifest);
+  return tracker.backupRoot(gameDir);
 }
 
 function captureReShadeAttempt(manifest, exeDir, known, hook, hookExisted) {
@@ -83,27 +50,7 @@ function captureReShadeAttempt(manifest, exeDir, known, hook, hookExisted) {
 }
 
 function wasAdded(manifest, rel) {
-  const key = relKey(rel);
-  return manifest.added.some((item) => relKey(item) === key);
-}
-
-function rememberAdded(manifest, rel) {
-  if (!wasAdded(manifest, rel)) manifest.added.push(rel);
-}
-
-// Keep the first oldVersion forever: it is the version in the backup. Later
-// installs may update newVersion, but must never turn an app-added file into a
-// replacement or replace the identity of the user's original file.
-function rememberReplacement(manifest, item) {
-  if (wasAdded(manifest, item.rel)) return;
-  const key = relKey(item.rel);
-  const previous = manifest.replaced.find((row) => relKey(row.rel) === key);
-  if (previous) {
-    previous.newVersion = item.newVersion;
-    if (item.kind && !previous.kind) previous.kind = item.kind;
-    return;
-  }
-  manifest.replaced.push(item);
+  return tracker.wasAdded(manifest, rel);
 }
 
 function fail(code, params) {
@@ -199,64 +146,17 @@ async function backupReShadeConfig(gameDir, exeDir, manifest) {
 }
 
 function rememberAddedDir(manifest, rel) {
-  const key = relKey(rel);
-  if (!manifest.addedDirs.some((item) => relKey(item) === key)) manifest.addedDirs.push(rel);
+  tracker.rememberAddedDir(manifest, rel);
 }
 
 // Record every parent folder that this install creates. Restore removes these
 // only when empty, so a user's files can never be swept up with our payload.
 function rememberMissingParents(manifest, gameDir, target) {
-  const missing = [];
-  let current = path.dirname(target);
-  const root = path.resolve(gameDir);
-  while (path.resolve(current).toLowerCase() !== root.toLowerCase()) {
-    const rel = path.relative(root, current);
-    if (rel.startsWith('..') || path.isAbsolute(rel)) break;
-    if (!fs.existsSync(current)) missing.push(rel);
-    current = path.dirname(current);
-  }
-  for (const rel of missing.reverse()) rememberAddedDir(manifest, rel);
+  tracker.rememberMissingParents(manifest, gameDir, target);
 }
 
 async function trackBeforeWrite(manifest, gameDir, target, meta = {}) {
-  const rel = path.relative(gameDir, target);
-  journal.safePath(gameDir, rel);
-  if (rel.split(path.sep)[0].toLowerCase() === BACKUP_DIR.toLowerCase()) throw fail('errUnsafeTarget', { rel });
-  await journal.capture(gameDir, target);
-  rememberMissingParents(manifest, gameDir, target);
-  if (fs.existsSync(target)) {
-    if (!wasAdded(manifest, rel)) {
-      const backupPath = originalPath(gameDir, manifest, rel);
-      if (!fs.existsSync(backupPath)) await copyOver(target, backupPath);
-      rememberReplacement(manifest, {
-        rel,
-        oldVersion: meta.oldVersion === undefined ? pe.getFileVersion(target) : meta.oldVersion,
-        newVersion: meta.newVersion,
-        kind: meta.kind
-      });
-    }
-  } else {
-    rememberAdded(manifest, rel);
-  }
-  return rel;
-}
-
-async function copyTracked(manifest, gameDir, src, dest, meta = {}) {
-  const rel = await trackBeforeWrite(manifest, gameDir, dest, meta);
-  await saveActiveManifest(gameDir, manifest);
-  await copyOver(src, dest);
-  return rel;
-}
-
-async function writeTracked(manifest, gameDir, dest, text, meta = {}) {
-  const rel = await trackBeforeWrite(manifest, gameDir, dest, meta);
-  await saveActiveManifest(gameDir, manifest);
-  await fs.promises.mkdir(path.dirname(dest), { recursive: true });
-  // A file an earlier install copied in can be read-only, and Windows refuses
-  // to rewrite it: clear the attribute before, not only after.
-  try { await fs.promises.chmod(dest, 0o666); } catch { /* absent is normal */ }
-  await fs.promises.writeFile(dest, text, 'utf8');
-  return rel;
+  return tracker.trackBeforeWrite(manifest, gameDir, target, meta);
 }
 
 async function copyTreeTracked(manifest, gameDir, srcRoot, destRoot, log) {

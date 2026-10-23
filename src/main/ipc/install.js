@@ -112,12 +112,13 @@ function register(ctx) {
     finally { mutationBusy = false; }
   }
 
-  ipcMain.handle('install', (event, dir, exePath, requestedRoute, requestedApi) => exclusiveMutation(async () => {
-    const p = payload();
-    if (!p) return { ok: false, ...ctx.winLayer.payloadMissing() };
+  // The install handler used to be one ~250-line arrow. It now reads as
+  // three private stages between the guard rails: choose the target and
+  // route, prepare every moving part (downloads, dialogs, the overlay plan),
+  // then run the tracked install. All three close over the same ctx pieces.
+  async function resolveTarget(dir, exePath, requestedApi) {
     const scan = await ctx.scanGame(dir);
-    if (!scan.chosen) return { ok: false, code: 'errNoGameExecutable', message: 'errNoGameExecutable' };
-
+    if (!scan.chosen) return { code: 'errNoGameExecutable', message: 'errNoGameExecutable' };
     // Honour the sheet's choice, but only if it is one of the candidates we
     // actually found - never patch a path the renderer made up.
     const detected = scan.exeCandidates.find((e) => e.path === exePath) || scan.chosen;
@@ -127,21 +128,42 @@ function register(ctx) {
     target.hasNativeDlss = ctx.installRoutes.nativeDlssPresent(scan);
     const api = target.api;
     const availableRoutes = ctx.installRoutes.routesFor(target, api);
+    return { scan, target, api, availableRoutes };
+  }
+
+  function resolveRoute(requestedRoute, availableRoutes, scan, target) {
     if (requestedRoute === 'optiscaler' && !availableRoutes.includes('optiscaler')) {
-      return { ok: false, code: ctx.installRoutes.optiReason(target, api) || 'optiUnsupported' };
+      return { code: ctx.installRoutes.optiReason(target, target.api) || 'optiUnsupported' };
     }
-    if (!availableRoutes.length) return { ok: false, code: 'unsupportedRendererHint', message: 'unsupportedRendererHint' };
+    if (!availableRoutes.length) return { code: 'unsupportedRendererHint', message: 'unsupportedRendererHint' };
     const recommendedRoute = ctx.installRoutes.recommendedRoute(scan, target);
     const route = availableRoutes.includes(requestedRoute) ? requestedRoute
       : (availableRoutes.includes(recommendedRoute) ? recommendedRoute : availableRoutes[0]);
+    return { route };
+  }
 
-    // ReShade Setup is a Windows executable. On Linux, support Windows games
-    // launched with Steam Play by using their existing Proton prefix; native
-    // Linux games do not load the Windows DLSS/ReShade payload.
+  // ReShade Setup is a Windows executable. On Linux, support Windows games
+  // launched with Steam Play by using their existing Proton prefix; native
+  // Linux games do not load the Windows DLSS/ReShade payload.
+  function protonContext(dir) {
     const protonGame = process.platform === 'linux'
       ? ctx.steam().find((game) => path.resolve(game.dir) === path.resolve(dir))
       : null;
-    const proton = ctx.contextForSteamGame(protonGame);
+    return ctx.contextForSteamGame(protonGame);
+  }
+
+  ipcMain.handle('install', (event, dir, exePath, requestedRoute, requestedApi) => exclusiveMutation(async () => {
+    const p = payload();
+    if (!p) return { ok: false, ...ctx.winLayer.payloadMissing() };
+
+    const resolved = await resolveTarget(dir, exePath, requestedApi);
+    if (resolved.code) return { ok: false, code: resolved.code, message: resolved.message };
+    const { scan, target, api, availableRoutes } = resolved;
+    const routed = resolveRoute(requestedRoute, availableRoutes, scan, target);
+    if (routed.code) return { ok: false, code: routed.code, message: routed.message };
+    const route = routed.route;
+
+    const proton = protonContext(dir);
     if (process.platform === 'linux' && !proton) {
       return { ok: false, code: 'errProtonRequired', message: 'errProtonRequired' };
     }
@@ -174,11 +196,11 @@ function register(ctx) {
       } catch {}
     }
 
-    let optiRoot = null;
-    let optiVersion = null;
-    if (route === 'optiscaler') {
+    // Prepare the OptiScaler build if the route wants one: conflict check,
+    // the hardware/confirm dialog, the VC runtime check, then the download.
+    async function prepareOptiscaler() {
       ctx.optiscaler.checkConflicts(dir, target.path, old, api);
-      if (api === 'vulkan' && await ctx.vulkanLayer.existing(ctx.vulkanLayer.defaultRunner)) return { ok: false, code: 'errOptiVulkanLayer' };
+      if (api === 'vulkan' && await ctx.vulkanLayer.existing(ctx.vulkanLayer.defaultRunner)) return { code: 'errOptiVulkanLayer' };
       const gpu = await ctx.guards.gpuInfo();
       // Neither the card nor the driver is refused outright any more. Upstream
       // 0.2.0 says plainly that architectures older than Blackwell work with a
@@ -195,9 +217,9 @@ function register(ctx) {
           ctx.featureText('optiHint'), ctx.featureText('optiBridgeHint'), ctx.featureText('backendHint')].filter(Boolean).join('\n\n'),
         buttons: [ctx.featureText('installOpti'), ctx.featureText('cancel')], defaultId: 1, cancelId: 1
       });
-      if (confirmation.response !== 0) return { ok: false, cancelled: true };
+      if (confirmation.response !== 0) return { cancelled: true };
       const missing = ctx.missingVCRuntime(64, path.dirname(target.path), process.env.SystemRoot, ['msvcp140_atomic_wait.dll']);
-      if (missing.length) return { ok: false, code: 'runtimeRequiredHint', message: missing.join(', ') };
+      if (missing.length) return { code: 'runtimeRequiredHint', message: missing.join(', ') };
       send({ code: 'optiDownloading', params: {} });
       // A game may name an older pinned build. #238: No Man's Sky runs on
       // 0.1.1.5 and crashes on 0.2.0-patch1, and until now the only way back was
@@ -206,15 +228,17 @@ function register(ctx) {
       const release = ctx.optiscaler.releaseFor(wanted);
       optiVersion = release.version;
       try { optiRoot = await ctx.optiscaler.ensureOptiScaler(app.getPath('userData'), release.version); }
-      catch (err) { return { ok: false, code: ctx.componentCode(err, 'errOptiDownload'), message: err.message }; }
+      catch (err) { return { code: ctx.componentCode(err, 'errOptiDownload'), message: err.message }; }
       send({ code: 'optiVerified', params: { version: release.version } });
+      return {};
     }
 
     // Check before restoring or touching the game: these DLLs are imported by
     // Feeder and its helper. Never report a working installation if absent.
-    if (route === 'feeder') {
+    // Returns the VCRuntime download URL when the runtime is missing.
+    async function prepareFeeder() {
       if (!p.source.feeder || !(target.bitness === 32 ? p.source.feeder.ok32 : p.source.feeder.ok64)) {
-        return { ok: false, code: 'errFeederPayload', message: 'errFeederPayload' };
+        return { code: 'errFeederPayload', message: 'errFeederPayload' };
       }
       const checks = [[target.bitness, path.dirname(target.path)]];
       if (target.bitness === 32) checks.push([64, path.join(path.dirname(target.path), 'host64')]);
@@ -228,7 +252,7 @@ function register(ctx) {
             buttons: [ctx.featureText('runtimeDownload'), ctx.featureText('cancel')], cancelId: 1, defaultId: 0
           });
           if (response.response === 0) await shell.openExternal(`https://aka.ms/vc14/vc_redist.${bits === 32 ? 'x86' : 'x64'}.exe`);
-          return { ok: false, code: 'runtimeRequiredHint' };
+          return { code: 'runtimeRequiredHint' };
         }
       }
       // DirectDraw goes through dgVoodoo exactly as DX8 and DX9 do - apply.js
@@ -239,65 +263,77 @@ function register(ctx) {
           p.source.feeder.dgVoodooDir = await ctx.ensureDgVoodoo(app.getPath('userData'));
           send({ code: 'legacyWrapperReady', params: { api, bitness: target.bitness } });
         } catch (error) {
-          return { ok: false, code: ctx.componentCode(error, 'legacyDownloadHint'), message: error.message };
+          return { code: ctx.componentCode(error, 'legacyDownloadHint'), message: error.message };
         }
       }
-    }
-
-    if (route === 'feeder') {
+      // Lumenite is motion-only: VORT is bundled under MIT as an offline
+      // fallback, so the install remains usable even when GitHub is not.
       try {
         p.source.feeder.lumeniteRoot = await ctx.ensureLumenite(app.getPath('userData'));
         send({ code: 'motionProviderReady', params: { provider: 'LumeniteFX Kernel 2.0' } });
       } catch (err) {
-        // VORT is bundled under MIT as an offline fallback. The install remains
-        // usable even when GitHub is unavailable.
         p.source.feeder.lumeniteRoot = null;
         send({ code: 'motionProviderFallback', params: { error: err.message } });
       }
+      return {};
     }
-
-    // Only user-selected companion builds are installed. Leave unrelated
-    // add-ons alone; all managed copies now participate in the transaction.
-    const companions = route === 'native' && target.bitness === 64 ? companionAddons() : [];
 
     // The in-game overlay rides along with the install when it is switched on and
     // the executable is one it supports. Prepared before anything is written, so
     // an unsupported build refuses the install rather than half-finishing it.
-    const gameOverlay = ctx.gameOverlay;
-    let overlayWanted = false;
-    // An unreadable preference means the overlay is off. A DLSS install must not
-    // fail because of it.
-    try { overlayWanted = ctx.overlayPreferences.read(app.getPath('userData')).enabled === true; } catch {}
-
-    let overlayPlan = null;
-    if (overlayWanted) {
+    function planOverlay() {
+      const overlay = ctx.gameOverlay;
+      let wanted = false;
+      // An unreadable preference means the overlay is off. A DLSS install must not
+      // fail because of it.
+      try { wanted = ctx.overlayPreferences.read(app.getPath('userData')).enabled === true; } catch {}
+      if (!wanted) return { plan: null };
       try {
         // Drop records whose bytes are already gone - a restore, or an overlay
         // rebuilt since. Without this, prepare() refuses the new build because an
         // old record still claims a different one is installed here.
-        gameOverlay.cleanupMissing(ctx.overlayLibrary(), dir);
+        overlay.cleanupMissing(ctx.overlayLibrary(), dir);
         // An update ships a different overlay build. Retire the copy this app
         // installed here for the previous one instead of stopping with "remove
         // the previous test overlay first".
-        gameOverlay.replaceOutdated(ctx.overlayLibrary(), path.dirname(target.path));
-        if (gameOverlay.routes(target).includes(route)) {
-          overlayPlan = gameOverlay.prepare({ library: ctx.overlayLibrary(), target, route });
-        } else {
-          // Never silently. A route or an API the panel cannot ride on produced
-          // an install with no overlay file and no line saying why, which is
-          // indistinguishable from a bug.
-          // The one reason that applies, in words: "does not attach on
-          // renodx/DirectX 11" read as a fault on every route (#338).
-          const why = target.bitness !== 64 ? 'bits' : route === 'renodx' ? 'multipass' : route === 'optiscaler' ? 'optiscaler' : 'api';
-          send({ code: 'overlayNotForRoute', params: { why, api: target.apiLabel || target.api } });
+        overlay.replaceOutdated(ctx.overlayLibrary(), path.dirname(target.path));
+        if (overlay.routes(target).includes(route)) {
+          return { plan: overlay.prepare({ library: ctx.overlayLibrary(), target, route }) };
         }
+        // Never silently. A route or an API the panel cannot ride on produced
+        // an install with no overlay file and no line saying why, which is
+        // indistinguishable from a bug.
+        // The one reason that applies, in words: "does not attach on
+        // renodx/DirectX 11" read as a fault on every route (#338).
+        const why = target.bitness !== 64 ? 'bits' : route === 'renodx' ? 'multipass' : route === 'optiscaler' ? 'optiscaler' : 'api';
+        send({ code: 'overlayNotForRoute', params: { why, api: target.apiLabel || target.api } });
       } catch (error) {
         // DLSS is the job; the overlay rides along. A missing or conflicting
         // overlay build is reported and skipped - the switch defaults to on, so
         // failing here would break every install on a machine without one.
         send({ code: 'overlaySkipped', params: { error: error.message } });
       }
+      return { plan: null };
     }
+
+    let optiRoot = null;
+    let optiVersion = null;
+    if (route === 'optiscaler') {
+      const prepared = await prepareOptiscaler();
+      if (prepared.code) return { ok: false, code: prepared.code, message: prepared.message };
+      if (prepared.cancelled) return { ok: false, cancelled: true };
+    }
+
+    if (route === 'feeder') {
+      const prepared = await prepareFeeder();
+      if (prepared.code) return { ok: false, code: prepared.code, message: prepared.message };
+    }
+
+    // Only user-selected companion builds are installed. Leave unrelated
+    // add-ons alone; all managed copies now participate in the transaction.
+    const companions = route === 'native' && target.bitness === 64 ? companionAddons() : [];
+
+    const overlayPlan = planOverlay().plan;
 
     try {
       // A game could have been launched while the component download ran.
@@ -341,18 +377,18 @@ function register(ctx) {
           const cfg = path.join(exeDir, 'dlss5-feed.cfg');
           if (fs.existsSync(cfg)) {
             await ctx.writeTracked(manifest, dir, cfg,
-              gameOverlay.completeFeederConfig(fs.readFileSync(cfg, 'utf8')), { kind: 'config' });
+              overlay.completeFeederConfig(fs.readFileSync(cfg, 'utf8')), { kind: 'config' });
           }
         }
         await ctx.journal.capture(dir, overlayPlan.file);
-        await gameOverlay.attach({
+        await overlay.attach({
           library: ctx.overlayLibrary(), target, gameDir: dir, manifest,
           saveManifest: ctx.saveActiveManifest, plan: overlayPlan
         });
         send({ code: 'addonInstalled', params: { name: 'DLSS 5 Overlay (F8)' } });
       } catch (error) {
         send({ code: 'overlaySkipped', params: { error: error.message } });
-        try { gameOverlay.cleanupMissing(ctx.overlayLibrary(), dir); } catch {}
+        try { overlay.cleanupMissing(ctx.overlayLibrary(), dir); } catch {}
       }
       ctx.saveOperation(dir, manifest, 'install', send);
       return { ok: true, replaced: manifest.replaced.length, added: manifest.added.length };
