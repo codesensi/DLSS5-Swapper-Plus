@@ -1,15 +1,22 @@
 'use strict';
 // Update check and crash log. Releases move quickly and nothing here updates
-// itself, so someone can sit on a build for weeks without knowing. One lookup
-// per launch, no identifiers sent, no download started: the answer is a
-// version number and a link the person may click. Any failure is silence -
-// this must never delay a start.
+// itself, so someone can sit on a build for weeks without knowing. A lookup
+// that succeeds is kept for the session; a failed one is not - the next ask
+// retries, though no more often than once per window, and the reason lands
+// in the crash log. No identifiers are sent, no download is started, and a
+// check must never delay a start.
 
 const fs = require('fs');
 const path = require('path');
 
-function createUpdate({ app, fetch = globalThis.fetch }) {
+function createUpdate({
+  app,
+  fetch = globalThis.fetch,
+  failureRetryMs = 60 * 1000,
+  feedUrl = 'https://github.com/codesensi/DLSS5-Swapper-Plus/releases.atom'
+}) {
   let updateAnswer = null;
+  let lastFailureAt = 0;
 
   // Nothing wrote the app's own failures down anywhere, so a crash left the
   // person with nothing to report but a description. Keep the last few in
@@ -38,23 +45,41 @@ function createUpdate({ app, fetch = globalThis.fetch }) {
   }
 
   function register(ipcMain) {
-    ipcMain.handle('update-check', async () => {
-      if (updateAnswer) return updateAnswer;
+    ipcMain.handle('update-check', async (_event, { force = false } = {}) => {
       const current = app.getVersion();
+      if (updateAnswer) return updateAnswer;
+      if (!force && Date.now() - lastFailureAt < failureRetryMs) {
+        return { current, latest: null, newer: false };
+      }
       try {
-        const response = await fetch('https://api.github.com/repos/codesensi/DLSS5-Swapper-Plus/releases/latest', {
-          headers: { 'User-Agent': `DLSS5-Swapper-Plus/${current}`, Accept: 'application/vnd.github+json' },
+        // The releases feed, not the REST API: the API allows 60 lookups per
+        // hour and IP, which a shared proxy exit burns through in minutes.
+        // The feed has no such cap. Entries are newest first, prereleases
+        // included, so the first plain stable tag is the answer - the same
+        // thing /releases/latest would have said.
+        const response = await fetch(feedUrl, {
+          headers: { 'User-Agent': `DLSS5-Swapper-Plus/${current}`, Accept: 'application/atom+xml' },
           signal: AbortSignal.timeout(8000)
         });
-        if (!response.ok) throw Error(String(response.status));
-        const release = await response.json();
-        const latest = String(release.tag_name || '').replace(/^v/, '');
-        updateAnswer = { current, latest, newer: newerRelease(current, latest) };
-      } catch {
-        // Offline, rate-limited or blocked: say nothing rather than worry anyone.
-        updateAnswer = { current, latest: null, newer: false };
+        if (!response.ok) {
+          // The body says why (rate limit, abuse block); keep a slice of it
+          // for the log instead of a bare status code.
+          let detail = '';
+          try { detail = `: ${(await response.text()).slice(0, 200)}`; } catch { /* body is a bonus */ }
+          throw Object.assign(new Error(`GitHub releases feed responded ${response.status}${detail}`), { status: response.status });
+        }
+        const feed = String(await response.text());
+        const found = feed.match(/releases\/tag\/(v?\d+\.\d+\.\d+)(?![\w.-])/);
+        if (!found) throw new Error('The releases feed carries no stable release');
+        updateAnswer = { current, latest: found[1].replace(/^v/, ''), newer: newerRelease(current, found[1]) };
+      } catch (error) {
+        // Offline, rate-limited or blocked: say nothing to the person, but the
+        // reason is written down for the diagnostics report, and the failed
+        // lookup is not kept - the next ask retries.
+        recordCrash('update check', error);
+        lastFailureAt = Date.now();
       }
-      return updateAnswer;
+      return updateAnswer || { current, latest: null, newer: false };
     });
   }
 

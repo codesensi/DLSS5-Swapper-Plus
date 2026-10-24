@@ -45,6 +45,7 @@ const S = {
     errBackendRecovery: 'An interrupted switch needs recovery. Close the game, then click Restore originals. Keep the backup folder intact.',
     updateAvailable: (version) => `Update available: v${version} ↗`,
     updateCheckFailed: () => 'Update check unavailable — this is not “you are up to date”.',
+    updateChecking: () => 'Checking for updates…',
     feedVkLayerReady: (rel) => `Vulkan interop layer installed. If DLSS 5 does not appear in game, launch it through ${rel}.`,
     neuralModelKept: (rel) => `Kept your existing ${rel}; the bundled model was not copied over it.`,
     restoreRecovered: (date) => `No live backup record was found, so the app is restoring from the one kept beside it (${date}). The files it describes are still in the game.`,
@@ -249,7 +250,7 @@ The install will go through. If the neural pass never appears in game, 616.56 is
     optiDownloading: '正在下载并校验 OptiScaler…', optiVerified: '官方 OptiScaler 发行版校验通过。', backendSwitching: '正在保存设置并切换后端…', backendRecovered: '已恢复被中断的切换。',
 
     // ===== 更新与状态提示 =====
-    updateAvailable: (version) => `有可用更新：v${version} ↗`, updateCheckFailed: () => '无法检查更新 — 这不代表「已是最新版本」。',
+    updateAvailable: (version) => `有可用更新：v${version} ↗`, updateCheckFailed: () => '无法检查更新 — 这不代表「已是最新版本」。', updateChecking: () => '正在检查更新…',
     feedVkLayerReady: (rel) => `Vulkan 互操作层已安装。如果游戏内未出现 DLSS 5，请通过 ${rel} 启动游戏。`, neuralModelKept: (rel) => `已保留你现有的 ${rel}；未用随附模型覆盖它。`,
 
     // ===== 隐藏游戏与导航 =====
@@ -406,6 +407,7 @@ The install will go through. If the neural pass never appears in game, 616.56 is
     errBackendRecovery: '中断された切り替えの復旧が必要です。ゲームを終了してから「元に戻す」をクリックしてください。バックアップフォルダーはそのまま残してください。',
     updateAvailable: (version) => `更新があります：v${version} ↗`,
     updateCheckFailed: () => '更新を確認できません — 「最新です」という意味ではありません。',
+    updateChecking: () => '更新を確認中…',
     feedVkLayerReady: (rel) => `Vulkan 相互運用レイヤーをインストールしました。ゲームに DLSS 5 が現れない場合は ${rel} から起動してください。`,
     neuralModelKept: (rel) => `既存の ${rel} を保持しました。同梱モデルで上書きはしていません。`,
     restoreRecovered: (date) => `有効なバックアップ記録が見つからないため、隣に残されていたもの（${date}）から復元しています。記録されたファイルはまだゲーム内にあります。`,
@@ -629,6 +631,7 @@ The install will go through. If the neural pass never appears in game, 616.56 is
     'errBackendRecovery': '중단된 전환의 복구가 필요합니다. 게임을 종료한 뒤 "원본 복원"을 클릭하세요. 백업 폴더는 그대로 유지하세요.',
     'updateAvailable': (version) => `업데이트 있음: v${version} ↗`,
     'updateCheckFailed': () => '업데이트를 확인하지 못했습니다 — "최신 상태"라는 뜻이 아닙니다.',
+    'updateChecking': () => '업데이트 확인 중…',
     'feedVkLayerReady': (rel) => `Vulkan 상호운용 레이어가 설치되었습니다. 게임에 DLSS 5가 나타나지 않으면 ${rel}을(를) 통해 실행하세요.`,
     'neuralModelKept': (rel) => `기존 ${rel}을(를) 유지했습니다. 번들된 모델로 덮어쓰지는 않았습니다.`,
     'restoreRecovered': (date) => `유효한 백업 기록을 찾지 못해, 그 옆에 보관된 기록(${date})으로 복원합니다. 기록이 가리키는 파일은 여전히 게임 안에 있습니다.`,
@@ -842,6 +845,7 @@ The install will go through. If the neural pass never appears in game, 616.56 is
     errBackendRecovery: '上次的切換被中斷，需要復原。請關閉遊戲，然後點擊「還原原始檔」。請保持備份資料夾完整。',
     updateAvailable: (version) => `有可用更新：v${version} ↗`,
     updateCheckFailed: () => '無法檢查更新 — 這不代表「已是最新版本」。',
+    updateChecking: () => '正在檢查更新…',
     feedVkLayerReady: (rel) => `Vulkan 互通層已安裝。如果遊戲內沒有出現 DLSS 5，請透過 ${rel} 啟動遊戲。`,
     neuralModelKept: (rel) => `已保留你現有的 ${rel}；未以隨附的模型覆蓋它。`,
     restoreRecovered: (date) => `找不到有效的備份紀錄，程式將改用備份旁保留的那一份（${date}）還原。它所記錄的檔案仍在遊戲中。`,

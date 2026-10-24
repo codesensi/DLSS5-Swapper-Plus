@@ -865,9 +865,23 @@ async function showUpdateNotice() {
     link.textContent = t('updateCheckFailed');
     link.classList.add('muted');
     link.classList.remove('hidden');
+    // The failed lookup is not cached in the main process, so a click forces
+    // a new one - the throttle that protects automatic re-checks must not
+    // swallow an explicit ask, or the click looks dead.
+    link.onclick = async (event) => {
+      event.preventDefault();
+      link.textContent = t('updateChecking');
+      try { await window.lab.checkUpdate({ force: true }); } catch { /* stays failed */ }
+      showUpdateNotice();
+    };
     return;
   }
-  if (!answer.newer) return;
+  link.onclick = null;
+  if (!answer.newer) {
+    // A retry that ends up current must undo the failure branch's unhiding.
+    link.classList.add('hidden');
+    return;
+  }
   link.textContent = t('updateAvailable', answer.latest);
   link.classList.remove('muted');
   link.classList.remove('hidden');
