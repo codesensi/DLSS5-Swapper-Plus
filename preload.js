@@ -17,6 +17,8 @@ contextBridge.exposeInMainWorld('lab', {
   boot: () => ipcRenderer.invoke('boot'),
   environmentInfo: () => ipcRenderer.invoke('environment-info'),
   thirdPartyNotices: () => ipcRenderer.invoke('third-party-notices'),
+  changelogEntry: () => ipcRenderer.invoke('changelog-entry'),
+  openCrashLog: () => ipcRenderer.invoke('open-crash-log'),
   setLang: (lang) => ipcRenderer.invoke('set-lang', lang),
   setTheme: (theme) => ipcRenderer.invoke('set-theme', theme),
   window: (action) => ipcRenderer.invoke('window', action),

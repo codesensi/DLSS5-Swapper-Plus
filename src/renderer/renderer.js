@@ -94,7 +94,7 @@ function show(view) {
   if (view === 'settings') renderSettings();
   if (view === 'addons') renderAddons();
   if (view === 'overlays') window.overlayLab.render();
-  if (view === 'about') loadEnvironment();
+  if (view === 'about') { loadEnvironment(); loadChangelog(); }
 }
 
 function bindProjectLink(link) {
@@ -1195,22 +1195,32 @@ function envRow(label, value) {
   return row;
 }
 
-function renderEnvironment(info) {
-  const panel = $('envPanel');
-  if (!panel || !info) return;
-  // A health line first: the two facts that decide whether the app can work
-  // at all. Anything missing names itself instead of failing silently.
+function healthIssues(info) {
   const issues = [];
   if (state.brand && state.brand.payloadMissing) issues.push(state.brand.payloadMissing);
   if (!info.gpu) issues.push(t('envGpuNone'));
-  panel.replaceChildren(
+  return issues;
+}
+
+function renderEnvironment(info) {
+  const panel = $('envPanel');
+  if (!panel || !info) return;
+  // A health line first: the facts that decide whether the app can work at
+  // all. Anything missing names itself instead of failing silently.
+  const issues = healthIssues(info);
+  const rows = [
     envRow(t('envHealth'), issues.length ? `⚠ ${issues.join(' · ')}` : `✓ ${t('ready')}`),
     envRow(t('envApp'), info.app),
     envRow(t('envElectron'), `${info.electron} · Chromium ${info.chrome} · Node ${info.node}`),
-    envRow(t('envOs'), `${info.os} · ${info.arch}`),
+    envRow(t('envOs'), `${info.os} · ${info.arch}`)
+  ];
+  // The stamp exists only in packaged builds; dev shows no row at all.
+  if (info.builtAt) rows.push(envRow(t('envBuilt'), `${info.builtAt.replace('T', ' ').slice(0, 16)} UTC`));
+  rows.push(
     envRow(t('envGpu'), info.gpu || t('envGpuNone')),
     envRow(t('envUi'), `${state.skin === 'two' ? t('envSkinTwo') : t('envSkinOne')} · ${state.lang}`)
   );
+  panel.replaceChildren(...rows);
 }
 
 async function loadEnvironment() {
@@ -1223,15 +1233,20 @@ async function loadEnvironment() {
   } catch { /* a quiet empty card beats an error box on the About page */ }
 }
 
-// The text a bug report wants: the same keys the diagnostics file uses.
+// The text a bug report wants: the same keys the diagnostics file uses, the
+// health verdict, and a scaffold so the steps get filled in, not forgotten.
 function envReportText() {
   if (!envCache) return '';
-  return [
+  const issues = healthIssues(envCache);
+  const facts = [
     `app: ${envCache.app}`,
     `electron: ${envCache.electron} (Chromium ${envCache.chrome}, Node ${envCache.node})`,
     `platform: ${envCache.os} (${envCache.arch})`,
-    envCache.gpu ? `gpu: ${envCache.gpu}` : null
-  ].filter(Boolean).join('\n');
+    envCache.builtAt ? `build: ${envCache.builtAt}` : null,
+    envCache.gpu ? `gpu: ${envCache.gpu}` : null,
+    `status: ${issues.length ? issues.join(' · ') : t('ready')}`
+  ].filter(Boolean);
+  return `${facts.join('\n')}\n\n${t('copySteps')}:\n1. \n2. `;
 }
 
 // ---------------- events ----------------
@@ -1301,6 +1316,25 @@ $('noticesClose').onclick = () => $('noticesOverlay').classList.add('hidden');
 $('noticesOverlay').onclick = (event) => {
   if (event.target === $('noticesOverlay')) $('noticesOverlay').classList.add('hidden');
 };
+
+// The changelog slice for the running version is read once, on first visit.
+// A build without an entry keeps the box hidden instead of showing an empty
+// one, and a failed read is not an About-page event.
+let changelogLoaded = false;
+
+async function loadChangelog() {
+  if (changelogLoaded) return;
+  changelogLoaded = true;
+  try {
+    const entry = await window.lab.changelogEntry();
+    if (entry && entry.text) {
+      $('changelogBody').textContent = entry.text;
+      $('changelogBox').hidden = false;
+    }
+  } catch { /* stays hidden */ }
+}
+
+$('crashLogBtn').onclick = () => window.lab.openCrashLog();
 
 // The wordmark is black artwork, so the dark theme gets the lifted copy.
 function paintBrand() {

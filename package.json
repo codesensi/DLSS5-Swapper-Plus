@@ -10,7 +10,7 @@
     "test:payload": "node scripts/test/test-feeder-payload.js",
     "test:optiscaler": "node scripts/test/test-optiscaler-payload.js",
     "payload": "node scripts/build/collect-payload.js",
-    "prebuild": "pnpm run payload",
+    "prebuild": "pnpm run payload && node scripts/build/build-info.js",
     "build": "electron-builder --win",
     "build:linux": "electron-builder --linux AppImage deb",
     "icon": "electron scripts/build/make-icon.js",
@@ -35,6 +35,7 @@
       "preload.js",
       "overlay-preload.js",
       "THIRD_PARTY_NOTICES.md",
+      "CHANGELOG.md",
       "src/**/*",
       "assets/**/*",
       "package.json"

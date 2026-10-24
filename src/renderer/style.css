@@ -483,6 +483,18 @@ select option { background: var(--panel); color: var(--text); }
 }
 .notices-body:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 
+/* Current-version changelog: collapsed until asked for, hidden entirely when
+   the running build has no entry in the file. */
+.changelog { margin-top: 14px; }
+.changelog summary { cursor: pointer; font-size: 13px; font-weight: 600; color: var(--muted); user-select: none; }
+.changelog summary:hover { color: var(--text); }
+.changelog pre {
+  max-height: 240px; margin: 10px 0 0; padding: 12px 14px; overflow: auto;
+  border-radius: 10px; background: var(--panel-2); border: 1px solid var(--stroke);
+  white-space: pre-wrap; word-break: break-word;
+  font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace; font-size: 12px; line-height: 1.7;
+}
+
 /* ---------------- game sheet ---------------- */
 .overlay {
   position: fixed;

@@ -5,3 +5,4 @@ build/icon.png
 *.log
 vendor/
 /.idea/
+assets/build-info.json

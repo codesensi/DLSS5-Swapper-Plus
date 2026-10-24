@@ -6,6 +6,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { pathToFileURL } = require('url');
+const changelog = require('../../core/changelog');
 
 // Before anything has been installed in this session, the row is filled from
 // the backup manifests already sitting in the game folders - real installs
@@ -65,6 +66,9 @@ function register(ctx) {
     let gpu = null;
     try { gpu = ctx.guards.driverNames(await ctx.guards.gpuInfo()); } catch { /* advice only */ }
     const osVersion = process.platform === 'win32' ? os.version() : '';
+    // Written by the packaging step; dev runs carry no stamp and hide the row.
+    let builtAt = null;
+    try { builtAt = JSON.parse(fs.readFileSync(path.join(app.getAppPath(), 'assets', 'build-info.json'), 'utf8')).builtAt || null; } catch { /* no stamp */ }
     return {
       app: `v${app.getVersion()}`,
       electron: process.versions.electron,
@@ -72,6 +76,7 @@ function register(ctx) {
       node: process.versions.node,
       arch: process.arch,
       os: osVersion ? `${osVersion} (${os.release()})` : `${os.type()} ${os.release()}`,
+      builtAt,
       gpu
     };
   });
@@ -82,6 +87,26 @@ function register(ctx) {
   ipcMain.handle('third-party-notices', async () => {
     try { return await fs.promises.readFile(path.join(app.getAppPath(), 'THIRD_PARTY_NOTICES.md'), 'utf8'); }
     catch { return null; }
+  });
+
+  // The About view shows only the running version's own slice of the
+  // changelog, so the panel cannot grow with the file.
+  ipcMain.handle('changelog-entry', () => {
+    try {
+      const markdown = fs.readFileSync(path.join(app.getAppPath(), 'CHANGELOG.md'), 'utf8');
+      const text = changelog.entryFor(markdown, app.getVersion());
+      return text ? { version: app.getVersion(), text } : null;
+    } catch { return null; }
+  });
+
+  // The crash log lives in userData, which the allowlisted 'open' channel
+  // refuses on purpose. This opens exactly one known file - or the folder
+  // when there is nothing to point at yet.
+  ipcMain.handle('open-crash-log', () => {
+    const file = path.join(app.getPath('userData'), 'crash.log');
+    if (fs.existsSync(file)) { shell.showItemInFolder(file); return true; }
+    shell.openPath(app.getPath('userData'));
+    return false;
   });
 
   ipcMain.handle('set-lang', (_event, lang) => {
