@@ -1,5 +1,27 @@
 # 更新日志（CHANGELOG）
 
+## v3.1.0（2026-10-24）
+
+## ✨ 关于页
+
+- **环境信息面板**：新增应用版本、Electron/Chromium/Node、操作系统、显卡与驱动、界面信息与构建时间的集中展示；首行健康状态（载荷完整性、GPU 检测）先行提示，缺失项自动降级说明
+- **一键复制排障信息**：复制与诊断文件同口径的环境事实，附健康判定与复现步骤模板，可直接贴进 issue
+- **检查更新**：主动检查并与当前版本对比，严格区分「已是最新 / 有新版（点击跳转）/ 检查失败」，失败的检查不会被误报为最新
+- **当前版本更新日志**：折叠展示 CHANGELOG 中运行版本的条目，CHANGELOG.md 随安装包分发
+- **第三方声明查看器**：应用内按需查看开源组件声明（THIRD_PARTY_NOTICES.md）
+- **崩溃日志入口**：一键在资源管理器中定位 crash.log，无记录时打开 userData 目录
+- **报告问题**：GitHub Issues 深链，沿用 open-project 白名单安全通道
+- **隐私声明**：明示本应用不收集任何数据
+
+## 🏗️ 内部改进（面向开发者）
+
+- 新增 4 条只读 IPC 通道：`environment-info`、`third-party-notices`、`changelog-entry`、`open-crash-log`
+- 新增纯模块 `src/core/changelog.js`：按「含版本号的标题」切分 CHANGELOG 条目，类目标题保留在版本切片内
+- 项目链接绑定抽出 `bindProjectLink()`，动态创建的发布链接复用同一白名单点击处理；链接白名单新增 `issues`
+- 构建时间戳：prebuild 写入 `assets/build-info.json`（已加入 .gitignore），打包版在环境信息中显示构建时间，开发模式自动隐藏
+- `CHANGELOG.md` 纳入 electron-builder 打包清单（build.files）
+- 新增测试 8 例（关于页环境面板与项目卡 5 例、更新日志解析 3 例），全量套件无回归
+
 ## v3.0.0（2026-10-23）
 
 ## ✨ 界面与多语言
