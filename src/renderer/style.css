@@ -473,6 +473,16 @@ select option { background: var(--panel); color: var(--text); }
 .env-row .k { flex: none; min-width: 96px; color: var(--muted); font-weight: 600; }
 .env-row .v { flex: 1; min-width: 0; word-break: break-all; font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace; font-size: 12.5px; }
 
+/* Third-party notices: the packaged markdown shown as plain text. */
+.notices-dialog { width: min(680px, 100%); }
+.notices-body {
+  max-height: 55vh; margin: 14px 0 18px; padding: 12px 14px; overflow: auto;
+  border-radius: 10px; background: var(--panel-2); border: 1px solid var(--stroke);
+  white-space: pre-wrap; word-break: break-word;
+  font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace; font-size: 12px; line-height: 1.7;
+}
+.notices-body:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
 /* ---------------- game sheet ---------------- */
 .overlay {
   position: fixed;

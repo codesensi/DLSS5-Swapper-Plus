@@ -197,7 +197,34 @@
           </div>
         </div>
         <div class="glass pad env" id="envPanel"></div>
+
+        <div class="section-head"><h3 data-i18n="projectTitle">Project</h3></div>
+        <div class="glass pad project">
+          <div class="set-row">
+            <div>
+              <div class="k" data-i18n="updateTitle">Updates</div>
+              <div class="v" id="updateResult"></div>
+            </div>
+            <button class="ghost sm" id="checkUpdateBtn" data-i18n="updateCheckNow">Check for updates</button>
+          </div>
+          <div class="about-links">
+            <a class="glass-btn" href="https://github.com/codesensi/DLSS5-Swapper-Plus/issues" data-project="issues"><span data-i18n="reportIssue">Report an issue</span> ↗</a>
+            <button class="glass-btn" id="noticesBtn" data-i18n="thirdPartyNotices">Third-party notices</button>
+          </div>
+          <p class="dim"><span data-i18n="aboutPrivacy"></span></p>
+        </div>
       </section>
+    </div>
+  </div>
+
+  <!-- third-party notices viewer -->
+  <div class="overlay hidden" id="noticesOverlay">
+    <div class="dialog notices-dialog">
+      <h3 data-i18n="thirdPartyNotices">Third-party notices</h3>
+      <div class="notices-body" id="noticesBody" tabindex="0"></div>
+      <div class="dlg-actions">
+        <button class="ghost sm" id="noticesClose" data-i18n="close">Close</button>
+      </div>
     </div>
   </div>
 

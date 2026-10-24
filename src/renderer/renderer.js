@@ -97,7 +97,7 @@ function show(view) {
   if (view === 'about') loadEnvironment();
 }
 
-for (const link of document.querySelectorAll('[data-project]')) {
+function bindProjectLink(link) {
   link.addEventListener('click', async event => {
     event.preventDefault();
     let ok = false;
@@ -105,6 +105,7 @@ for (const link of document.querySelectorAll('[data-project]')) {
     $('projectLinkError').classList.toggle('hidden', Boolean(ok));
   });
 }
+for (const link of document.querySelectorAll('[data-project]')) bindProjectLink(link);
 
 // ---------------- recent game ----------------
 
@@ -1197,7 +1198,13 @@ function envRow(label, value) {
 function renderEnvironment(info) {
   const panel = $('envPanel');
   if (!panel || !info) return;
+  // A health line first: the two facts that decide whether the app can work
+  // at all. Anything missing names itself instead of failing silently.
+  const issues = [];
+  if (state.brand && state.brand.payloadMissing) issues.push(state.brand.payloadMissing);
+  if (!info.gpu) issues.push(t('envGpuNone'));
   panel.replaceChildren(
+    envRow(t('envHealth'), issues.length ? `⚠ ${issues.join(' · ')}` : `✓ ${t('ready')}`),
     envRow(t('envApp'), info.app),
     envRow(t('envElectron'), `${info.electron} · Chromium ${info.chrome} · Node ${info.node}`),
     envRow(t('envOs'), `${info.os} · ${info.arch}`),
@@ -1245,6 +1252,56 @@ $('copyEnv').onclick = async () => {
   setTimeout(() => { btn.textContent = t('envCopy'); }, 1500);
 };
 
+// ---------------- about: project ----------------
+
+// The version line starts as the running build. A check either confirms it is
+// current, names the newer release as a link, or says the lookup failed - a
+// failed lookup is never "up to date", the same rule showUpdateNotice follows.
+let updateInfo = null;
+
+function refreshUpdateLine() {
+  const out = $('updateResult');
+  if (!out) return;
+  if (!updateInfo) { out.textContent = state.brand ? `v${state.brand.version}` : ''; return; }
+  if (!updateInfo.latest) { out.textContent = t('updateCheckFailed'); return; }
+  if (updateInfo.newer) {
+    const a = document.createElement('a');
+    a.href = 'https://github.com/codesensi/DLSS5-Swapper-Plus/releases/latest';
+    a.dataset.project = 'releases';
+    a.textContent = t('updateAvailable', updateInfo.latest);
+    bindProjectLink(a);
+    out.replaceChildren(a);
+    return;
+  }
+  out.textContent = t('updateLatest');
+}
+
+$('checkUpdateBtn').onclick = async () => {
+  const out = $('updateResult');
+  out.textContent = t('updateChecking');
+  try {
+    updateInfo = await window.lab.checkUpdate({ force: true });
+    refreshUpdateLine();
+  } catch { out.textContent = t('updateCheckFailed'); }
+};
+
+// The notices file ships beside the app and is only read once, on request,
+// shown as plain text. A missing file reads as one dash rather than an error.
+let noticesCache = null;
+
+$('noticesBtn').onclick = async () => {
+  const body = $('noticesBody');
+  $('noticesOverlay').classList.remove('hidden');
+  if (noticesCache === null) {
+    try { noticesCache = (await window.lab.thirdPartyNotices()) || ''; } catch { noticesCache = ''; }
+  }
+  body.textContent = noticesCache || '—';
+};
+$('noticesClose').onclick = () => $('noticesOverlay').classList.add('hidden');
+$('noticesOverlay').onclick = (event) => {
+  if (event.target === $('noticesOverlay')) $('noticesOverlay').classList.add('hidden');
+};
+
 // The wordmark is black artwork, so the dark theme gets the lifted copy.
 function paintBrand() {
   const art = state.theme === 'dark' ? (state.brand.logoDark || state.brand.logoLight) : state.brand.logoLight;
@@ -1280,9 +1337,12 @@ function applyLang(code) {
   if (view && view.id === 'view-settings') renderSettings();
   if (view && view.id === 'view-addons') renderAddons();
   if (view && view.id === 'view-overlays') window.overlayLab.render();
-  // The environment panel is data drawn from state, so a language switch has
-  // to rebuild it, not just relabel the static nodes.
-  if (view && view.id === 'view-about' && envCache) renderEnvironment(envCache);
+  // The environment panel and the update line are data drawn from state, so a
+  // language switch has to rebuild them, not just relabel the static nodes.
+  if (view && view.id === 'view-about') {
+    if (envCache) renderEnvironment(envCache);
+    refreshUpdateLine();
+  }
   // The update notice was written into the corner once, in the language of
   // the moment it appeared, so a later switch left it behind. The answer is
   // cached in the main process, so asking again is free.
@@ -1639,6 +1699,7 @@ document.addEventListener('drop', (e) => e.preventDefault());
   if (boot.payloadMissing) log(boot.payloadMissing);
   state.brand = boot;
   paintBrand();
+  $('updateResult').textContent = `v${boot.version}`;
   state.art = (await window.lab.artStatus()).available;
   // Artwork comes from Steam's public store endpoints, so there is nothing to
   // configure and nothing for the reader to act on.

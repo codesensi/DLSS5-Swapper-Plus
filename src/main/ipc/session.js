@@ -76,6 +76,14 @@ function register(ctx) {
     };
   });
 
+  // The packaged notices file sits beside the app entry (repo root in dev, the
+  // asar root once packaged). It is only read when somebody asks to see it and
+  // shown as plain text; the renderer never loads it on its own.
+  ipcMain.handle('third-party-notices', async () => {
+    try { return await fs.promises.readFile(path.join(app.getAppPath(), 'THIRD_PARTY_NOTICES.md'), 'utf8'); }
+    catch { return null; }
+  });
+
   ipcMain.handle('set-lang', (_event, lang) => {
     const state = loadState();
     state.lang = lang;
