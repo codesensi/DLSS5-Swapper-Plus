@@ -3,6 +3,7 @@
 // toggles, window controls, the driver warning barrier and the history rows.
 
 const fs = require('fs');
+const os = require('os');
 const path = require('path');
 const { pathToFileURL } = require('url');
 
@@ -53,6 +54,25 @@ function register(ctx) {
       groupGamesByStore: state.groupGamesByStore !== false,
       logoLight: asUrl('logo-light.png'),
       logoDark: asUrl('logo-dark.png')
+    };
+  });
+
+  // The About view's environment panel shows the same facts a saved diagnostics
+  // file opens with, so a screenshot and a report never disagree. GPU rows come
+  // from nvidia-smi and may not answer; that row then reads as not detected
+  // while the rest of the facts are always available.
+  ipcMain.handle('environment-info', async () => {
+    let gpu = null;
+    try { gpu = ctx.guards.driverNames(await ctx.guards.gpuInfo()); } catch { /* advice only */ }
+    const osVersion = process.platform === 'win32' ? os.version() : '';
+    return {
+      app: `v${app.getVersion()}`,
+      electron: process.versions.electron,
+      chrome: process.versions.chrome,
+      node: process.versions.node,
+      arch: process.arch,
+      os: osVersion ? `${osVersion} (${os.release()})` : `${os.type()} ${os.release()}`,
+      gpu
     };
   });
 

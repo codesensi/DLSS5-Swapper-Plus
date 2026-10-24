@@ -15,6 +15,7 @@ contextBridge.exposeInMainWorld('lab', {
   checkUpdate: (opts) => ipcRenderer.invoke('update-check', opts),
   unhide: (dir) => ipcRenderer.invoke('unhide', dir),
   boot: () => ipcRenderer.invoke('boot'),
+  environmentInfo: () => ipcRenderer.invoke('environment-info'),
   setLang: (lang) => ipcRenderer.invoke('set-lang', lang),
   setTheme: (theme) => ipcRenderer.invoke('set-theme', theme),
   window: (action) => ipcRenderer.invoke('window', action),

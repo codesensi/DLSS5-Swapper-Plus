@@ -94,6 +94,7 @@ function show(view) {
   if (view === 'settings') renderSettings();
   if (view === 'addons') renderAddons();
   if (view === 'overlays') window.overlayLab.render();
+  if (view === 'about') loadEnvironment();
 }
 
 for (const link of document.querySelectorAll('[data-project]')) {
@@ -1172,6 +1173,60 @@ function closeSheet() {
   $('overlay').classList.add('hidden');
 }
 
+// ---------------- about: environment ----------------
+
+// Same facts a saved diagnostics report opens with, so a screenshot of the
+// About view and a diagnostics file never disagree. nvidia-smi can be slow or
+// absent, so the panel is filled the moment the main process answers and a
+// missing GPU row reads as "not detected" rather than an error.
+let envCache = null;
+
+function envRow(label, value) {
+  const row = document.createElement('div');
+  row.className = 'env-row';
+  const k = document.createElement('span');
+  k.className = 'k';
+  k.textContent = label;
+  const v = document.createElement('span');
+  v.className = 'v';
+  v.textContent = value;
+  row.append(k, v);
+  return row;
+}
+
+function renderEnvironment(info) {
+  const panel = $('envPanel');
+  if (!panel || !info) return;
+  panel.replaceChildren(
+    envRow(t('envApp'), info.app),
+    envRow(t('envElectron'), `${info.electron} · Chromium ${info.chrome} · Node ${info.node}`),
+    envRow(t('envOs'), `${info.os} · ${info.arch}`),
+    envRow(t('envGpu'), info.gpu || t('envGpuNone')),
+    envRow(t('envUi'), `${state.skin === 'two' ? t('envSkinTwo') : t('envSkinOne')} · ${state.lang}`)
+  );
+}
+
+async function loadEnvironment() {
+  const panel = $('envPanel');
+  if (!panel) return;
+  if (envCache) return renderEnvironment(envCache);
+  try {
+    envCache = await window.lab.environmentInfo();
+    renderEnvironment(envCache);
+  } catch { /* a quiet empty card beats an error box on the About page */ }
+}
+
+// The text a bug report wants: the same keys the diagnostics file uses.
+function envReportText() {
+  if (!envCache) return '';
+  return [
+    `app: ${envCache.app}`,
+    `electron: ${envCache.electron} (Chromium ${envCache.chrome}, Node ${envCache.node})`,
+    `platform: ${envCache.os} (${envCache.arch})`,
+    envCache.gpu ? `gpu: ${envCache.gpu}` : null
+  ].filter(Boolean).join('\n');
+}
+
 // ---------------- events ----------------
 
 $('nav').onclick = (e) => {
@@ -1179,6 +1234,16 @@ $('nav').onclick = (e) => {
   if (b) show(b.dataset.view);
 };
 document.querySelector('.link[data-view]').onclick = () => show('games');
+
+$('copyEnv').onclick = async () => {
+  const text = envReportText();
+  if (!text) return;
+  const ok = await window.lab.copyText(text);
+  if (!ok) return;
+  const btn = $('copyEnv');
+  btn.textContent = t('envCopied');
+  setTimeout(() => { btn.textContent = t('envCopy'); }, 1500);
+};
 
 // The wordmark is black artwork, so the dark theme gets the lifted copy.
 function paintBrand() {
@@ -1215,6 +1280,9 @@ function applyLang(code) {
   if (view && view.id === 'view-settings') renderSettings();
   if (view && view.id === 'view-addons') renderAddons();
   if (view && view.id === 'view-overlays') window.overlayLab.render();
+  // The environment panel is data drawn from state, so a language switch has
+  // to rebuild it, not just relabel the static nodes.
+  if (view && view.id === 'view-about' && envCache) renderEnvironment(envCache);
   // The update notice was written into the corner once, in the language of
   // the moment it appeared, so a later switch left it behind. The answer is
   // cached in the main process, so asking again is free.

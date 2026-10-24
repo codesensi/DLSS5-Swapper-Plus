@@ -464,6 +464,14 @@ select option { background: var(--panel); color: var(--text); }
 .about-links { display: flex; flex-wrap: wrap; gap: 12px; margin: 18px 0; }
 .about-links a { text-decoration: none; }
 .about-links a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+/* Environment panel: one labelled line per fact, the same rows a saved
+   diagnostics report opens with. Values may be long paths or adapter names,
+   so the value side takes the free space and wraps instead of pushing. */
+.env p { font-size: 13px; }
+.env-row { display: flex; align-items: baseline; gap: 14px; padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 13px; line-height: 1.6; }
+.env-row:last-child { border-bottom: none; }
+.env-row .k { flex: none; min-width: 96px; color: var(--muted); font-weight: 600; }
+.env-row .v { flex: 1; min-width: 0; word-break: break-all; font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace; font-size: 12.5px; }
 
 /* ---------------- game sheet ---------------- */
 .overlay {
